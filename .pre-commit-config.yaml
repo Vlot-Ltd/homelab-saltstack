@@ -1,0 +1,70 @@
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+repos:
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v4.4.0
+  hooks:
+  - id: check-added-large-files
+  - id: check-docstring-first
+  - id: check-executables-have-shebangs
+  - id: check-merge-conflict
+  - id: check-symlinks
+  - id: check-toml
+  - id: check-xml
+  - id: detect-private-key
+  - id: mixed-line-ending
+  - id: name-tests-test
+  - id: requirements-txt-fixer
+  - id: trailing-whitespace
+- repo: https://github.com/Yelp/detect-secrets
+  rev: 'v1.4.0'
+  hooks:
+  - id: detect-secrets
+- repo: https://github.com/psf/black
+  rev: 23.3.0
+  hooks:
+  - id: black
+- repo: https://github.com/asottile/pyupgrade
+  rev: v3.4.0
+  hooks:
+  - id: pyupgrade
+- repo: https://github.com/PyCQA/bandit
+  rev: '1.7.5'
+  hooks:
+  - id: bandit
+- repo: https://github.com/jazzband/pip-tools
+  rev: '6.13.0'
+  hooks:
+  - id: pip-compile
+- repo: https://github.com/sondrelg/pep585-upgrade
+  rev: 'v1.0' # pragma: allowlist secret
+  hooks:
+  - id: upgrade-type-hints
+- repo: https://github.com/doublify/pre-commit-go
+  rev: 208a4aaa7f86b44e961eaaea526743b920e187a0 # pragma: allowlist secret
+  hooks:
+  - id: fmt
+  - id: vet
+  - id: fix
+- repo: https://github.com/doublify/pre-commit-rust
+  rev: v1.0
+  hooks:
+  - id: fmt
+  - id: cargo-check
+- repo: https://github.com/detailyang/pre-commit-shell
+  rev: 1.0.5
+  hooks:
+  - id: shell-lint
+#- repo: https://github.com/kintoandar/pre-commit.git
+  #rev: v2.1.0
+  #hooks:
+  #- id: terraform_fmt
+  #- id: terraform_validate
+- repo: https://github.com/IamTheFij/docker-pre-commit
+  rev: 'v3.0.1'
+  hooks:
+  - id: docker-compose-check
+- repo: https://github.com/ashwin153/pre-commit-vagrant
+  rev: v1.2.0
+  hooks:
+      - id: vagrant-validate
