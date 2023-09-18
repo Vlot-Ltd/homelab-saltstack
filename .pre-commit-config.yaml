@@ -68,3 +68,10 @@ repos:
   rev: v1.2.0
   hooks:
       - id: vagrant-validate
+- id: salt-lint
+  name: Salt-lint
+  description: This hook runs salt-lint.
+  entry: salt-lint
+  language: python
+  files: \.(sls)$
+---
