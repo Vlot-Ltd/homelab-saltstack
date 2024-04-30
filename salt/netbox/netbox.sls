@@ -13,7 +13,7 @@ install_netbox_requirements:
 
 generate_netbox_secret_key:
   cmd.run:
-    - name: python3 /path/to/netbox/generate_secret_key.py
+    - name: python3 /opt/netbox/netbox/generate_secret_key.py
     - cwd: /opt/netbox
     - output: grain
     - grain: netbox_secret_key
