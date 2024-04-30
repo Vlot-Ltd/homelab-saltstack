@@ -12,3 +12,5 @@ base:
     - install_qemu_agent
   'docker*':
     - install_docker
+  'netbox':
+    - netbox
