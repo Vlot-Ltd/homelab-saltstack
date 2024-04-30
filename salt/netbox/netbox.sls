@@ -11,14 +11,6 @@ install_netbox_requirements:
     - bin_env: /usr/bin/pip3
     - requirements: /opt/netbox/requirements.txt
 
-generate_netbox_secret_key:
-  cmd.run:
-    - name: python3 /opt/netbox/netbox/generate_secret_key.py
-    - cwd: /opt/netbox
-    - output: grain
-    - grain: netbox_secret_key
-    - require: clone_netbox_repo
-
 setup_netbox_config:
   file.managed:
     - name: /opt/netbox/netbox/netbox/configuration.py
@@ -30,8 +22,6 @@ setup_netbox_config:
     - user: root
     - group: root
     - mode: 644
-    - require:
-      - cmd: generate_netbox_secret_key
 
 migrate_database:
   cmd.run:
