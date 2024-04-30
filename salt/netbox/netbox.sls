@@ -17,6 +17,7 @@ generate_netbox_secret_key:
     - cwd: /opt/netbox
     - output: grain
     - grain: netbox_secret_key
+    - require: clone_netbox_repo
 
 setup_netbox_config:
   file.managed:
