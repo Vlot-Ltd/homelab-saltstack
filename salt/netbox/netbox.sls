@@ -25,7 +25,7 @@ setup_netbox_config:
     - source: salt://netbox/files/configuration.py.jinja
     - template: jinja
     - context:
-        secret_key: {{ grains['netbox_secret_key'] }}
+        secret_key: {{ pillar['netbox']['secret_key'] }}
         db_password: {{ pillar['netbox']['db_password'] }}
     - user: root
     - group: root
