@@ -1,2 +1,4 @@
 # Don't stash VIM .swp files
 .*.swp
+
+./pillar/*
