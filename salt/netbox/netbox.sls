@@ -23,10 +23,10 @@ setup_netbox_config:
     - group: root
     - mode: 644
 
-migrate_database:
+config_netbox:
   cmd.run:
-    - name: python3 manage.py migrate
-    - cwd: /opt/netbox/netbox
+    - name: upgrade.sh
+    - cwd: /opt/netbox/
     - user: root
 
 collect_static_files:
