@@ -2,3 +2,4 @@
 .*.swp
 
 ./pillar/netbox.sls
+pillar/netbox.sls
