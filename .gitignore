@@ -1,5 +1,4 @@
 # Don't stash VIM .swp files
 .*.swp
 
-./pillar
-pillar
+./pillar/netbox.sls
