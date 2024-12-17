@@ -1,16 +1,13 @@
 base: 
   'kernel:Linux':
     - match: grain
-    - base_linux
-    - install_vim
-    - linux_patch
+    - linux.base_linux
+    - linux.install_vim
   'os:MacOS':
     - match: grain
-    - brew_update
+    - mac.brew_update
   'virtual:kvm':
     - match: grain
-    - install_qemu_agent
-  'docker*':
-    - install_docker
-  'netbox':
-    - netbox
+    - linux.install_qemu_agent
+  'docker':
+    - docker.install_docker
