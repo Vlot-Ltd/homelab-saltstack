@@ -23,7 +23,7 @@
     {% set names_to_add = [minion_id, short_hostname, long_hostname] %}
 
     {% if ip not in hostmap %}
-      {% set hostmap.update({ip: names_to_add}) %}
+      {% do hostmap.update({ip: names_to_add}) %}
     {% else %}
       {% for h in names_to_add %}
         {% if h and h not in hostmap[ip] %}
@@ -39,7 +39,7 @@
   {% set ip = entry['ip'] %}
   {% set names = entry['hostnames'] %}
   {% if ip not in hostmap %}
-    {% set hostmap.update({ip: names}) %}
+    {% do hostmap.update({ip: names}) %}
   {% else %}
     {% for n in names %}
       {% if n not in hostmap[ip] %}
