@@ -1,6 +1,5 @@
 base:
   '*':
-    - extra_hosts
-  'netbox':
-    - netbox
+    - common.schedule
+    - common.extra_hosts
 
