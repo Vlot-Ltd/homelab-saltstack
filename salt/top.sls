@@ -1,4 +1,7 @@
-base: 
+base:
+  '*':
+    - hostfile
+    - mine_functions
   'kernel:Linux':
     - match: grain
     - linux.base_linux
