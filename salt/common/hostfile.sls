@@ -1,4 +1,4 @@
-{% set mine_hosts = salt['mine.get']('*', 'network.ip_addrs', 'network.get_hostname') %}
+{% set mine_hosts = salt['mine.get']('*', ['network.ip_addrs', 'network.get_hostname']) %}
 {% set extra_hosts = pillar.get('extra_hosts', []) %}
 
 {% set all_hosts = [] %}
