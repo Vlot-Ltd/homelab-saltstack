@@ -23,6 +23,16 @@ postgres_hba_config:
     - require:
       - pkg: postgresql
 
+postgres-config-listen:
+  file.replace:
+    - name: /etc/postgresql/{{ pg_version }}/main/postgresql.conf
+    - pattern: '^listen_addresses\s*=\s*.*$'
+    - repl: "listen_addresses = '*'"
+    - append_if_not_found: True
+    - require:
+        - pkg: postgresql
+
+
 postgres_service:
   service.running:
     - name: postgresql
@@ -31,3 +41,4 @@ postgres_service:
       - pkg: postgresql
     - watch:
       - file: /etc/postgresql/{{ pg_version }}/main/pg_hba.conf
+      - file: postgres-config-listen
