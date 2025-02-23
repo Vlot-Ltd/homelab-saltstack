@@ -6,10 +6,10 @@ local   all             all                                     md5
 host    all             all             127.0.0.1/32            md5
 host    all             all             ::1/128                 md5
 
-{% for db in pillar.get('postgres_databases', []) %}
+{%- for db in pillar.get('postgres_databases', []) %}
 host    {{ db.name }}    {{ db.users[0].name }}    192.168.1.0/24         md5
-{% endfor %}
+{%- endfor %}
 
-{% for mon_user in pillar.get('postgres_monitoring_users', []) %}
+{%- for mon_user in pillar.get('postgres_monitoring_users', []) %}
 host    all             {{ mon_user.name }}    192.168.1.0/24         md5
-{% endfor %}
+{%- endfor %}
