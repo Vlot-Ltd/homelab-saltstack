@@ -2,6 +2,12 @@ backup-nfs-mount:
   pkg.installed:
     - name: nfs-common
 
+/backups:
+  file.directory:
+    - user: root
+    - group: root
+    - mode: '0755'
+
   mount.mounted:
     - name: /backups
     - device: {{ salt['pillar.get']('backup_nfs_server') }}:{{ salt['pillar.get']('backup_nfs_path') }}
