@@ -15,7 +15,7 @@ postgres_package:
 postgres_hba_config:
   file.managed:
     - name: /etc/postgresql/{{ pg_version }}/main/pg_hba.conf
-    - source: salt://postgres/files/pg_hba.conf.jinja
+    - source: salt://database/postgres/files/pg_hba.conf.jinja
     - user: postgres
     - group: postgres
     - mode: '0640'
