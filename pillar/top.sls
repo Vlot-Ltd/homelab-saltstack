@@ -1,7 +1,10 @@
 base:
   '*':
     - common.schedule
-    - common.extra_hosts
+    - common.hosts
   'postgres':
     - postgres
     - application.netbox
+    - application.linkwarden
+  'docker':
+    - application.linkwarden

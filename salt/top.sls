@@ -3,15 +3,16 @@ base:
     - common
   'kernel:Linux':
     - match: grain
-    - linux.base_linux
-    - linux.install_vim
+    - os.linux.base_linux
+    - os.linux.install_vim
   'os:MacOS':
     - match: grain
-    - mac.brew_update
+    - os.mac.brew_update
   'virtual:kvm':
     - match: grain
-    - linux.install_qemu_agent
+    - os.linux.install_qemu_agent
   'docker':
-    - docker.install_docker
+    - application.docker
+    - application.linkwarden
   'postgres':
-    - postgres
+    - database.postgres
