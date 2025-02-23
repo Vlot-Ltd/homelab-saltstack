@@ -1,38 +1,41 @@
-{% for db in salt['pillar.get']('postgres_databases', []) %}
-postgres-db-{{ db.name }}:
-  cmd.run:
-    - name: >
-        sudo -u postgres psql --dbname=postgres --command='CREATE DATABASE {{ db.name }};'
-    - unless: >
-        sudo -u postgres psql --dbname=postgres --tuples-only
-        --command="SELECT datname FROM pg_database WHERE datname='{{ db.name }}';"
-    - require:
-      - service: postgresql
+{% set all_databases = salt['pillar.get']('postgres_databases', [], merge=True) %}
+{% set monitoring_users = salt['pillar.get']('postgres_monitoring_users', [], merge=True) %}
 
-{% for user in db.users %}
-postgres-user-{{ user.name }}:
+{% for db in all_databases %}
+{% if 'users' in db %}
+{% for user in db['users'] %}
+postgres-user-{{ user['name'] }}:
   cmd.run:
-    - name: >
-        sudo -u postgres psql --dbname=postgres --command='
-        CREATE USER {{ user.name }} WITH LOGIN ENCRYPTED PASSWORD ''{{ user.password }}'';'
-    - unless: >
-        sudo -u postgres psql --dbname=postgres --tuples-only
-        --command="SELECT rolname FROM pg_roles WHERE rolname='{{ user.name }}';"
-    - require:
-      - service: postgresql
-      - cmd: postgres-db-{{ db.name }}
+    - name: sudo -u postgres psql --dbname=postgres --command="CREATE USER {{ user['name'] }} WITH LOGIN ENCRYPTED PASSWORD '{{ user['password'] }}';"
+    - unless: sudo -u postgres psql -tAc "SELECT 1 FROM pg_roles WHERE rolname = '{{ user['name'] }}'; exit $?"
 
-postgres-privileges-{{ db.name }}-{{ user.name }}:
+postgres-db-{{ db['name'] }}:
   cmd.run:
-    - name: >
-        sudo -u postgres psql --dbname=postgres --command='
-        GRANT ALL PRIVILEGES ON DATABASE {{ db.name }} TO {{ user.name }};'
-    - unless: >
-        sudo -u postgres psql --dbname=postgres --tuples-only
-        --command="SELECT 1 FROM information_schema.role_table_grants
-        WHERE grantee='{{ user.name }}' AND table_catalog='{{ db.name }}';"
+    - name: sudo -u postgres psql --dbname=postgres --command="CREATE DATABASE {{ db['name'] }};"
+    - unless: sudo -u postgres psql -tAc "SELECT 1 FROM pg_database WHERE datname = '{{ db['name'] }}'; exit $?"
     - require:
-      - cmd: postgres-db-{{ db.name }}
-      - cmd: postgres-user-{{ user.name }}
+        - cmd: postgres-user-{{ user['name'] }}
+
+postgres-privileges-{{ db['name'] }}-{{ user['name'] }}:
+  cmd.run:
+    - name: sudo -u postgres psql --dbname=postgres --command="GRANT ALL PRIVILEGES ON DATABASE {{ db['name'] }} TO {{ user['name'] }};"
+    - unless: sudo -u postgres psql -tAc "SELECT has_database_privilege('{{ user['name'] }}', '{{ db['name'] }}', 'CONNECT'); exit $?"
+    - require:
+        - cmd: postgres-db-{{ db['name'] }}
 {% endfor %}
+{% endif %}
+{% endfor %}
+
+{% for mon_user in monitoring_users %}
+postgres-monitor-user-{{ mon_user['name'] }}:
+  cmd.run:
+    - name: sudo -u postgres psql --dbname=postgres --command="CREATE USER {{ mon_user['name'] }} WITH LOGIN ENCRYPTED PASSWORD '{{ mon_user['password'] }}';"
+    - unless: sudo -u postgres psql -tAc "SELECT 1 FROM pg_roles WHERE rolname = '{{ mon_user['name'] }}'; exit $?"
+
+postgres-monitor-permissions-{{ mon_user['name'] }}:
+  cmd.run:
+    - name: sudo -u postgres psql --dbname=postgres --command="GRANT pg_monitor TO {{ mon_user['name'] }};"
+    - unless: sudo -u postgres psql -tAc "SELECT 1 FROM pg_roles WHERE rolname = '{{ mon_user['name'] }}' AND pg_has_role('{{ mon_user['name'] }}', 'pg_monitor', 'USAGE'); exit $?"
+    - require:
+        - cmd: postgres-monitor-user-{{ mon_user['name'] }}
 {% endfor %}
