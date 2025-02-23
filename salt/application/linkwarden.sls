@@ -23,6 +23,7 @@ linkwarden-env:
         POSTGRES_PASSWORD={{ db_password }}
         POSTGRES_DB=linkwarden
         DATABASE_URL=postgresql://{{ db_user }}:{{ db_password }}@{{ postgres_ip }}:5432/linkwarden
+        NEXTAUTH_SECRET=5ecr£t
     - user: root
     - group: docker
     - mode: "0640"
@@ -31,7 +32,6 @@ linkwarden-docker-compose:
   file.managed:
     - name: /docker/linkwarden/docker-compose.yml
     - contents: |
-        version: "3.5"
         services:
           linkwarden:
             env_file: .env
