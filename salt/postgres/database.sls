@@ -14,6 +14,7 @@ postgres-user-{{ user.name }}:
     - unless: "sudo -u postgres psql -tAc \"SELECT 1 FROM pg_roles WHERE rolname='{{ user.name }}';\""
     - require:
       - service: postgresql
+      - cmd: postgres-db-{{ db.name }}
 
 postgres-privileges-{{ db.name }}-{{ user.name }}:
   cmd.run:
@@ -22,19 +23,4 @@ postgres-privileges-{{ db.name }}-{{ user.name }}:
       - cmd: postgres-db-{{ db.name }}
       - cmd: postgres-user-{{ user.name }}
 {% endfor %}
-{% endfor %}
-
-{% for user in salt['pillar.get']('postgres_monitoring_users', []) %}
-postgres-monitor-user-{{ user.name }}:
-  cmd.run:
-    - name: "sudo -u postgres psql -c \"CREATE USER {{ user.name }} WITH ENCRYPTED PASSWORD '{{ user.password }}';\""
-    - unless: "sudo -u postgres psql -tAc \"SELECT 1 FROM pg_roles WHERE rolname='{{ user.name }}';\""
-    - require:
-      - service: postgresql
-
-postgres-monitor-permissions-{{ user.name }}:
-  cmd.run:
-    - name: "sudo -u postgres psql -c \"GRANT pg_monitor TO {{ user.name }};\""
-    - require:
-      - cmd: postgres-monitor-user-{{ user.name }}
 {% endfor %}

@@ -2,11 +2,9 @@ backup-nfs-mount:
   pkg.installed:
     - name: nfs-common
 
-/backups:
   file.directory:
-    - user: root
-    - group: root
-    - mode: '0755'
+    - name: /backups
+    - makedirs: True
 
   mount.mounted:
     - name: /backups
@@ -14,11 +12,14 @@ backup-nfs-mount:
     - fstype: nfs
     - opts: defaults
     - persist: True
+    - require:
+      - pkg: nfs-common
+      - file: /backups
 
 postgres-backup-script:
   file.managed:
     - name: /usr/local/bin/postgres_backup.sh
-    - source: salt://postgres/files/postgres_backup.sh
+    - source: salt://postgres/postgres_backup.sh
     - mode: '0755'
     - user: root
     - group: root
@@ -32,3 +33,5 @@ postgres-backup-cron:
     - minute: '0'
     - hour: '2'
     - comment: "Daily PostgreSQL backup at 2 AM"
+    - require:
+      - file: /usr/local/bin/postgres_backup.sh
