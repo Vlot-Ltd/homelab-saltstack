@@ -40,7 +40,7 @@ linkwarden-docker-compose:
             restart: always
             image: ghcr.io/linkwarden/linkwarden:latest
             ports:
-              - "3100:3000"
+              - "3200:3000"
             volumes:
               - ./data:/data/data
     - user: root
