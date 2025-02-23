@@ -35,8 +35,8 @@ postgres-monitor-user-{{ mon_user['name'] }}:
 postgres-monitor-permissions-{{ mon_user['name'] }}:
   cmd.run:
     - name: sudo -u postgres psql --dbname=postgres --command="GRANT pg_monitor TO {{ mon_user['name'] }};"
-    - unless:
-    - sudo -u postgres psql -tAc "
+    - unless: |
+        sudo -u postgres psql -tAc "
         SELECT 1 FROM pg_roles 
         WHERE rolname = '{{ mon_user['name'] }}' 
         AND pg_has_role('{{ mon_user['name'] }}', 'pg_monitor', 'USAGE');" | grep -q 1
