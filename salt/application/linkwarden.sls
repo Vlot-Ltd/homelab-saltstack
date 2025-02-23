@@ -49,7 +49,7 @@ check-linkwarden:
   cmd.run:
     - name: docker ps -f status=running | grep -q linkwarden && echo RUNNING || echo STOPPED
     - output_loglevel: quiet
-    - stateful: True
+
 restart-linkwarden:
   cmd.run:
     - name: docker compose down && docker pull ghcr.io/linkwarden/linkwarden:latest && docker compose up -d
