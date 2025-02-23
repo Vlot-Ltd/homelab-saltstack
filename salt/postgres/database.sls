@@ -4,6 +4,7 @@ postgres-db-{{ db.name }}:
   cmd.run:
     - name: "sudo -u postgres psql -c \"CREATE DATABASE {{ db.name }};\""
     - unless: "sudo -u postgres psql -tAc \"SELECT 1 FROM pg_database WHERE datname='{{ db.name }}';\""
+    - shell: True
     - require:
       - service: postgresql
 
@@ -12,6 +13,7 @@ postgres-user-{{ user.name }}:
   cmd.run:
     - name: "sudo -u postgres psql -c \"CREATE USER {{ user.name }} WITH ENCRYPTED PASSWORD '{{ user.password }}';\""
     - unless: "sudo -u postgres psql -tAc \"SELECT 1 FROM pg_roles WHERE rolname='{{ user.name }}';\""
+    - shell: True
     - require:
       - service: postgresql
       - cmd: postgres-db-{{ db.name }}
@@ -19,6 +21,8 @@ postgres-user-{{ user.name }}:
 postgres-privileges-{{ db.name }}-{{ user.name }}:
   cmd.run:
     - name: "sudo -u postgres psql -c \"GRANT ALL PRIVILEGES ON DATABASE {{ db.name }} TO {{ user.name }};\""
+    - unless: "sudo -u postgres bash -c "psql -tAc 'SELECT 1 FROM information_schema.role_table_grants WHERE grantee = '{{ user.name }}' AND table_catalog = '{{ db.name }}';'"
+    - shell: True
     - require:
       - cmd: postgres-db-{{ db.name }}
       - cmd: postgres-user-{{ user.name }}
