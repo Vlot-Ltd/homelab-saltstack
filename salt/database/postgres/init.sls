@@ -5,8 +5,8 @@
 {% endif %}
 
 include:
-  - postgres.database
-  - postgres.backup
+  - .database
+  - .backup
 
 postgres_package:
   pkg.installed:
