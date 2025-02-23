@@ -27,6 +27,17 @@ postgres-backup-script:
       - mount: /backups
 
 postgres-backup-cron:
+  pkg.installed:
+    - name: cron
+    - require:
+      - postgres-backup-script
+
+  service.running:
+    - name: cron
+    - enable: True
+    - require:
+      - pkg: cron
+
   cron.present:
     - name: /usr/local/bin/postgres_backup.sh
     - user: postgres
@@ -35,3 +46,4 @@ postgres-backup-cron:
     - comment: "Daily PostgreSQL backup at 2 AM"
     - require:
       - file: /usr/local/bin/postgres_backup.sh
+      - service: cron
