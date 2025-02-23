@@ -1,5 +1,5 @@
 include:
-  - postgres.db
+  - postgres.database
   - postgres.backup
 
 postgres:
