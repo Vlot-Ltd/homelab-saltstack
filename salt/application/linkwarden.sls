@@ -31,7 +31,7 @@ linkwarden-env:
 
 linkwarden-docker-compose:
   file.managed:
-    - name: /dcoker/linkwarden/docker-compose.yml
+    - name: /docker/linkwarden/docker-compose.yml
     - contents: |
         version: "3.5"
         services:
