@@ -24,7 +24,7 @@ postgres_service:
 postgres_hba_config:
   file.managed:
     - name: /etc/postgresql/14/main/pg_hba.conf
-    - source: salt://postgres/pg_hba.conf.jinja
+    - source: salt://postgres/files/pg_hba.conf.jinja
     - user: postgres
     - group: postgres
     - mode: '0640'

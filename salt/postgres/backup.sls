@@ -19,7 +19,7 @@ backup-nfs-mount:
 postgres-backup-script:
   file.managed:
     - name: /usr/local/bin/postgres_backup.sh
-    - source: salt://postgres/postgres_backup.sh
+    - source: salt://postgres/files/postgres_backup.sh
     - mode: '0755'
     - user: root
     - group: root
