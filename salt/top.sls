@@ -13,3 +13,5 @@ base:
     - linux.install_qemu_agent
   'docker':
     - docker.install_docker
+  'postgres':
+    - postgres
