@@ -1,5 +1,5 @@
 include:
-  - docker
+  - application.docker
 
 {% set db_info = salt['pillar.get']('postgres_databases', []) | selectattr('name', 'equalto', 'linkwarden') | list | first %}
 {% if db_info and 'users' in db_info %}
