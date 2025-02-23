@@ -21,7 +21,7 @@ postgres_hba_config:
     - mode: '0640'
     - template: jinja
     - require:
-      - package: postgresql
+      - pkg: postgresql
 
 postgres_service:
   service.running:

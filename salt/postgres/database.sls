@@ -6,8 +6,6 @@ postgres-db-{{ db.name }}:
     - unless: "sudo -u postgres psql -tAc \"SELECT 1 FROM pg_database WHERE datname='{{ db.name }}';\""
     - require:
       - service: postgresql
-      - cmd: postgres_restart
-
 
 {% for user in db.users %}
 postgres-user-{{ user.name }}:
