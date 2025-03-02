@@ -7,6 +7,8 @@ hosts_entries:
     name: salt
   - ip: 192.168.1.5
     name: docker
+  - ip: 192.168.1.6
+    name: zabbix
   - ip: 192.168.1.7
     name: netbox
   - ip: 192.168.1.8

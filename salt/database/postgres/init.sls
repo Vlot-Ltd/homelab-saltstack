@@ -7,6 +7,7 @@
 include:
   - .database
   - .backup
+  - .maintenance
 
 postgres_package:
   pkg.installed:

@@ -14,5 +14,8 @@ base:
   'docker':
     - application.docker
     - application.linkwarden
+    - application.netbox
   'postgres':
     - database.postgres
+  'zabbix':
+    - application.zabbix.server

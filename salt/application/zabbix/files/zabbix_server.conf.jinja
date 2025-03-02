@@ -1,0 +1,4 @@
+DBHost={{ salt['pillar.get']('postgres_host', 'postgres') }}
+DBName=zabbix
+DBUser={{ salt['pillar.get']('postgres_databases')[0]['users'][0]['name'] }}
+DBPassword={{ salt['pillar.get']('postgres_databases')[0]['users'][0]['password'] }}

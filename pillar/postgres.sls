@@ -4,3 +4,9 @@ postgres_monitoring_users:
 
 backup_nfs_server: 192.168.1.2
 backup_nfs_path: /mnt/backuppool/postgres
+
+postgres_maintenance:
+  autovacuum: True
+  analyze: True
+  reindex: True
+  schedule: daily

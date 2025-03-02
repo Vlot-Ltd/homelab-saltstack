@@ -2,8 +2,8 @@
 {% set monitoring_users = salt['pillar.get']('postgres_monitoring_users', [], merge=True) %}
 
 {% for db in all_databases %}
-{% if 'users' in db %}
-{% for user in db['users'] %}
+  {% if 'users' in db and db['users']|length > 0 %}
+    {% set owner = db['users'][0]['name'] %}
 postgres-user-{{ user['name'] }}:
   cmd.run:
     - name: sudo -u postgres psql --dbname=postgres --command="CREATE USER {{ user['name'] }} WITH LOGIN ENCRYPTED PASSWORD '{{ user['password'] }}';"
@@ -22,8 +22,15 @@ postgres-privileges-{{ db['name'] }}-{{ user['name'] }}:
     - unless: sudo -u postgres psql -tAc "SELECT has_database_privilege('{{ user['name'] }}', '{{ db['name'] }}', 'CONNECT');"
     - require:
         - cmd: postgres-db-{{ db['name'] }}
-{% endfor %}
-{% endif %}
+
+postgres-db-ownership-{{ db['name'] }}:
+  cmd.run:
+    - name: sudo -u postgres psql -c "ALTER DATABASE {{ db['name'] }} OWNER TO {{ owner }};"
+    - unless: sudo -u postgres psql -tAc "SELECT pg_catalog.pg_get_userbyid(datdba) FROM pg_database WHERE datname='{{ db['name'] }}'" | grep -q {{ owner }}
+    - require:
+        - cmd: postgres-db-{{ db['name'] }}
+
+  {% endif %}
 {% endfor %}
 
 {% for mon_user in monitoring_users %}
