@@ -1,4 +1,6 @@
 hosts_entries:
+  - ip: 192.168.1.1
+    name: jellyfin
   - ip: 192.168.1.2
     name: truenas
   - ip: 192.168.1.3
