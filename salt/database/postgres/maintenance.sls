@@ -24,9 +24,8 @@ postgres-maintenance-script:
 
 postgres-maintenance-cron:
   cron.present:
-    - name: /usr/local/bin/postgres_maintenance.sh
+    - name: /usr/local/bin/postgres_maintenance.sh > /var/log/postgres_maintenance.log 2>&1
     - user: postgres
-    - cmd: /usr/local/bin/postgres_maintenance.sh > /var/log/postgres_maintenance.log 2>&1
     - minute: 0
     - hour: 0
     - require:
