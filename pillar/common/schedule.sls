@@ -1,7 +1,7 @@
 schedule:
   highstate_job:
     function: state.highstate
-    minutes: 60
+    minutes: 30
     splay: 10
     enabled: True
     maxrunning: 1

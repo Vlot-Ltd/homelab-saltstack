@@ -11,28 +11,28 @@ apply_{{ job_name }}:
     - function: {{ job_details.function }}
     - enabled: {{ job_details.enabled }}
     - maxrunning: {{ job_details.maxrunning }}
-    {%- if job_details.get('hours') %}
+    {%- if job_details.get('hours') is not none %}
     - hours: {{ job_details.hours }}
     {%- endif %}
-    {%- if job_details.get('minutes') %}
+    {%- if job_details.get('minutes') is not none %}
     - minutes: {{ job_details.minutes }}
     {%- endif %}
-    {%- if job_details.get('seconds') %}
+    {%- if job_details.get('seconds') is not none %}
     - seconds: {{ job_details.seconds }}
     {%- endif %}
-    {%- if job_details.get('cron') %}
+    {%- if job_details.get('cron') is not none %}
     - cron: {{ job_details.cron }}
     {%- endif %}
-    {%- if job_details.get('splay') %}
+    {%- if job_details.get('splay') is not none %}
     - splay: {{ job_details.splay }}
     {%- endif %}
-    {%- if job_details.get('job_args') %}
+    {%- if job_details.get('job_args') is not none %}
     - job_args: {{ job_details.job_args }}
     {%- endif %}
-    {%- if job_details.get('on_start') %}
+    {%- if job_details.get('on_start') is not none %}
     - on_start: {{ job_details.on_start }}
     {%- endif %}
-    {%- if job_details.get('return_job') %}
+    {%- if job_details.get('return_job') is not none %}
     - return_job: {{ job_details.return_job }}
     {%- endif %}
 {%- endfor %}
