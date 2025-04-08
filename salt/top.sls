@@ -8,6 +8,9 @@ base:
   'os:MacOS':
     - match: grain
     - os.mac.brew_update
+  'cpuarch:aarch64':
+    - match: grain
+    - hardware.pi
   'virtual:kvm':
     - match: grain
     - os.linux.install_qemu_agent
