@@ -26,7 +26,8 @@ postgres-maintenance-cron:
   cron.present:
     - name: /usr/local/bin/postgres_maintenance.sh
     - user: postgres
-    - job: "/usr/local/bin/postgres_maintenance.sh > /var/log/postgres_maintenance.log 2>&1"
-    - special_time: {{ schedule }}
+    - cmd: /usr/local/bin/postgres_maintenance.sh > /var/log/postgres_maintenance.log 2>&1
+    - minute: 0
+    - hour: 0
     - require:
         - file: postgres-maintenance-script
