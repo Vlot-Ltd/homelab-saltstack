@@ -17,5 +17,7 @@ hosts_entries:
     name: homeassistant
   - ip: 192.168.1.9
     name: postgres
+  - ip: 192.168.1.170
+    name: colossus
 
 default_domain: local
