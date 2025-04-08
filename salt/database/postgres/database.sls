@@ -4,6 +4,7 @@
 {% for db in all_databases %}
   {% if 'users' in db and db['users']|length > 0 %}
     {% set owner = db['users'][0]['name'] %}
+    {% for user in db['users'] %}
 postgres-user-{{ user['name'] }}:
   cmd.run:
     - name: sudo -u postgres psql --dbname=postgres --command="CREATE USER {{ user['name'] }} WITH LOGIN ENCRYPTED PASSWORD '{{ user['password'] }}';"
@@ -22,6 +23,7 @@ postgres-privileges-{{ db['name'] }}-{{ user['name'] }}:
     - unless: sudo -u postgres psql -tAc "SELECT has_database_privilege('{{ user['name'] }}', '{{ db['name'] }}', 'CONNECT');"
     - require:
         - cmd: postgres-db-{{ db['name'] }}
+    {% endfor %}
 
 postgres-db-ownership-{{ db['name'] }}:
   cmd.run:
@@ -44,8 +46,8 @@ postgres-monitor-permissions-{{ mon_user['name'] }}:
     - name: sudo -u postgres psql --dbname=postgres --command="GRANT pg_monitor TO {{ mon_user['name'] }};"
     - unless: |
         sudo -u postgres psql -tAc "
-        SELECT 1 FROM pg_roles 
-        WHERE rolname = '{{ mon_user['name'] }}' 
+        SELECT 1 FROM pg_roles
+        WHERE rolname = '{{ mon_user['name'] }}'
         AND pg_has_role('{{ mon_user['name'] }}', 'pg_monitor', 'USAGE');" | grep -q 1
     - require:
         - cmd: postgres-monitor-user-{{ mon_user['name'] }}
