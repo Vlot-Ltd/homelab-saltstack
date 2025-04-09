@@ -27,7 +27,7 @@ zabbix-server-service:
     - require:
         - file: zabbix-db-config
 
-apache2-service:
+apache2.service:
   service.running:
     - enable: True
     - require:
