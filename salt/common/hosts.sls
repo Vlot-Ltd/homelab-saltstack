@@ -5,9 +5,11 @@
   host.present:
     - name: {{ entry.name }}
     - ip: {{ entry.ip }}
+    - clean: True
 
 {{ entry.name }}-fqdn:
   host.present:
     - name: {{ entry.name }}.{{ domain }}
     - ip: {{ entry.ip }}
+    - clean: True
 {% endfor %}
