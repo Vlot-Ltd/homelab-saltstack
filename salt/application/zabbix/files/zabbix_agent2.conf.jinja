@@ -1,17 +1,21 @@
 # Managed by Salt
-Server={{ salt['pillar.get']('zabbix_agent:Server', '127.0.0.1' }}
-ServerActive={{ salt['pillar.get']('zabbix_agent:ServerActive', '127.0.0.1' }}
+Server={{ salt['pillar.get']('zabbix_agent:Server', '127.0.0.1') }}
+ServerActive={{ salt['pillar.get']('zabbix_agent:ServerActive', '127.0.0.1') }}
 HostnameItem=system.hostname
-HostMetadata=ce89dfd30092c0e1a4c752d54171a34f RedHat8 production  none
+{% set os_info = salt['grains.get']('os') + salt['grains.get']('osmajorrelease') %}
+{% set saltenv = salt['grains.get']('saltenv', 'undefined') %}
+{% set purpose = zabbix_agent.get('Purpose', '') %}
+{% set hostmetadata = zabbix_agent.get('Secret', 'default_secret') + os_info + saltenv + (':' + purpose if purpose else '') %}
+HostMetadata={{ hostmetadata }}
 
 # Defaults
-AllowKey={{ salt['pillar.get']('zabbix_agent:AllowKey', 'system.run[*]' }}
-ControlSocket={{ salt['pillar.get']('zabbix_agent:ControlSocket', '/tmp/agent.sock' }}
-ListenPort={{ salt['pillar.get']('zabbix_agent:ListenPort', 10050 }}
-LogFile={{ salt['pillar.get']('zabbix_agent:LogFile', '/var/log/zabbix/zabbix_agent2.log' }}
-LogFileSize={{ salt['pillar.get']('zabbix_agent:LogFileSize', 1024 }}
-PidFile={{ salt['pillar.get']('zabbix_agent:PidFile', '/var/run/zabbix/zabbix_agent2.pid' }}
-Timeout={{ salt['pillar.get']('zabbix_agent:Timeout', 30 }}
+AllowKey={{ salt['pillar.get']('zabbix_agent:AllowKey', 'system.run[*]') }}
+ControlSocket={{ salt['pillar.get']('zabbix_agent:ControlSocket', '/tmp/agent.sock') }}
+ListenPort={{ salt['pillar.get']('zabbix_agent:ListenPort', 10050) }}
+LogFile={{ salt['pillar.get']('zabbix_agent:LogFile', '/var/log/zabbix/zabbix_agent2.log') }}
+LogFileSize={{ salt['pillar.get']('zabbix_agent:LogFileSize', 1024) }}
+PidFile={{ salt['pillar.get']('zabbix_agent:PidFile', '/var/run/zabbix/zabbix_agent2.pid') }}
+Timeout={{ salt['pillar.get']('zabbix_agent:Timeout', 30) }}
 
 # Include directives
 {% for include_path in salt['pillar.get']('zabbix_agent:Include', []) %}

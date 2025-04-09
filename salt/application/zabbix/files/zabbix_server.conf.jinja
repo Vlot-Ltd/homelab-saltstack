@@ -6,14 +6,14 @@ DBUser={{ salt['pillar.get']('postgres_databases', [])[0].get('users', [{'name':
 DBPassword={{ salt['pillar.get']('postgres_databases', [])[0].get('users', [{'name': '', 'password': ''}])[0]['password'] }}
 
 # Defaults configuration
-AlertScriptsPath={{ salt['pillar.get']('zabbix_server:AlertScriptsPath', '/usr/lib/zabbix/alertscripts' }}
-ExternalScripts={{ salt['pillar.get']('zabbix_server:ExternalScripts', '/usr/lib/zabbix/externalscripts' }}
-LogFile={{ salt['pillar.get']('zabbix_server:LogFile', '/var/log/zabbix/zabbix_server.log' }}
-LogFileSize={{ salt['pillar.get']('zabbix_server:LogFileSize', 0 }}
-PidFile={{ salt['pillar.get']('zabbix_server:PidFile', '/var/run/zabbix/zabbix_server.pid' }}
-SNMPTrapperFile={{ salt['pillar.get']('zabbix_server:SNMPTrapperFile', '/var/log/snmptrap/snmptrap.log' }}
-SocketDir={{ salt['pillar.get']('zabbix_server:SocketDir', '/var/run/zabbix' }}
-StatsAllowedIP={{ salt['pillar.get']('zabbix_server:StatsAllowedIP', '127.0.0.1' }}
+AlertScriptsPath={{ salt['pillar.get']('zabbix_server:AlertScriptsPath', '/usr/lib/zabbix/alertscripts') }}
+ExternalScripts={{ salt['pillar.get']('zabbix_server:ExternalScripts', '/usr/lib/zabbix/externalscripts') }}
+LogFile={{ salt['pillar.get']('zabbix_server:LogFile', '/var/log/zabbix/zabbix_server.log') }}
+LogFileSize={{ salt['pillar.get']('zabbix_server:LogFileSize', 0) }}
+PidFile={{ salt['pillar.get']('zabbix_server:PidFile', '/var/run/zabbix/zabbix_server.pid') }}
+SNMPTrapperFile={{ salt['pillar.get']('zabbix_server:SNMPTrapperFile', '/var/log/snmptrap/snmptrap.log') }}
+SocketDir={{ salt['pillar.get']('zabbix_server:SocketDir', '/var/run/zabbix') }}
+StatsAllowedIP={{ salt['pillar.get']('zabbix_server:StatsAllowedIP', '127.0.0.1') }}
 
 # Server Start Process configuration
 StartAlerters={{ salt['pillar.get']('zabbix_server:StartAlerters', 2) }}
@@ -32,14 +32,14 @@ StartTrappers={{ salt['pillar.get']('zabbix_server:StartTrappers', 5) }}
 StartVMCollectors={{ salt['pillar.get']('zabbix_server:StartVMCollectors', 0) }}
 
 # Server Cache configuration
-CacheSize={{ salt['pillar.get']('zabbix_server:CacheSize', '1G' }}
-HistoryIndexCacheSize={{ salt['pillar.get']('zabbix_server:CacheSize', '1G' }}
-TrendCacheSize={{ salt['pillar.get']('zabbix_server:TrendCacheSize', '1G' }}
-ValueCacheSize={{ salt['pillar.get']('zabbix_server:ValueCacheSize', '2G' }}
-VMwareCacheSize={{ salt['pillar.get']('zabbix_server:VMwareCacheSize', '1M' }}
+CacheSize={{ salt['pillar.get']('zabbix_server:CacheSize', '1G') }}
+HistoryIndexCacheSize={{ salt['pillar.get']('zabbix_server:CacheSize', '1G') }}
+TrendCacheSize={{ salt['pillar.get']('zabbix_server:TrendCacheSize', '1G') }}
+ValueCacheSize={{ salt['pillar.get']('zabbix_server:ValueCacheSize', '2G') }}
+VMwareCacheSize={{ salt['pillar.get']('zabbix_server:VMwareCacheSize', '1M') }}
 
 # Server Timeout configuration
 HousekeepingFrequency={{ salt['pillar.get']('zabbix_server:HousekeepingFrequency', 1) }}
-UnreachablePeriod={{ salt['pillar.get']('zabbix_server:UnreachablePeriod', 30 }}
-UnreachableDelay={{ salt['pillar.get']('zabbix_server:UnreachableDelay', 60 }}
-UnavailableDelay={{ salt['pillar.get']('zabbix_server:UnavailableDelay', 300 }}
+UnreachablePeriod={{ salt['pillar.get']('zabbix_server:UnreachablePeriod', 30) }}
+UnreachableDelay={{ salt['pillar.get']('zabbix_server:UnreachableDelay', 60) }}
+UnavailableDelay={{ salt['pillar.get']('zabbix_server:UnavailableDelay', 300) }}
