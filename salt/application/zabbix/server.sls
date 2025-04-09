@@ -15,7 +15,7 @@ zabbix-server-packages:
 zabbix-db-config:
   file.managed:
     - name: /etc/zabbix/zabbix_server.conf
-    - source: salt://zabbix/files/zabbix_server.conf.jinja
+    - source: salt://application/zabbix/files/zabbix_server.conf.jinja
     - mode: "0644"
     - require:
         - pkg: zabbix-server-packages
