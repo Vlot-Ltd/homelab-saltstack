@@ -4,7 +4,7 @@ include:
 zabbix-agent2:
   pkgs.installed:
     - require:
-        - pkg: install-zabbix-release
+      - pkg: install-zabbix-release
 
 zabbix-agent2-config:
   file.managed:
@@ -12,11 +12,13 @@ zabbix-agent2-config:
     - source: salt://zabbix/files/zabbix_agent2.conf.jinja
     - mode: "0644"
     - require:
-        - pkg: zabbix-agent2
+      - pkg: zabbix-agent2
 
 zabbix-agent2-service:
   service.running:
     - name: zabbix-agent2
     - enable: True
+    - onchanges:
+      - file: zabbix-agent2-config
     - require:
-        - file: zabbix-agent2-config
+      - pkg: zabbix-agent2
