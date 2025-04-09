@@ -10,6 +10,7 @@ zabbix-agent2-config:
   file.managed:
     - name: /etc/zabbix/zabbix_agent2.conf
     - source: salt://application/zabbix/files/zabbix_agent2.conf.jinja
+    - template: jinja
     - mode: "0644"
     - require:
       - pkg: zabbix-agent2
