@@ -1,14 +1,16 @@
 include:
   - application.zabbix
 
-zabbix-packages:
+zabbix-server-packages:
   pkg.installed:
     - names:
         - zabbix-server-pgsql
         - zabbix-frontend-php
-        - zabbix-agent
+        - zabbix-sql-scripts
+        - php8.3-pgsql
+        - zabbix-apache-conf
     - require:
-        - cmd: zabbix-repo
+        - pkg: install-zabbix-release
 
 zabbix-db-config:
   file.managed:
@@ -16,11 +18,17 @@ zabbix-db-config:
     - source: salt://zabbix/files/zabbix_server.conf.jinja
     - mode: "0644"
     - require:
-        - pkg: zabbix-packages
+        - pkg: zabbix-server-packages
 
-zabbix-service:
+zabbix-server-service:
   service.running:
     - name: zabbix-server
     - enable: True
     - require:
         - file: zabbix-db-config
+
+apache2-service:
+  service-running:
+    - enable: True
+    - require:
+        - pkg: zabbix-server-packages

@@ -1,7 +1,22 @@
-zabbix-repo:
-  cmd.run:
-    - name: >
-        wget -qO- https://repo.zabbix.com/zabbix-official-repo.key | gpg --dearmor -o /usr/share/keyrings/zabbix-official-repo.gpg &&
-        echo "deb [signed-by=/usr/share/keyrings/zabbix-official-repo.gpg] https://repo.zabbix.com/zabbix/7.2/ubuntu/ $(lsb_release -cs) main" 
-        | tee /etc/apt/sources.list.d/zabbix.list
-    - creates: /etc/apt/sources.list.d/zabbix.list
+include:
+  - .repo
+
+zabbix-agent2:
+  pkgs.installed:
+    - require:
+        - pkg: install-zabbix-release
+
+zabbix-agent2-config:
+  file.managed:
+    - name: /etc/zabbix/zabbix_agent2.conf
+    - source: salt://zabbix/files/zabbix_agent2.conf.jinja
+    - mode: "0644"
+    - require:
+        - pkg: zabbix-agent2
+
+zabbix-agent2-service:
+  service.running:
+    - name: zabbix-agent2
+    - enable: True
+    - require:
+        - file: zabbix-agent2-config

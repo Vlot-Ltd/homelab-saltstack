@@ -1,4 +1,45 @@
+# Managed by Salt
+# Database configuration
 DBHost={{ salt['pillar.get']('postgres_host', 'postgres') }}
-DBName=zabbix
-DBUser={{ salt['pillar.get']('postgres_databases')[0]['users'][0]['name'] }}
-DBPassword={{ salt['pillar.get']('postgres_databases')[0]['users'][0]['password'] }}
+DBName={{ salt['pillar.get']('postgres_databases', [])[0].get('name', 'zabbix') }}
+DBUser={{ salt['pillar.get']('postgres_databases', [])[0].get('users', [{'name': '', 'password': ''}])[0]['name'] }}
+DBPassword={{ salt['pillar.get']('postgres_databases', [])[0].get('users', [{'name': '', 'password': ''}])[0]['password'] }}
+
+# Defaults configuration
+AlertScriptsPath={{ salt['pillar.get']('zabbix_server:AlertScriptsPath', '/usr/lib/zabbix/alertscripts' }}
+ExternalScripts={{ salt['pillar.get']('zabbix_server:ExternalScripts', '/usr/lib/zabbix/externalscripts' }}
+LogFile={{ salt['pillar.get']('zabbix_server:LogFile', '/var/log/zabbix/zabbix_server.log' }}
+LogFileSize={{ salt['pillar.get']('zabbix_server:LogFileSize', 0 }}
+PidFile={{ salt['pillar.get']('zabbix_server:PidFile', '/var/run/zabbix/zabbix_server.pid' }}
+SNMPTrapperFile={{ salt['pillar.get']('zabbix_server:SNMPTrapperFile', '/var/log/snmptrap/snmptrap.log' }}
+SocketDir={{ salt['pillar.get']('zabbix_server:SocketDir', '/var/run/zabbix' }}
+StatsAllowedIP={{ salt['pillar.get']('zabbix_server:StatsAllowedIP', '127.0.0.1' }}
+
+# Server Start Process configuration
+StartAlerters={{ salt['pillar.get']('zabbix_server:StartAlerters', 2) }}
+StartDiscoverers={{ salt['pillar.get']('zabbix_server:StartDiscoverers', 10) }}
+StartEsclators={{ salt['pillar.get']('zabbix_server:StartEsclators', 1) }}
+StartHTTPPollers={{ salt['pillar.get']('zabbix_server:StartHTTPPollers', 10) }}
+StartIPMIPollers={{ salt['pillar.get']('zabbix_server:StartIPMIPollers', 0) }}
+StartPingers={{ salt['pillar.get']('zabbix_server:StartPingers', 5) }}
+StartPollers={{ salt['pillar.get']('zabbix_server:StartPollers', 10) }}
+StartPollersUnreachable={{ salt['pillar.get']('zabbix_server:StartPollersUnreachable', 5) }}
+StartPreprocessors={{ salt['pillar.get']('zabbix_server:StartPreprocessors', 5) }}
+StartProxyPollers={{ salt['pillar.get']('zabbix_server:StartProxyPollers', 0) }}
+StartSNMPTrapper={{ salt['pillar.get']('zabbix_server:StartSNMPTrapper', 1) }}
+StartTimers={{ salt['pillar.get']('zabbix_server:StartTimers', 5) }}
+StartTrappers={{ salt['pillar.get']('zabbix_server:StartTrappers', 5) }}
+StartVMCollectors={{ salt['pillar.get']('zabbix_server:StartVMCollectors', 0) }}
+
+# Server Cache configuration
+CacheSize={{ salt['pillar.get']('zabbix_server:CacheSize', '1G' }}
+HistoryIndexCacheSize={{ salt['pillar.get']('zabbix_server:CacheSize', '1G' }}
+TrendCacheSize={{ salt['pillar.get']('zabbix_server:TrendCacheSize', '1G' }}
+ValueCacheSize={{ salt['pillar.get']('zabbix_server:ValueCacheSize', '2G' }}
+VMwareCacheSize={{ salt['pillar.get']('zabbix_server:VMwareCacheSize', '1M' }}
+
+# Server Timeout configuration
+HousekeepingFrequency={{ salt['pillar.get']('zabbix_server:HousekeepingFrequency', 1) }}
+UnreachablePeriod={{ salt['pillar.get']('zabbix_server:UnreachablePeriod', 30 }}
+UnreachableDelay={{ salt['pillar.get']('zabbix_server:UnreachableDelay', 60 }}
+UnavailableDelay={{ salt['pillar.get']('zabbix_server:UnavailableDelay', 300 }}
