@@ -9,7 +9,7 @@ zabbix-sql-scripts:
 
 zabbix-schema-load:
   cmd.run:
-    - name: zcat /tmp/zabbix_schema.sql.gz | sudo -u postgres psql --dbname=zabbix
+    - name: zcat /usr/share/zabbix/sql-scripts/postgresql/server.sql.gz | sudo -u postgres psql --dbname=zabbix
     - unless: sudo -u postgres psql -tAc "SELECT 1 FROM pg_tables WHERE tablename = 'zabbix_config';"
     - require:
       - pkg: zabbix-sql-scripts
