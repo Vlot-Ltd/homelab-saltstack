@@ -5,7 +5,7 @@ include:
 zabbix-sql-scripts:
   pkg.installed:
     - require:
-      - pkg: install_zabbix-release
+      - pkg: install-zabbix-release
 
 zabbix-schema-load:
   cmd.run:
