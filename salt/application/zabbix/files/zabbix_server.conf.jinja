@@ -29,7 +29,7 @@ StartProxyPollers={{ salt['pillar.get']('zabbix_server:StartProxyPollers', 0) }}
 StartSNMPTrapper={{ salt['pillar.get']('zabbix_server:StartSNMPTrapper', 1) }}
 StartTimers={{ salt['pillar.get']('zabbix_server:StartTimers', 5) }}
 StartTrappers={{ salt['pillar.get']('zabbix_server:StartTrappers', 5) }}
-StartVMWareCollectors={{ salt['pillar.get']('zabbix_server:StartVMWareCollectors', 0) }}
+StartVMwareCollectors={{ salt['pillar.get']('zabbix_server:StartVMwareCollectors', 0) }}
 
 # Server Cache configuration
 CacheSize={{ salt['pillar.get']('zabbix_server:CacheSize', '1G') }}
