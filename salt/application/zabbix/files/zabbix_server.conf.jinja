@@ -18,7 +18,7 @@ StatsAllowedIP={{ salt['pillar.get']('zabbix_server:StatsAllowedIP', '127.0.0.1'
 # Server Start Process configuration
 StartAlerters={{ salt['pillar.get']('zabbix_server:StartAlerters', 2) }}
 StartDiscoverers={{ salt['pillar.get']('zabbix_server:StartDiscoverers', 10) }}
-StartEsclators={{ salt['pillar.get']('zabbix_server:StartEsclators', 1) }}
+StartEscalators={{ salt['pillar.get']('zabbix_server:StartEscalators', 1) }}
 StartHTTPPollers={{ salt['pillar.get']('zabbix_server:StartHTTPPollers', 10) }}
 StartIPMIPollers={{ salt['pillar.get']('zabbix_server:StartIPMIPollers', 0) }}
 StartPingers={{ salt['pillar.get']('zabbix_server:StartPingers', 5) }}
@@ -29,7 +29,7 @@ StartProxyPollers={{ salt['pillar.get']('zabbix_server:StartProxyPollers', 0) }}
 StartSNMPTrapper={{ salt['pillar.get']('zabbix_server:StartSNMPTrapper', 1) }}
 StartTimers={{ salt['pillar.get']('zabbix_server:StartTimers', 5) }}
 StartTrappers={{ salt['pillar.get']('zabbix_server:StartTrappers', 5) }}
-StartVMCollectors={{ salt['pillar.get']('zabbix_server:StartVMCollectors', 0) }}
+StartVMWareCollectors={{ salt['pillar.get']('zabbix_server:StartVMWareCollectors', 0) }}
 
 # Server Cache configuration
 CacheSize={{ salt['pillar.get']('zabbix_server:CacheSize', '1G') }}
