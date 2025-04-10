@@ -56,3 +56,15 @@ set_engb_locale:
 
 fping:
   pkg.installed
+
+/usr/sbin/fping:
+  file.symlink:
+    - target: /usr/bin/fping
+    - require:
+      - pkg: fping
+
+/usr/sbin/fping6:
+  file.symlink:
+    - target: /usr/bin/fping6
+    - require:
+      - pkg: fping
