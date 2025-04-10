@@ -19,7 +19,7 @@ zabbix-agent2-service:
   service.running:
     - name: zabbix-agent2
     - enable: True
-    - onchanges:
+    - watch:
       - file: zabbix-agent2-config
     - require:
       - pkg: zabbix-agent2

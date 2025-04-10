@@ -25,8 +25,10 @@ zabbix-server-service:
   service.running:
     - name: zabbix-server
     - enable: True
+    - watch:
+      - file: zabbix-db-config
     - require:
-        - file: zabbix-db-config
+      - file: zabbix-db-config
 
 apache2.service:
   service.running:
