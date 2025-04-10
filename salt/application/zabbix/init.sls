@@ -17,7 +17,7 @@ zabbix-agent2-config:
     - template: jinja
     - mode: "0644"
     - require:
-      - pkg: zabbix-agent2
+      - pkg: zabbix-agent-packages
 
 zabbix-agent2-service:
   service.running:
@@ -26,4 +26,4 @@ zabbix-agent2-service:
     - watch:
       - file: zabbix-agent2-config
     - require:
-      - pkg: zabbix-agent2
+      - pkg: zabbix-agent-packages
