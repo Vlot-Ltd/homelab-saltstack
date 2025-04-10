@@ -3,9 +3,9 @@ install_required_packages:
     - pkgs:
       - ca-certificates
       - curl
+      - dnsutils
       - iputils-ping
       - gnupg
-      - bind-utils
       - git
       - htop
       - lshw
