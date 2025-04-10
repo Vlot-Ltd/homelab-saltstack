@@ -17,7 +17,7 @@ install_required_packages:
 
 remove_packages:
   pkg.removed:
-    pkgs:
+    - pkgs:
       - alloy
       - grafana-agent
 
