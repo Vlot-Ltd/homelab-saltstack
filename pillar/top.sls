@@ -2,6 +2,7 @@ base:
   '*':
     - common.schedule
     - common.hosts
+    - application.zabbixagent
   'postgres':
     - postgres
     - application.netbox
