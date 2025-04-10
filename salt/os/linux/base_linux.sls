@@ -3,7 +3,7 @@ install_required_packages:
     - pkgs:
       - ca-certificates
       - curl
-      - iputiles-ping
+      - iputils-ping
       - gnupg
       - vim
 
