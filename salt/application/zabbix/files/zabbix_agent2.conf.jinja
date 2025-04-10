@@ -5,7 +5,7 @@ HostnameItem=system.hostname
 {% set os_info = salt['grains.get']('os') + (salt['grains.get']('osmajorrelease') | string ) %}
 {% set saltenv = salt['grains.get']('saltenv', 'undefined') %}
 {% set purpose = salt['pillar.get']('zabbix_agent:purpose', '') %}
-{% set hostmetadata = salt['pillar.get']('Secret', 'default_secret') + os_info + saltenv + (purpose if purpose else '') %}
+{% set hostmetadata = salt['pillar.get']('Secret', 'default_secret') + ' ' + os_info + ' ' + saltenv + (' ' + purpose if purpose else '') %}
 HostMetadata={{ hostmetadata }}
 
 # Defaults
