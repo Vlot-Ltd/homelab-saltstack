@@ -33,3 +33,21 @@ apache2.service:
     - enable: True
     - require:
         - pkg: zabbix-server-packages
+
+locales-pkg:
+  pkg.installed:
+    - name: locales
+
+generate-locales:
+  cmd.run:
+    - name: locale-gen en_GB.UTF-8 en_GB en_US.UTF-8 en_US
+    - unless: locale -a | egrep "GB|US"
+    - require:
+      - pkg: locales-pkg
+
+set_engb_locale:
+  cmd.run:
+    - name: localectl set-locale LANG=en_GB.UTF-8
+    - unless: grep en_GB.UTF-8 /etc/locale.conf
+    - require:
+      - cmd: generate-locales

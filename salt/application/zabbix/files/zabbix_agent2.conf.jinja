@@ -2,7 +2,7 @@
 Server={{ salt['pillar.get']('zabbix_agent:Server', '127.0.0.1') }}
 ServerActive={{ salt['pillar.get']('zabbix_agent:ServerActive', '127.0.0.1') }}
 HostnameItem=system.hostname
-{% set os_info = salt['grains.get']('os') + str(salt['grains.get']('osmajorrelease')) %}
+{% set os_info = salt['grains.get']('os') + (salt['grains.get']('osmajorrelease') | string ) %}
 {% set saltenv = salt['grains.get']('saltenv', 'undefined') %}
 {% set purpose = zabbix_agent.get('Purpose', '') %}
 {% set hostmetadata = zabbix_agent.get('Secret', 'default_secret') + os_info + saltenv + (':' + purpose if purpose else '') %}
