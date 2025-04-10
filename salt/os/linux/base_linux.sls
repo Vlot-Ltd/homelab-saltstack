@@ -3,6 +3,7 @@ install_required_packages:
     - pkgs:
       - ca-certificates
       - curl
+      - iputiles-ping
       - gnupg
       - vim
 
@@ -16,4 +17,3 @@ install_required_packages:
         - user
         - group
         - mode
-
