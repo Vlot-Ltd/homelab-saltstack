@@ -18,7 +18,6 @@ webdriver-docker-compose:
             container_name: webdriver
             image: selenium/standalone-chrome:latest
             restart: always
-            env_file: .env
             ports:
               - "4444:4444"
               - "7900:7900"
