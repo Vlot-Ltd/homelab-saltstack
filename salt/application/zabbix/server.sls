@@ -53,3 +53,6 @@ set_engb_locale:
     - unless: grep en_GB.UTF-8 /etc/locale.conf
     - require:
       - cmd: generate-locales
+
+fping:
+  pkg.installed
