@@ -1,4 +1,5 @@
 {% set webdriver_url = salt['pillar.get']('zabbix_server:WebDriverURL', None) %}
+{% set VMwareCacheSize = salt['pillar.get']('zabbix_server:VMwareCacheSize', None %}
 
 # Managed by Salt
 # Database configuration
@@ -38,7 +39,9 @@ CacheSize={{ salt['pillar.get']('zabbix_server:CacheSize', '1G') }}
 HistoryIndexCacheSize={{ salt['pillar.get']('zabbix_server:CacheSize', '1G') }}
 TrendCacheSize={{ salt['pillar.get']('zabbix_server:TrendCacheSize', '1G') }}
 ValueCacheSize={{ salt['pillar.get']('zabbix_server:ValueCacheSize', '2G') }}
-VMwareCacheSize={{ salt['pillar.get']('zabbix_server:VMwareCacheSize', '1M') }}
+{% if VMwareCacheSize %}
+VMwareCacheSize={{ VMwareCacheSize }}
+{% endif %}
 
 # Server Timeout configuration
 HousekeepingFrequency={{ salt['pillar.get']('zabbix_server:HousekeepingFrequency', 1) }}
