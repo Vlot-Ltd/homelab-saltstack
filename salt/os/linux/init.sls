@@ -15,6 +15,12 @@ install_required_packages:
       - wget
       - zsh
 
+remove_packages:
+  pkg.removed:
+    pkgs:
+      - alloy
+      - grafana-agent
+
 /etc/apt/keyrings:
   file.directory:
     - user: root
@@ -28,3 +34,9 @@ install_required_packages:
 
 include:
   - .vim
+
+alloy:
+  user.absent
+
+grafana-agent:
+  user.absent

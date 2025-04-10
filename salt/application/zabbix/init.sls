@@ -1,8 +1,12 @@
 include:
   - .repo
 
-zabbix-agent2:
+zabbix-agent-packages:
   pkg.installed:
+    - pkgs:
+      - zabbix-agent2
+      - zabbix-sender
+      - facter
     - require:
       - pkg: install-zabbix-release
 

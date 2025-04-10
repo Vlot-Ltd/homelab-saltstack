@@ -9,6 +9,7 @@ zabbix-server-packages:
         - zabbix-sql-scripts
         - php8.3-pgsql
         - zabbix-apache-conf
+        - zabbix-get
     - require:
         - pkg: install-zabbix-release
 
