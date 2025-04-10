@@ -37,8 +37,6 @@ grafana-set-admin-password:
     - contents: |
         [security]
         admin_password = {{ salt['pillar.get']('grafana_admin_password', 'admin') }}
-    - require:
-        - service: grafana-service
     - watch_in:
         - service: grafana-service
 
@@ -86,7 +84,5 @@ grafana-datasources:
               sslmode: {{ datasource.jsonData.get('sslmode', 'disable') }}
               username: {{ datasource.jsonData.get('username', '') }}
         {% endfor %}
-    - require:
-        - service: grafana-service
     - watch_in:
         - service: grafana-service
