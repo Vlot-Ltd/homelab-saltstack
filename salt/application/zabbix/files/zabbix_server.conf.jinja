@@ -1,3 +1,5 @@
+{% set webdriver_url = salt['pillar.get']('zabbix_server:WebDriverURL', None) %}
+
 # Managed by Salt
 # Database configuration
 DBHost={{ salt['pillar.get']('postgres_host', 'postgres') }}
@@ -43,3 +45,8 @@ HousekeepingFrequency={{ salt['pillar.get']('zabbix_server:HousekeepingFrequency
 UnreachablePeriod={{ salt['pillar.get']('zabbix_server:UnreachablePeriod', 30) }}
 UnreachableDelay={{ salt['pillar.get']('zabbix_server:UnreachableDelay', 60) }}
 UnavailableDelay={{ salt['pillar.get']('zabbix_server:UnavailableDelay', 300) }}
+
+{% if webdriver_url %}
+# Webdirver configuration
+WebDriverURL={{ webdriver_url }}:4444
+{% endif %}

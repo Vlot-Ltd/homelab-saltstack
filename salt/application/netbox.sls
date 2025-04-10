@@ -33,7 +33,6 @@ netbox-docker-compose:
     - name: /docker/netbox/docker-compose.yml
     - mode: "0644"
     - contents: |
-        version: "3.5"
         services:
           netbox:
             image: netboxcommunity/netbox:latest

@@ -5,7 +5,15 @@ install_required_packages:
       - curl
       - iputils-ping
       - gnupg
-      - vim
+      - bind-utils
+      - git
+      - htop
+      - lshw
+      - lsof
+      - net-tools
+      - tree
+      - wget
+      - zsh
 
 /etc/apt/keyrings:
   file.directory:
@@ -17,3 +25,6 @@ install_required_packages:
         - user
         - group
         - mode
+
+include:
+  - .vim
