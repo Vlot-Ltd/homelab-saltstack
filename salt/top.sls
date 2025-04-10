@@ -5,6 +5,7 @@ base:
     - match: grain
     - os.linux.base_linux
     - os.linux.install_vim
+    - application.zabbix
   'os:MacOS':
     - match: grain
     - os.mac.brew_update
