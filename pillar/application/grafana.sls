@@ -4,7 +4,7 @@ grafana_datasources:
   - name: Zabbix
     type: "alexanderzobnin-zabbix-datasource"
     access: "proxy"
-    url: "http://localhost/api_jsonrpc.php"
+    url: "http://localhost/zabbix/api_jsonrpc.php"
     jsonData:
       username: "Admin"
     secureJsonData:
