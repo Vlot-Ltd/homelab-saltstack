@@ -4,7 +4,7 @@ base:
   'kernel:Linux':
     - match: grain
     - os.linux
-    - application.zabbix
+    #- application.zabbix
   'os:MacOS':
     - match: grain
     - os.mac.brew_update
