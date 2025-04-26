@@ -16,7 +16,7 @@
     - mode: '0755'
     - source: salt://hardware/zabbix_pi.sh
 
-/etc/zabbix/zabbix_agent.d/zabbix_pi.conf:
+/etc/zabbix/zabbix_agent2.d/zabbix_pi.conf:
   file.managed:
     - user: root
     - group: root
