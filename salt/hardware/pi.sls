@@ -14,11 +14,11 @@
     - user: root
     - group: root
     - mode: '0755'
-    - source: salt://hardware/pi/zabbix_pi.sh
+    - source: salt://hardware/pi/files/zabbix_pi.sh
 
 /etc/zabbix/zabbix_agent2.d/zabbix_pi.conf:
   file.managed:
     - user: root
     - group: root
     - mode: '0755'
-    - source: salt://hardware/pi/zabbix_pi.conf
+    - source: salt://hardware/pi/files/zabbix_pi.conf
