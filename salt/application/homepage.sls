@@ -1,25 +1,12 @@
 include:
   - application.docker
 
-#{% set homepage_repo = salt[I'pillar.get']('homepage_repo', 'https://github.com/yourusername/homepage-config.git') %}
-#{% set homepage_branch = salt['pillar.get']('homepage_branch', 'main') %}
-
 homepage-directory:
   file.directory:
     - name: /docker/homepage
     - user: root
     - group: docker
     - mode: "0755"
-
-#homepage-repo-clone:
-  #git.latest:
-    #- name: /docker/homepage
-    #- repository: {{ homepage_repo }}
-    #- branch: {{ homepage_branch }}
-    #- user: root
-    #- group: docker
-    #- require:
-        #- file: homepage-directory
 
 homepage-docker-compose:
   file.managed:
@@ -41,8 +28,6 @@ homepage-docker-compose:
     - user: root
     - group: docker
     - mode: "0644"
-    #- require:
-    #    - git: homepage-repo-clone
     restart: unless-stopped
 
 check-homepage:
