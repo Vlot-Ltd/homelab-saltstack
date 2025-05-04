@@ -44,3 +44,14 @@ docker-group:
         - user
         - group
         - mode
+
+# /srv/salt/docker-cleanup.sls
+
+docker-cleanup-cron:
+  cron.present:
+    - name: /usr/bin/docker system prune -af
+    - user: root
+    - minute: 0
+    - hour: 2
+    - require:
+      - pkg: docker
