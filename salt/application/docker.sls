@@ -54,4 +54,4 @@ docker-cleanup-cron:
     - minute: 0
     - hour: 2
     - require:
-      - pkg: docker
+      - pkg: install_docker_packages
