@@ -16,7 +16,7 @@ homepage-docker-compose:
         services:
           homepage:
             image: ghcr.io/gethomepage/homepage:latest
-            restart: always
+            restart: unless-stopped
             ports:
               - "0.0.0.0:3000:3000"
             volumes:
@@ -28,7 +28,6 @@ homepage-docker-compose:
     - user: root
     - group: docker
     - mode: "0644"
-    restart: unless-stopped
 
 check-homepage:
   cmd.run:
