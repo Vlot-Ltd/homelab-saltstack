@@ -21,6 +21,7 @@ homepage-docker-compose:
               - "0.0.0.0:3000:3000"
             volumes:
               - ./config:/app/config
+              - ./images:/app/public/images
             environment:
               - HOMEPAGE_ALLOWED_HOSTS=*  # Allow access from any host
               - PUID=1000
