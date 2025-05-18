@@ -1,0 +1,59 @@
+version: '3.8'
+
+services:
+  netbox:
+    image: netboxcommunity/netbox:latest
+    env_file: ./env/netbox.env
+    user: "unit:root"
+    healthcheck:
+      test: curl -f http://localhost:8080/login/ || exit 1
+      start_period: 90s
+      timeout: 3s
+      interval: 15s
+    volumes:
+      - "/docker/netbox/media:/opt/netbox/netbox/media:rw"
+      - "/docker/netbox/reports:/opt/netbox/netbox/reports:rw"
+      - "/docker/netbox/scripts:/opt/netbox/netbox/scripts:rw"
+    ports:
+      - 8000:8080
+    container_name: netbox
+    command: >
+      sh -c "
+      /opt/netbox/venv/bin/python /opt/netbox/netbox/manage.py rqworker &
+      /opt/netbox/housekeeping.sh &
+      /opt/netbox/venv/bin/gunicorn --bind 0.0.0.0:8080 --workers 5 netbox.wsgi:application
+      "
+
+  redis:
+    image: redis:8-alpine
+    command:
+      - sh
+      - -c
+      - redis-server --appendonly yes --requirepass $$REDIS_PASSWORD
+    healthcheck: &redis-healthcheck
+      test: '[ $$(redis-cli -a "$${REDIS_PASSWORD}" ping) = ''PONG'' ]'
+      start_period: 5s
+      timeout: 3s
+      interval: 1s
+      retries: 5
+    env_file: ./env/redis.env
+    volumes:
+      - "/docker/redis:/data"
+    container_name: redis
+
+  redis-cache:
+    image: redis:8-alpine
+    command:
+      - sh
+      - -c
+      - redis-server --requirepass $$REDIS_CACHE_PASSWORD
+    healthcheck:
+      test: '[ $$(redis-cli -a "$${REDIS_CACHE_PASSWORD}" ping) = ''PONG'' ]'
+      start_period: 5s
+      timeout: 3s
+      interval: 1s
+      retries: 5
+    env_file: ./env/redis-cache.env
+    volumes:
+      - "/docker/redis-cache:/data"
+    container_name: redis-cache

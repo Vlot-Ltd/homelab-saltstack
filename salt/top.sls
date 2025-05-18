@@ -15,10 +15,12 @@ base:
     - application.docker
     - application.homepage
     - application.linkwarden
-    #- application.netbox
+    - application.netbox
     - application.zabbix.webdriver
   'postgres':
     - database.postgres
     - application.zabbix.database
+'vault':
+    - application.vault
   'zabbix':
     - application.zabbix.server

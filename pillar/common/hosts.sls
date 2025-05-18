@@ -12,7 +12,7 @@ hosts_entries:
   - ip: 192.168.1.6
     name: zabbix
   - ip: 192.168.1.7
-    name: netbox
+    name: vault
   - ip: 192.168.1.8
     name: homeassistant
   - ip: 192.168.1.9
