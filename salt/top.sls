@@ -20,7 +20,7 @@ base:
   'postgres':
     - database.postgres
     - application.zabbix.database
-'vault':
+  'vault':
     - application.vault
   'zabbix':
     - application.zabbix.server
