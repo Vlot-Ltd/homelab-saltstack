@@ -18,7 +18,7 @@ install_vault:
     - name: vault
     - version: latest
     - require:
-      - pkgrepo: add_hashicorp_gpg_key
+      - pkgrepo: add_hashicorp_repo
 
 vault_config:
   file.managed:
