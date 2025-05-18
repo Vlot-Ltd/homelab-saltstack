@@ -1,8 +1,13 @@
 {% set vault_ip = salt['pillar.get']('hosts_entries', {}) | selectattr('name', 'equalto', 'vault') | map(attribute='ip') | first %}
 
-add_hashicorp_gpg_key:
+download_hashicorp_gpg_key:
+  cmd.run:
+    - name: wget -O - https://apt.releases.hashicorp.com/gpg | gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+    - unless: test -f /usr/share/keyrings/hashicorp-archive-keyring.gpg
+
+add_hashicorp_repo:
   pkgrepo.managed:
-    - name: deb [arch=amd64] https://apt.releases.hashicorp.com {{ grains['osrelease'] }} main
+    - name: deb [arch=amd64 signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com {{ grains['oscodename'] }} main
     - key_url: https://apt.releases.hashicorp.com/gpg
     - file: /etc/apt/sources.list.d/hashicorp.list
     - require_in:
