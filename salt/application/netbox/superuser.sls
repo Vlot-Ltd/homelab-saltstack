@@ -13,5 +13,3 @@ create_netbox_superuser:
         User = get_user_model();
         exit(0 if User.objects.filter(username='admin').exists() else 1);
         "
-    - require:
-        - docker_container: netbox
