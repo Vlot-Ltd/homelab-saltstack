@@ -94,7 +94,7 @@ redis-cache-env-file:
 netbox-docker-compose:
   file.managed:
     - name: /docker/netbox/docker-compose.yml
-    - source: salt://netbox/netbox-docker-compose.jinja
+    - source: salt://application/netbox/docker-compose-netbox.jinja
     - template: jinja
     - user: root
     - group: docker
