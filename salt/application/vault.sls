@@ -29,7 +29,7 @@ vault_config:
         }
 
         api_addr = "http://{{ vault_ip }}:8200"
-        cluster_addr = "https://{{ vaultvault_ip }}:8201"
+        cluster_addr = "https://{{ vault_ip }}:8201"
         ui = true
     - user: root
     - group: root
