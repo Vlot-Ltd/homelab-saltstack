@@ -8,9 +8,9 @@ include:
 {% set db_user = db_info['users'][0]['name'] if db_info and 'users' in db_info else 'netbox_user' %}
 {% set db_password = db_info['users'][0]['password'] if db_info and 'users' in db_info else 'netbox_securepassword' %}
 
-{% set netbox_secret = salt['pillar.bet']('netbox_secret', 'banananananas')
-{% set redis_cache_password = salt['pillar.get']('redis_cache_password', 'banananananas')
-{% set redis_password = salt['pillar.get']('redis_password', 'babababababa')
+{% set netbox_secret = salt['pillar.bet']('netbox_secret', 'banananananas') %}
+{% set redis_cache_password = salt['pillar.get']('redis_cache_password', 'banananananas') %}
+{% set redis_password = salt['pillar.get']('redis_password', 'babababababa') %}
 
 netbox-directory:
   file.directory:
