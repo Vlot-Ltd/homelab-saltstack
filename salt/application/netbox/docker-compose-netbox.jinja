@@ -16,9 +16,6 @@ services:
       - /docker/netbox/media:/opt/netbox/netbox/media:rw
       - /docker/netbox/reports:/opt/netbox/netbox/reports:rw
       - /docker/netbox/scripts:/opt/netbox/netbox/scripts:rw
-    ports:
-      - 8000:8080
-    container_name: netbox
   netbox-worker:
     <<: *netbox
     depends_on:
