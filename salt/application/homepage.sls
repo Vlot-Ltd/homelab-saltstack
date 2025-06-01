@@ -12,7 +12,6 @@ homepage-docker-compose:
   file.managed:
     - name: /docker/homepage/docker-compose.yml
     - contents: |
-        version: '3.8'
         services:
           homepage:
             image: ghcr.io/gethomepage/homepage:latest
