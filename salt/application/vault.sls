@@ -38,7 +38,7 @@ vault_config:
         ui = true
     - user: root
     - group: root
-    - mode: 644
+    - mode: '0644'
 
 vault_service:
   service.running:
