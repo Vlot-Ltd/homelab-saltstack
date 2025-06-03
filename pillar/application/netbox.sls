@@ -7,3 +7,5 @@ postgres_databases:
 netbox_secret: 'r(m)9nLGnz$(_q3N4z1k(EFsMCjjjzx08x9VhNVcfd%6RF#r!6DE@+V5Zk2X'
 redis_cache_password: t4Ph722qJ5QHeQ1qfu36
 redis_password: H733Kdjndks81
+superuser_password: 'YSfq#VL0c^fIUKT78dUO^t2%M'
+superuser_email: 'netbox@vlot.scot'
