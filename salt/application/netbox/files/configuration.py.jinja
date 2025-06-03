@@ -1,0 +1,185 @@
+# Managed by Salt
+#########################
+#                       #
+#   Required settings   #
+#                       #
+#########################
+
+ALLOWED_HOSTS = ['*']
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql', 
+        'NAME': 'netbox'
+        'USER': '{{ db_user }}',
+        'PASSWORD': '{{ db_password }}',
+        'HOST': '{{ postgres_ip }}',
+        'PORT': '',
+        'CONN_MAX_AGE': 300,
+    }
+}
+
+REDIS = {
+    'tasks': {
+        'HOST': 'localhost',
+        'PORT': 6379,
+        'USERNAME': '',
+        'PASSWORD': '',
+        'DATABASE': 0,
+        'SSL': False,
+    },
+    'caching': {
+        'HOST': 'localhost',
+        'PORT': 6379,
+        'USERNAME': '',
+        'PASSWORD': '',
+        'DATABASE': 1,
+        'SSL': False,
+    }
+}
+
+SECRET_KEY = '{{ netbox_secret }}'
+
+
+#########################
+#                       #
+#   Optional settings   #
+#                       #
+#########################
+
+# Specify one or more name and email address tuples representing NetBox administrators. These people will be notified of
+# application errors (assuming correct email settings are provided).
+ADMINS = [
+    # ('John Doe', 'jdoe@example.com'),
+]
+
+ALLOW_TOKEN_RETRIEVAL = False
+
+AUTH_PASSWORD_VALIDATORS = [
+    # {
+    #     'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+    #     'OPTIONS': {
+    #         'min_length': 10,
+    #     }
+    # },
+]
+
+BASE_PATH = ''
+
+CORS_ORIGIN_ALLOW_ALL = False
+CORS_ORIGIN_WHITELIST = [
+    # 'https://hostname.example.com',
+]
+CORS_ORIGIN_REGEX_WHITELIST = [
+    # r'^(https?://)?(\w+\.)?example\.com$',
+]
+
+CSRF_COOKIE_NAME = 'csrftoken'
+DEBUG = False
+DEFAULT_LANGUAGE = 'en-us'
+
+# Email settings
+EMAIL = {
+    'SERVER': 'localhost',
+    'PORT': 25,
+    'USERNAME': '',
+    'PASSWORD': '',
+    'USE_SSL': False,
+    'USE_TLS': False,
+    'TIMEOUT': 10,  # seconds
+    'FROM_EMAIL': '',
+}
+
+EXEMPT_VIEW_PERMISSIONS = [
+    # 'dcim.site',
+    # 'dcim.region',
+    # 'ipam.prefix',
+]
+
+INTERNAL_IPS = ('127.0.0.1', '::1')
+LOGGING = {}
+LOGIN_PERSISTENCE = False
+LOGIN_REQUIRED = True
+LOGIN_TIMEOUT = None
+LOGIN_FORM_HIDDEN = False
+LOGOUT_REDIRECT_URL = 'home'
+METRICS_ENABLED = True
+PLUGINS = [
+  "netbox-lists",
+  "netbox_lifecycle",
+  "netbox_inventory",
+  "netbox_topology_views"
+]
+
+PLUGINS_CONFIG = {
+  "netbox_lists": {
+    "as_cidr": True,
+    "service_primary_ips": True,
+    "summarize": True,
+    "devices_vms_attrs": [
+      ("id",),
+      ("name",),
+      ("role", "slug"),
+      ("platform", "slug"),
+      ("primary_ip", "address"),
+      ("tags",),
+    ],
+    "prometheus_vm_sd_target": (
+      ("primary_ip", "address", "ip"),
+      ("name",), # not necessary
+    ),
+    "prometheus_vm_sd_labels": {
+      "__meta_netbox_id": ("id",),
+      "__meta_netbox_name": ("name",),
+      "__meta_netbox_status": ("status",),
+      "__meta_netbox_cluster_name": ("cluster", "name"),
+      "__meta_netbox_site_name": ("site", "name"),
+      "__meta_netbox_role_name": ("role", "name"),
+      "__meta_netbox_platform_name": ("platform", "name"),
+      "__meta_netbox_primary_ip": ("primary_ip", "address", "ip"),
+      "__meta_netbox_primary_ip4": ("primary_ip4", "address", "ip"),
+      "__meta_netbox_primary_ip6": ("primary_ip6", "address", "ip"),
+    },
+    "prometheus_device_sd_target": (
+      ("primary_ip", "address", "ip"),
+      ("name",), # not necessary
+    ),
+    "prometheus_device_sd_labels": {
+      "__meta_netbox_id": ("id",),
+      "__meta_netbox_name": ("name",),
+      "__meta_netbox_status": ("status",),
+      "__meta_netbox_site_name": ("site", "name"),
+      "__meta_netbox_platform_name": ("platform", "name"),
+      "__meta_netbox_primary_ip": ("primary_ip", "address", "ip"),
+      "__meta_netbox_primary_ip4": ("primary_ip4", "address", "ip"),
+      "__meta_netbox_primary_ip6": ("primary_ip6", "address", "ip"),
+      "__meta_netbox_serial": ("serial",),
+    },
+    "prometheus_ipaddress_sd_target": (
+      ("address", "ip"),
+    ),
+    "prometheus_ipaddress_sd_labels": {
+      "__meta_netbox_id": ("id",),
+      "__meta_netbox_role": ("role",),
+      "__meta_netbox_dns_name": ("dns_name",),
+      "__meta_netbox_status": ("status",),
+    },
+  },
+  "netbox_inventory": {},
+}
+
+REMOTE_AUTH_ENABLED = False
+REMOTE_AUTH_BACKEND = 'netbox.authentication.RemoteUserBackend'
+REMOTE_AUTH_HEADER = 'HTTP_REMOTE_USER'
+REMOTE_AUTH_USER_FIRST_NAME = 'HTTP_REMOTE_USER_FIRST_NAME'
+REMOTE_AUTH_USER_LAST_NAME = 'HTTP_REMOTE_USER_LAST_NAME'
+REMOTE_AUTH_USER_EMAIL = 'HTTP_REMOTE_USER_EMAIL'
+REMOTE_AUTH_AUTO_CREATE_USER = True
+REMOTE_AUTH_DEFAULT_GROUPS = []
+REMOTE_AUTH_DEFAULT_PERMISSIONS = {}
+
+RELEASE_CHECK_URL = 'https://api.github.com/repos/netbox-community/netbox/releases'
+RQ_DEFAULT_TIMEOUT = 300
+SESSION_COOKIE_NAME = 'sessionid'
+SESSION_FILE_PATH = None
+TIME_ZONE = 'UTC'

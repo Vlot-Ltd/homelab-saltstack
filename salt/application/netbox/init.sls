@@ -1,2 +1,6 @@
-redis-server:
-  pkg.installed
+include:
+  - .redis
+  - .netbox
+  - .config
+  #- .webserver
+  #- .superuser
