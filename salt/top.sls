@@ -15,7 +15,6 @@ base:
     - application.docker
     - application.homepage
     - application.linkwarden
-    - application.netbox
     - application.zabbix.webdriver
   'postgres':
     - database.postgres
