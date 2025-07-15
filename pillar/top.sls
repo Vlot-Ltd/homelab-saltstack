@@ -10,6 +10,8 @@ base:
     - application.netbox
   'nlremote*':
     - nlremote
+  'plex':
+    - application.plex
   'postgres':
     - postgres
     - application.netbox

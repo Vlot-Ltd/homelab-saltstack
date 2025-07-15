@@ -1,0 +1,21 @@
+[project]
+name = "plex-monitoring"
+version = "1.0.0"
+description = "Plex Media Server monitoring for Zabbix"
+authors = [
+    {name = "Vlot Ltd", email = "admin@vlot.scot"}
+]
+requires-python = ">=3.12"
+dependencies = [
+    "requests>=2.31.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/Vlot-Ltd/homelab"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.uv]
+dev-dependencies = []

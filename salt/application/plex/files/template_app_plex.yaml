@@ -1,0 +1,514 @@
+zabbix_export:
+  version: '7.4'
+  template_groups:
+    - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
+      name: Templates/Applications
+  host_groups:
+    - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
+      name: Applications
+  templates:
+    - uuid: b8d9c5e0f2a14c5b9e3f7d8a1b5c8e9f
+      template: 'Plex Media Server by Zabbix agent'
+      name: 'Plex Media Server by Zabbix agent'
+      description: |
+        Monitor Plex Media Server performance, active sessions, library statistics, maintenance operations, and server health.
+        
+        This template uses Zabbix agent to collect metrics from Plex Media Server via REST API and system monitoring.
+        
+        Template features:
+        - Active streaming sessions and bandwidth monitoring
+        - Transcoding session detection and performance metrics
+        - Library content statistics with automatic discovery
+        - Server health monitoring (process, ports, web interface)
+        - Maintenance operations monitoring (backups, database health)
+        - Performance monitoring (CPU, memory, disk usage)
+        
+        Requirements:
+        - Python 3.12+ with uv virtual environment on monitored host
+        - Plex Media Server accessible from Zabbix agent
+        - Valid Plex authentication token
+        - Custom monitoring scripts deployed via Salt
+        
+        Setup:
+        1. Apply Salt state: salt 'plex' state.apply application.plex
+        2. Set template macros {$PLEX.URL} and {$PLEX.TOKEN}
+        3. Verify scripts are executable and environment is working
+        
+        You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
+        
+        Template created for Vlot Ltd homelab monitoring setup.
+      vendor:
+        name: Vlot Ltd
+        version: 7.4-1
+      groups:
+        - name: Templates/Applications
+      items:
+        # API-based monitoring
+        - uuid: c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6
+          name: 'Plex: Active streaming sessions'
+          type: ZABBIX_ACTIVE
+          key: 'plex.metric[{$PLEX.URL},{$PLEX.TOKEN},active_sessions]'
+          delay: 60s
+          value_type: NUMERIC_UNSIGNED
+          description: 'Number of active streaming sessions on Plex server'
+          tags:
+            - tag: component
+              value: plex
+            - tag: application
+              value: plex-sessions
+        - uuid: d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6c1
+          name: 'Plex: Bandwidth usage'
+          type: ZABBIX_ACTIVE
+          key: 'plex.metric[{$PLEX.URL},{$PLEX.TOKEN},bandwidth]'
+          delay: 60s
+          value_type: NUMERIC_UNSIGNED
+          units: kbps
+          description: 'Total bandwidth usage of active Plex sessions'
+          tags:
+            - tag: component
+              value: plex
+            - tag: application
+              value: plex-performance
+        - uuid: e3f4a5b6c7d8e9f0a1b2c3d4e5f6c1d2
+          name: 'Plex: Active transcoding sessions'
+          type: ZABBIX_ACTIVE
+          key: 'plex.metric[{$PLEX.URL},{$PLEX.TOKEN},transcodes]'
+          delay: 60s
+          value_type: NUMERIC_UNSIGNED
+          description: 'Number of active transcoding sessions'
+          tags:
+            - tag: component
+              value: plex
+            - tag: application
+              value: plex-performance
+        - uuid: f4a5b6c7d8e9f0a1b2c3d4e5f6c1d2e3
+          name: 'Plex: Movies count'
+          type: ZABBIX_ACTIVE
+          key: 'plex.metric[{$PLEX.URL},{$PLEX.TOKEN},movies]'
+          delay: 1h
+          value_type: NUMERIC_UNSIGNED
+          description: 'Total number of movies in Plex libraries'
+          tags:
+            - tag: component
+              value: plex
+            - tag: application
+              value: plex-library
+        - uuid: a5b6c7d8e9f0a1b2c3d4e5f6c1d2e3f4
+          name: 'Plex: TV shows count'
+          type: ZABBIX_ACTIVE
+          key: 'plex.metric[{$PLEX.URL},{$PLEX.TOKEN},shows]'
+          delay: 1h
+          value_type: NUMERIC_UNSIGNED
+          description: 'Total number of TV shows in Plex libraries'
+          tags:
+            - tag: component
+              value: plex
+            - tag: application
+              value: plex-library
+        - uuid: b6c7d8e9f0a1b2c3d4e5f6c1d2e3f4a5
+          name: 'Plex: Music artists count'
+          type: ZABBIX_ACTIVE
+          key: 'plex.metric[{$PLEX.URL},{$PLEX.TOKEN},music]'
+          delay: 1h
+          value_type: NUMERIC_UNSIGNED
+          description: 'Total number of music artists in Plex libraries'
+          tags:
+            - tag: component
+              value: plex
+            - tag: application
+              value: plex-library
+        - uuid: c7d8e9f0a1b2c3d4e5f6c1d2e3f4a5b6
+          name: 'Plex: Server version'
+          type: ZABBIX_ACTIVE
+          key: 'plex.metric[{$PLEX.URL},{$PLEX.TOKEN},server_version]'
+          delay: 1h
+          value_type: CHAR
+          description: 'Plex server version'
+          tags:
+            - tag: component
+              value: plex
+            - tag: application
+              value: plex-info
+        - uuid: d8e9f0a1b2c3d4e5f6c1d2e3f4a5b6c7
+          name: 'Plex: Users count'
+          type: ZABBIX_ACTIVE
+          key: 'plex.metric[{$PLEX.URL},{$PLEX.TOKEN},users]'
+          delay: 1h
+          value_type: NUMERIC_UNSIGNED
+          description: 'Number of Plex users (requires Plex Pass)'
+          tags:
+            - tag: component
+              value: plex
+            - tag: application
+              value: plex-users
+        # Infrastructure monitoring
+        - uuid: e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3
+          name: 'Plex: Main port check'
+          type: SIMPLE
+          key: 'net.tcp.port[{HOST.CONN},32400]'
+          delay: 60s
+          value_type: NUMERIC_UNSIGNED
+          description: 'Check if Plex main port (32400) is responding'
+          tags:
+            - tag: component
+              value: plex
+            - tag: application
+              value: plex-connectivity
+        - uuid: f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4
+          name: 'Plex: Web interface check'
+          type: SIMPLE
+          key: 'web.page.get[{$PLEX.URL}/web]'
+          delay: 300s
+          value_type: CHAR
+          description: 'HTTP check of Plex web interface availability'
+          tags:
+            - tag: component
+              value: plex
+            - tag: application
+              value: plex-web
+        - uuid: a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5
+          name: 'Plex: Web interface response time'
+          type: SIMPLE
+          key: 'web.page.perf[{$PLEX.URL}/web]'
+          delay: 300s
+          value_type: FLOAT
+          units: s
+          description: 'Response time for Plex web interface'
+          tags:
+            - tag: component
+              value: plex
+            - tag: application
+              value: plex-performance
+        - uuid: b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6
+          name: 'Plex: Process running'
+          type: ZABBIX_ACTIVE
+          key: 'proc.num[Plex Media Server]'
+          delay: 60s
+          value_type: NUMERIC_UNSIGNED
+          description: 'Number of Plex Media Server processes running'
+          tags:
+            - tag: component
+              value: plex
+            - tag: application
+              value: plex-process
+        - uuid: c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7
+          name: 'Plex: Process CPU usage'
+          type: ZABBIX_ACTIVE
+          key: 'proc.cpu.util[Plex Media Server]'
+          delay: 60s
+          value_type: FLOAT
+          units: '%'
+          description: 'CPU usage of Plex Media Server processes'
+          tags:
+            - tag: component
+              value: plex
+            - tag: application
+              value: plex-performance
+        - uuid: d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8
+          name: 'Plex: Process memory usage'
+          type: ZABBIX_ACTIVE
+          key: 'proc.mem[Plex Media Server]'
+          delay: 60s
+          value_type: NUMERIC_UNSIGNED
+          units: B
+          description: 'Memory usage of Plex Media Server processes'
+          tags:
+            - tag: component
+              value: plex
+            - tag: application
+              value: plex-performance
+        # Maintenance monitoring
+        - uuid: e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9
+          name: 'Plex: Last backup age'
+          type: ZABBIX_ACTIVE
+          key: 'plex.maintenance[backup_age]'
+          delay: 1h
+          value_type: NUMERIC_UNSIGNED
+          units: h
+          description: 'Age of last Plex backup in hours'
+          tags:
+            - tag: component
+              value: plex
+            - tag: application
+              value: plex-maintenance
+        - uuid: f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0
+          name: 'Plex: Backup count'
+          type: ZABBIX_ACTIVE
+          key: 'plex.maintenance[backup_count]'
+          delay: 1h
+          value_type: NUMERIC_UNSIGNED
+          description: 'Number of Plex backup files'
+          tags:
+            - tag: component
+              value: plex
+            - tag: application
+              value: plex-maintenance
+        - uuid: a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1
+          name: 'Plex: Total backup size'
+          type: ZABBIX_ACTIVE
+          key: 'plex.maintenance[backup_size]'
+          delay: 1h
+          value_type: NUMERIC_UNSIGNED
+          units: MB
+          description: 'Total size of all Plex backups in MB'
+          tags:
+            - tag: component
+              value: plex
+            - tag: application
+              value: plex-maintenance
+        - uuid: b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2
+          name: 'Plex: Database size'
+          type: ZABBIX_ACTIVE
+          key: 'plex.maintenance[db_size]'
+          delay: 1h
+          value_type: NUMERIC_UNSIGNED
+          units: MB
+          description: 'Plex database size in MB'
+          tags:
+            - tag: component
+              value: plex
+            - tag: application
+              value: plex-maintenance
+        - uuid: c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3
+          name: 'Plex: Database integrity'
+          type: ZABBIX_ACTIVE
+          key: 'plex.maintenance[db_integrity]'
+          delay: 6h
+          value_type: NUMERIC_UNSIGNED
+          description: 'Plex database integrity check (0=ok, 1=error)'
+          tags:
+            - tag: component
+              value: plex
+            - tag: application
+              value: plex-maintenance
+        - uuid: d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4
+          name: 'Plex: Disk usage'
+          type: ZABBIX_ACTIVE
+          key: 'plex.maintenance[disk_usage]'
+          delay: 300s
+          value_type: NUMERIC_UNSIGNED
+          units: '%'
+          description: 'Disk usage percentage for Plex data directory'
+          tags:
+            - tag: component
+              value: plex
+            - tag: application
+              value: plex-maintenance
+        - uuid: e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5
+          name: 'Plex: Cache size'
+          type: ZABBIX_ACTIVE
+          key: 'plex.maintenance[cache_size]'
+          delay: 1h
+          value_type: NUMERIC_UNSIGNED
+          units: MB
+          description: 'Plex cache directory size in MB'
+          tags:
+            - tag: component
+              value: plex
+            - tag: application
+              value: plex-maintenance
+        - uuid: f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6
+          name: 'Plex: Service uptime'
+          type: ZABBIX_ACTIVE
+          key: 'plex.maintenance[service_uptime]'
+          delay: 300s
+          value_type: NUMERIC_UNSIGNED
+          units: h
+          description: 'Plex service uptime in hours'
+          tags:
+            - tag: component
+              value: plex
+            - tag: application
+              value: plex-maintenance
+        - uuid: a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7
+          name: 'Plex: Update available'
+          type: ZABBIX_ACTIVE
+          key: 'plex.maintenance[update_available]'
+          delay: 6h
+          value_type: NUMERIC_UNSIGNED
+          description: 'Plex update available (0=no, 1=yes)'
+          tags:
+            - tag: component
+              value: plex
+            - tag: application
+              value: plex-maintenance
+      discovery_rules:
+        - uuid: e9f0a1b2c3d4e5f6c1d2e3f4a5b6c7d8
+          name: 'Plex libraries discovery'
+          type: ZABBIX_ACTIVE
+          key: 'plex.discovery[{$PLEX.URL},{$PLEX.TOKEN}]'
+          delay: 1h
+          description: 'Discovers Plex media libraries'
+          item_prototypes:
+            - uuid: f0a1b2c3d4e5f6c1d2e3f4a5b6c7d8e9
+              name: 'Plex: Library [{#LIBRARY_TITLE}] items count'
+              type: ZABBIX_ACTIVE
+              key: 'plex.library[{$PLEX.URL},{$PLEX.TOKEN},{#LIBRARY_KEY}]'
+              delay: 1h
+              value_type: NUMERIC_UNSIGNED
+              description: 'Number of items in library {#LIBRARY_TITLE}'
+              tags:
+                - tag: component
+                  value: plex
+                - tag: application
+                  value: plex-library
+                - tag: library
+                  value: '{#LIBRARY_TITLE}'
+                - tag: library_type
+                  value: '{#LIBRARY_TYPE}'
+          trigger_prototypes:
+            - uuid: a1b2c3d4e5f6c1d2e3f4a5b6c7d8e9f0
+              expression: 'change(/Plex Media Server by Zabbix agent/plex.library[{$PLEX.URL},{$PLEX.TOKEN},{#LIBRARY_KEY}])<-10'
+              name: 'Plex: Library [{#LIBRARY_TITLE}] has significantly fewer items'
+              priority: WARNING
+              description: 'The number of items in library {#LIBRARY_TITLE} has decreased by more than 10'
+              tags:
+                - tag: scope
+                  value: notice
+      triggers:
+        # API and performance triggers
+        - uuid: b2c3d4e5f6c1d2e3f4a5b6c7d8e9f0a1
+          expression: 'last(/Plex Media Server by Zabbix agent/plex.metric[{$PLEX.URL},{$PLEX.TOKEN},active_sessions])>10'
+          name: 'Plex: High number of active sessions'
+          priority: WARNING
+          description: 'More than 10 active streaming sessions detected'
+          tags:
+            - tag: scope
+              value: performance
+        - uuid: c3d4e5f6c1d2e3f4a5b6c7d8e9f0a1b2
+          expression: 'last(/Plex Media Server by Zabbix agent/plex.metric[{$PLEX.URL},{$PLEX.TOKEN},transcodes])>5'
+          name: 'Plex: High number of transcoding sessions'
+          priority: WARNING
+          description: 'More than 5 active transcoding sessions detected - may impact server performance'
+          tags:
+            - tag: scope
+              value: performance
+        - uuid: d4e5f6c1d2e3f4a5b6c7d8e9f0a1b2c3
+          expression: 'last(/Plex Media Server by Zabbix agent/plex.metric[{$PLEX.URL},{$PLEX.TOKEN},bandwidth])>50000'
+          name: 'Plex: High bandwidth usage'
+          priority: INFO
+          description: 'Plex bandwidth usage is above 50 Mbps'
+          tags:
+            - tag: scope
+              value: performance
+        - uuid: e5f6c1d2e3f4a5b6c7d8e9f0a1b2c3d4
+          expression: 'nodata(/Plex Media Server by Zabbix agent/plex.metric[{$PLEX.URL},{$PLEX.TOKEN},active_sessions],5m)=1'
+          name: 'Plex: Server API not responding'
+          priority: AVERAGE
+          description: 'Plex server is not responding to API requests'
+          tags:
+            - tag: scope
+              value: availability
+        # Infrastructure triggers
+        - uuid: f6c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5
+          expression: 'last(/Plex Media Server by Zabbix agent/net.tcp.port[{HOST.CONN},32400])=0'
+          name: 'Plex: Main port not responding'
+          priority: HIGH
+          description: 'Plex main port (32400) is not responding'
+          tags:
+            - tag: scope
+              value: availability
+        - uuid: a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2
+          expression: 'last(/Plex Media Server by Zabbix agent/proc.num[Plex Media Server])=0'
+          name: 'Plex: Process not running'
+          priority: HIGH
+          description: 'Plex Media Server process is not running'
+          tags:
+            - tag: scope
+              value: availability
+        - uuid: b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3
+          expression: 'last(/Plex Media Server by Zabbix agent/proc.cpu.util[Plex Media Server])>80'
+          name: 'Plex: High CPU usage'
+          priority: WARNING
+          description: 'Plex Media Server CPU usage is above 80%'
+          tags:
+            - tag: scope
+              value: performance
+        - uuid: c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4
+          expression: 'last(/Plex Media Server by Zabbix agent/proc.mem[Plex Media Server])>4G'
+          name: 'Plex: High memory usage'
+          priority: WARNING
+          description: 'Plex Media Server memory usage is above 4GB'
+          tags:
+            - tag: scope
+              value: performance
+        - uuid: d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5
+          expression: 'find(/Plex Media Server by Zabbix agent/web.page.get[{$PLEX.URL}/web],,"regexp","HTTP.*[45][0-9][0-9]")=1'
+          name: 'Plex: Web interface error'
+          priority: AVERAGE
+          description: 'Plex web interface returned HTTP error code'
+          tags:
+            - tag: scope
+              value: availability
+        - uuid: e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6
+          expression: 'last(/Plex Media Server by Zabbix agent/web.page.perf[{$PLEX.URL}/web])>10'
+          name: 'Plex: Slow web interface response'
+          priority: WARNING
+          description: 'Plex web interface response time is above 10 seconds'
+          tags:
+            - tag: scope
+              value: performance
+        # Maintenance triggers
+        - uuid: f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7
+          expression: 'last(/Plex Media Server by Zabbix agent/plex.maintenance[backup_age])>168'
+          name: 'Plex: Backup is too old'
+          priority: WARNING
+          description: 'Last Plex backup is older than 7 days'
+          tags:
+            - tag: scope
+              value: maintenance
+        - uuid: a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8
+          expression: 'last(/Plex Media Server by Zabbix agent/plex.maintenance[backup_age])=-1'
+          name: 'Plex: No backups found'
+          priority: HIGH
+          description: 'No Plex backups found in backup directory'
+          tags:
+            - tag: scope
+              value: maintenance
+        - uuid: b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9
+          expression: 'last(/Plex Media Server by Zabbix agent/plex.maintenance[db_integrity])=1'
+          name: 'Plex: Database integrity check failed'
+          priority: HIGH
+          description: 'Plex database integrity check failed'
+          tags:
+            - tag: scope
+              value: maintenance
+        - uuid: c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0
+          expression: 'last(/Plex Media Server by Zabbix agent/plex.maintenance[disk_usage])>90'
+          name: 'Plex: High disk usage'
+          priority: WARNING
+          description: 'Plex data directory disk usage is above 90%'
+          tags:
+            - tag: scope
+              value: performance
+        - uuid: d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1
+          expression: 'last(/Plex Media Server by Zabbix agent/plex.maintenance[cache_size])>5000'
+          name: 'Plex: Large cache size'
+          priority: INFO
+          description: 'Plex cache directory is larger than 5GB'
+          tags:
+            - tag: scope
+              value: maintenance
+        - uuid: e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2
+          expression: 'last(/Plex Media Server by Zabbix agent/plex.maintenance[service_uptime])<1'
+          name: 'Plex: Service recently restarted'
+          priority: INFO
+          description: 'Plex service was restarted less than 1 hour ago'
+          tags:
+            - tag: scope
+              value: availability
+        - uuid: f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3
+          expression: 'last(/Plex Media Server by Zabbix agent/plex.maintenance[update_available])=1'
+          name: 'Plex: Update available'
+          priority: INFO
+          description: 'A Plex update is available'
+          tags:
+            - tag: scope
+              value: maintenance
+      macros:
+        - macro: '{$PLEX.TOKEN}'
+          value: your-plex-token-here
+          description: 'Plex authentication token - get from Plex Web App network tab'
+        - macro: '{$PLEX.URL}'
+          value: 'http://192.168.1.3:32400'
+          description: 'Plex server URL including protocol and port'
