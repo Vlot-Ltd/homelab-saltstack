@@ -88,8 +88,8 @@ plex-zabbix-config:
     - mode: '0644'
     - user: root
     - group: root
-    - watch_in:
-      - service: zabbix-agent2
+    #- watch_in:
+    #  - service: zabbix-agent2
     - require:
       - file: plex-monitoring-symlink
       - file: plex-maintenance-monitoring-symlink
