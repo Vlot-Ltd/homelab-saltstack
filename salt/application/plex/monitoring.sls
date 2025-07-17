@@ -29,7 +29,7 @@ setup-plex-monitoring-env:
   cmd.run:
     - name: |
         cd /opt/plex-monitoring
-        /root/.cargo/bin/uv sync
+        /root/.local/bin/uv sync
     - creates: /opt/plex-monitoring/.venv/bin/python
     - require:
       - cmd: install-uv
