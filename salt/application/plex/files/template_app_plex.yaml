@@ -510,5 +510,5 @@ zabbix_export:
           value: your-plex-token-here
           description: 'Plex authentication token - get from Plex Web App network tab'
         - macro: '{$PLEX.URL}'
-          value: 'http://192.168.1.3:32400'
+          value: 'http://192.168.0.28:32400'
           description: 'Plex server URL including protocol and port'

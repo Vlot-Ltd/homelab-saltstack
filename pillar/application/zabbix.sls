@@ -7,4 +7,4 @@ postgres_databases:
 zabbix_server:
   StartSNMPTrappers: 0
   ValueCacheSize: '1G'
-  WebDriverURL: '192.168.1.5'
+  WebDriverURL: '192.168.0.20'

@@ -1,4 +1,4 @@
-{% set plex_url = salt['pillar.get']('plex_url', 'http://192.168.1.3:32400') %}
+{% set plex_url = salt['pillar.get']('plex_url', 'http://192.168.0.28:32400') %}
 {% set plex_token = salt['pillar.get']('plex_token', '') %}
 
 install-uv:
