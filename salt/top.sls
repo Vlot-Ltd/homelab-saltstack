@@ -13,6 +13,7 @@ base:
     - os.linux.qemu_agent
   'docker':
     - application.docker
+    - application.fing
     - application.homepage
     - application.linkwarden
     - application.zabbix.webdriver
