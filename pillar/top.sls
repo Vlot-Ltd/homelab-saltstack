@@ -5,7 +5,6 @@ base:
     - application.zabbixagent
   'docker':
     - application.linkwarden
-    - application.webdriver
   'netbox':
     - application.netbox
   'nlremote*':

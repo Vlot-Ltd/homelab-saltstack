@@ -16,7 +16,7 @@ base:
     - application.fing
     - application.homepage
     - application.linkwarden
-    - application.zabbix.webdriver
+    - application.webdriver
   'postgres':
     - database.postgres
     - application.zabbix.database
