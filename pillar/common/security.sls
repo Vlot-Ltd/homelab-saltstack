@@ -8,8 +8,8 @@ heimdall2_reporting:
   url: "http://docker:8080"
   
   # API key for uploading scan results
-  # Generate this from Heimdall2 web interface: User Settings -> API Keys
-  api_key: ""
+  # Generated programmatically via API login
+  api_key: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJrZXlJZCI6IjIiLCJjcmVhdGVkQXQiOiIyMDI1LTA4LTI0VDE3OjM2OjMwLjYyN1oiLCJpYXQiOjE3NTYwNTY5OTB9.lMnRkZzk53hruUhfsCUwlVymvER_KH6SGOU66YNdBs0"
   
   # Optional: Alternative URL for external access
   # external_url: "https://heimdall.yourdomain.com"
