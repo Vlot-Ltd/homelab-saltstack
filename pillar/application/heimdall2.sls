@@ -21,4 +21,4 @@ heimdall2:
   # ldap_binddn: cn=admin,dc=example,dc=com
   # ldap_password: ldap_password
   # ldap_searchbase: ou=users,dc=example,dc=com
-  # ldap_searchfilter: (uid={{username}})
+  # ldap_searchfilter: "(uid={username})"
