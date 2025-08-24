@@ -19,9 +19,7 @@ services:
       NGINX_HOST: ${NGINX_HOST}
     volumes:
       - ./nginx/conf/:/etc/nginx/templates/
-      - ./nginx/certs/:/etc/nginx/certs/
     ports:
-      - "8443:443"
       - "8080:80"
     depends_on:
       - server
