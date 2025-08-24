@@ -1,5 +1,3 @@
-{% from 'common/map.jinja' import common with context %}
-
 include:
   - application.docker
 

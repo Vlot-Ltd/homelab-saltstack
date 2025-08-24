@@ -1,5 +1,3 @@
-{% from 'common/map.jinja' import common with context %}
-
 # Time synchronization configuration for Ubuntu/Raspbian systems
 
 # Install NTP packages
