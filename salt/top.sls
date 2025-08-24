@@ -14,6 +14,7 @@ base:
   'docker':
     - application.docker
     - application.fing
+    - application.heimdall2
     - application.homepage
     - application.linkwarden
     - application.webdriver
