@@ -15,17 +15,20 @@ saf_cli:
     - require:
       - pkg: nodejs
 
-# Install Chef InSpec using gem (more reliable than apt repo)
+# Install Chef InSpec using direct download (most reliable)
 inspec_ruby:
   pkg.installed:
     - names:
       - ruby
       - ruby-dev
       - build-essential
+      - curl
 
-inspec:
-  gem.installed:
-    - name: inspec
+inspec_download:
+  cmd.run:
+    - name: |
+        curl -L https://omnitruck.chef.io/install.sh | bash -s -- -P inspec
+    - creates: /usr/bin/inspec
     - require:
       - pkg: inspec_ruby
 
