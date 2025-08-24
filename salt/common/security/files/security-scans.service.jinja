@@ -1,0 +1,30 @@
+[Unit]
+Description=Automated Security Scanning Service
+After=network.target
+
+[Service]
+Type=oneshot
+ExecStart=/opt/security-scans/scripts/run_security_scans.sh
+User=root
+Group=root
+StandardOutput=journal
+StandardError=journal
+
+# Security settings
+PrivateTmp=yes
+ProtectSystem=strict
+ReadWritePaths=/opt/security-scans
+ProtectHome=yes
+NoNewPrivileges=yes
+PrivateDevices=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+
+# Resource limits
+TimeoutStartSec=1800
+MemoryLimit=2G
+CPUQuota=50%
+
+[Install]
+WantedBy=multi-user.target

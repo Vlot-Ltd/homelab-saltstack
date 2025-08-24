@@ -1,0 +1,58 @@
+services:
+  certs:
+    image: registry.access.redhat.com/ubi9/ubi:latest
+    container_name: heimdall2-certs
+    restart: unless-stopped
+    command: sh -c "sh /etc/pki/ca-trust/source/anchors/dodcerts.sh && update-ca-trust && tail -f /dev/null"
+    volumes:
+      - type: volume
+        source: cert_bundles
+        target: /etc/pki/ca-trust/extracted/
+      - type: bind
+        source: ./certs/
+        target: /etc/pki/ca-trust/source/anchors/
+    networks:
+      - heimdall2-network
+
+  server:
+    image: mitre/heimdall2:release-latest
+    container_name: heimdall2-server
+    restart: unless-stopped
+    env_file: .env
+    expose:
+      - "3000"
+    volumes:
+      - type: volume
+        source: cert_bundles
+        target: /etc/pki/ca-trust/extracted/
+        read_only: true
+        volume:
+          nocopy: true
+    depends_on:
+      - certs
+    networks:
+      - heimdall2-network
+
+  nginx:
+    image: nginx:alpine
+    container_name: heimdall2-nginx
+    restart: unless-stopped
+    environment:
+      NGINX_HOST: ${NGINX_HOST}
+    volumes:
+      - ./nginx/conf/:/etc/nginx/templates/
+      - ./nginx/certs/:/etc/nginx/certs/
+    ports:
+      - "8443:443"
+      - "8080:80"
+    depends_on:
+      - server
+    networks:
+      - heimdall2-network
+
+volumes:
+  cert_bundles:
+
+networks:
+  heimdall2-network:
+    driver: bridge

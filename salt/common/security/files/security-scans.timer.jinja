@@ -1,0 +1,14 @@
+[Unit]
+Description=Run Security Scans Daily
+Requires=security-scans.service
+
+[Timer]
+# Run daily at 2 AM
+OnCalendar=daily
+# Randomize start time by up to 1 hour to avoid system load spikes
+RandomizedDelaySec=3600
+# Run if missed (e.g., system was off)
+Persistent=true
+
+[Install]
+WantedBy=timers.target

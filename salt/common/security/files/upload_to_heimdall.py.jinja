@@ -1,0 +1,137 @@
+#!/usr/bin/env python3
+"""
+Upload security scan results to MITRE Heimdall2
+"""
+
+import argparse
+import json
+import sys
+import requests
+from pathlib import Path
+import urllib3
+
+# Disable SSL warnings for self-signed certificates
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+def upload_to_heimdall(file_path, heimdall_url, api_key, title=None):
+    """
+    Upload HDF file to Heimdall2 server
+    """
+    
+    # Prepare the API endpoint
+    api_endpoint = f"{heimdall_url}/api/v1/evaluations"
+    
+    # Read the HDF file
+    try:
+        with open(file_path, 'r') as f:
+            hdf_data = json.load(f)
+    except (IOError, json.JSONDecodeError) as e:
+        print(f"Error reading HDF file: {e}")
+        return False
+    
+    # Prepare the upload payload
+    if not title:
+        title = Path(file_path).stem
+    
+    payload = {
+        "data": hdf_data,
+        "filename": Path(file_path).name,
+        "public": False,
+        "evaluationTags": [
+            "automated-scan",
+            "ubuntu",
+            "compliance"
+        ]
+    }
+    
+    # Prepare headers
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json"
+    }
+    
+    # Upload to Heimdall2
+    try:
+        print(f"Uploading {file_path} to {heimdall_url}...")
+        
+        response = requests.post(
+            api_endpoint,
+            json=payload,
+            headers=headers,
+            verify=False,  # Skip SSL verification for self-signed certs
+            timeout=60
+        )
+        
+        if response.status_code in [200, 201]:
+            print(f"✓ Successfully uploaded: {title}")
+            
+            # Try to get the evaluation ID from response
+            try:
+                result = response.json()
+                if 'id' in result:
+                    print(f"  Evaluation ID: {result['id']}")
+            except json.JSONDecodeError:
+                pass
+                
+            return True
+        else:
+            print(f"✗ Upload failed with status {response.status_code}")
+            print(f"  Response: {response.text}")
+            return False
+            
+    except requests.exceptions.RequestException as e:
+        print(f"✗ Upload failed with error: {e}")
+        return False
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="Upload HDF files to MITRE Heimdall2"
+    )
+    
+    parser.add_argument(
+        "--file", "-f",
+        required=True,
+        help="Path to HDF JSON file"
+    )
+    
+    parser.add_argument(
+        "--url", "-u", 
+        required=True,
+        help="Heimdall2 server URL (e.g., https://localhost:8443)"
+    )
+    
+    parser.add_argument(
+        "--api-key", "-k",
+        required=True,
+        help="Heimdall2 API key"
+    )
+    
+    parser.add_argument(
+        "--title", "-t",
+        help="Title for the evaluation (default: filename)"
+    )
+    
+    args = parser.parse_args()
+    
+    # Validate file exists
+    if not Path(args.file).exists():
+        print(f"Error: File {args.file} does not exist")
+        sys.exit(1)
+    
+    # Validate URL format
+    if not args.url.startswith(('http://', 'https://')):
+        print("Error: URL must start with http:// or https://")
+        sys.exit(1)
+    
+    # Upload the file
+    success = upload_to_heimdall(
+        args.file,
+        args.url.rstrip('/'),  # Remove trailing slash
+        args.api_key,
+        args.title
+    )
+    
+    sys.exit(0 if success else 1)
+
+if __name__ == "__main__":
+    main()

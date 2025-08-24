@@ -1,0 +1,29 @@
+#!/bin/bash
+#
+# Hardware clock synchronization script for Proxmox VMs
+# Managed by Salt
+#
+# This script ensures the hardware clock stays synchronized with system time
+# Especially important for VMs that may experience clock drift
+#
+
+# Exit on any error
+set -e
+
+# Check if we're running as root
+if [[ $EUID -ne 0 ]]; then
+    echo "This script must be run as root" >&2
+    exit 1
+fi
+
+# Check if system time is synchronized
+if timedatectl status | grep -q "System clock synchronized: yes"; then
+    # Sync hardware clock to system time
+    hwclock --systohc --utc
+    
+    # Log the sync (optional)
+    logger "hwclock-sync: Hardware clock synchronized with system time"
+else
+    # Log that sync was skipped due to unsynchronized system time
+    logger "hwclock-sync: Skipping hardware clock sync - system time not synchronized"
+fi

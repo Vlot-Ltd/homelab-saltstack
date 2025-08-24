@@ -1,0 +1,166 @@
+#!/bin/bash
+#
+# Security scanning script for Ubuntu systems
+# Runs InSpec profiles, converts to HDF format, and uploads to Heimdall2
+#
+
+set -e
+
+# Configuration
+SCAN_DIR="/opt/security-scans"
+RESULTS_DIR="${SCAN_DIR}/results"
+PROFILES_DIR="${SCAN_DIR}/profiles"
+TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+HOSTNAME=$(hostname)
+HEIMDALL_URL="{{ pillar.get('heimdall2_reporting', {}).get('url', 'https://localhost:8443') }}"
+HEIMDALL_API_KEY="{{ pillar.get('heimdall2_reporting', {}).get('api_key', '') }}"
+
+# Create timestamped results directory
+CURRENT_RESULTS="${RESULTS_DIR}/${TIMESTAMP}"
+mkdir -p "${CURRENT_RESULTS}"
+
+echo "Starting security scans at $(date)"
+echo "Results will be saved to: ${CURRENT_RESULTS}"
+
+# Function to run InSpec profile and convert to HDF
+run_inspec_scan() {
+    local profile_name="$1"
+    local profile_path="$2"
+    local output_file="${CURRENT_RESULTS}/${profile_name}_${HOSTNAME}_${TIMESTAMP}"
+    
+    echo "Running InSpec profile: ${profile_name}"
+    
+    # Run InSpec and save raw JSON results
+    if inspec exec "${profile_path}" --reporter=json > "${output_file}_raw.json" 2>/dev/null; then
+        echo "✓ InSpec scan completed: ${profile_name}"
+        
+        # Convert to HDF format using SAF CLI
+        if saf convert inspec2hdf -i "${output_file}_raw.json" -o "${output_file}_hdf.json" 2>/dev/null; then
+            echo "✓ Converted to HDF format: ${profile_name}"
+            
+            # Upload to Heimdall2 if API key is configured
+            if [[ -n "${HEIMDALL_API_KEY}" ]]; then
+                python3 "${SCAN_DIR}/scripts/upload_to_heimdall.py" \
+                    --file "${output_file}_hdf.json" \
+                    --url "${HEIMDALL_URL}" \
+                    --api-key "${HEIMDALL_API_KEY}" \
+                    --title "${profile_name}_${HOSTNAME}_${TIMESTAMP}"
+            fi
+        else
+            echo "✗ Failed to convert to HDF format: ${profile_name}"
+        fi
+    else
+        echo "✗ InSpec scan failed: ${profile_name}"
+    fi
+}
+
+# Function to run OWASP ZAP scan (if web services are detected)
+run_zap_scan() {
+    local target_url="$1"
+    local output_file="${CURRENT_RESULTS}/zap_${HOSTNAME}_${TIMESTAMP}"
+    
+    echo "Running OWASP ZAP scan against: ${target_url}"
+    
+    # Run ZAP baseline scan
+    if /usr/local/bin/zap.sh -cmd -quickurl "${target_url}" -quickout "${output_file}_raw.json" -quickprogress 2>/dev/null; then
+        echo "✓ OWASP ZAP scan completed"
+        
+        # Convert to HDF format
+        if saf convert zap2hdf -i "${output_file}_raw.json" -o "${output_file}_hdf.json" 2>/dev/null; then
+            echo "✓ Converted ZAP results to HDF format"
+            
+            # Upload to Heimdall2
+            if [[ -n "${HEIMDALL_API_KEY}" ]]; then
+                python3 "${SCAN_DIR}/scripts/upload_to_heimdall.py" \
+                    --file "${output_file}_hdf.json" \
+                    --url "${HEIMDALL_URL}" \
+                    --api-key "${HEIMDALL_API_KEY}" \
+                    --title "ZAP_${target_url}_${HOSTNAME}_${TIMESTAMP}"
+            fi
+        else
+            echo "✗ Failed to convert ZAP results to HDF format"
+        fi
+    else
+        echo "✗ OWASP ZAP scan failed"
+    fi
+}
+
+# Run system hardening scans
+echo "=== Running System Hardening Scans ==="
+
+# CIS Ubuntu Benchmark
+if [[ -d "${PROFILES_DIR}/cis-ubuntu" ]]; then
+    run_inspec_scan "cis-ubuntu" "${PROFILES_DIR}/cis-ubuntu"
+fi
+
+# Linux Baseline (dev-sec)
+if [[ -d "${PROFILES_DIR}/linux-baseline" ]]; then
+    run_inspec_scan "linux-baseline" "${PROFILES_DIR}/linux-baseline"
+fi
+
+# SSH Hardening Baseline
+if [[ -d "${PROFILES_DIR}/ssh-baseline" ]]; then
+    run_inspec_scan "ssh-baseline" "${PROFILES_DIR}/ssh-baseline"
+fi
+
+# Run web application scans if web services are detected
+echo "=== Checking for Web Services ==="
+WEB_SERVICES=$(netstat -tulnp | grep -E ':80|:443|:8080|:8443|:3000|:3200' | awk '{print $4}' | cut -d: -f2 | sort -u)
+
+if [[ -n "${WEB_SERVICES}" ]]; then
+    echo "Web services detected on ports: ${WEB_SERVICES}"
+    
+    # Scan localhost web services
+    for port in ${WEB_SERVICES}; do
+        case ${port} in
+            80|8080)
+                run_zap_scan "http://localhost:${port}"
+                ;;
+            443|8443)
+                run_zap_scan "https://localhost:${port}"
+                ;;
+            3000|3200)
+                run_zap_scan "http://localhost:${port}"
+                ;;
+        esac
+    done
+else
+    echo "No web services detected"
+fi
+
+# Run additional security tools
+echo "=== Running Additional Security Tools ==="
+
+# Lynis system audit
+echo "Running Lynis system audit..."
+lynis audit system --quiet --no-colors > "${CURRENT_RESULTS}/lynis_${HOSTNAME}_${TIMESTAMP}.txt" 2>/dev/null || true
+
+# RKHunter rootkit scan
+echo "Running RKHunter scan..."
+rkhunter --check --skip-keypress --report-warnings-only > "${CURRENT_RESULTS}/rkhunter_${HOSTNAME}_${TIMESTAMP}.txt" 2>/dev/null || true
+
+# Generate summary report
+echo "=== Generating Summary Report ==="
+SUMMARY_FILE="${CURRENT_RESULTS}/scan_summary_${HOSTNAME}_${TIMESTAMP}.txt"
+
+cat > "${SUMMARY_FILE}" << EOF
+Security Scan Summary
+====================
+Hostname: ${HOSTNAME}
+Date: $(date)
+Scan Directory: ${CURRENT_RESULTS}
+
+Files Generated:
+$(ls -la "${CURRENT_RESULTS}")
+
+HDF Files Ready for Heimdall2:
+$(find "${CURRENT_RESULTS}" -name "*_hdf.json" -exec basename {} \;)
+EOF
+
+echo "✓ Security scans completed successfully"
+echo "Results saved to: ${CURRENT_RESULTS}"
+
+# Clean up old results (keep last 30 days)
+find "${RESULTS_DIR}" -type d -name "20*" -mtime +30 -exec rm -rf {} \; 2>/dev/null || true
+
+echo "Scan completed at $(date)"

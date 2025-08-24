@@ -1,0 +1,19 @@
+# Managed by Salt
+# systemd-timesyncd configuration
+
+[Time]
+# Primary NTP servers
+NTP={{ pillar.get('ntp_servers', ['0.ubuntu.pool.ntp.org', '1.ubuntu.pool.ntp.org', '2.ubuntu.pool.ntp.org', '3.ubuntu.pool.ntp.org']) | join(' ') }}
+
+# Fallback NTP servers
+FallbackNTP={{ pillar.get('fallback_ntp_servers', ['time.cloudflare.com', 'time.google.com', 'pool.ntp.org']) | join(' ') }}
+
+# Root distance maximum
+RootDistanceMaxSec={{ pillar.get('ntp_root_distance_max', '5') }}
+
+# Poll interval (seconds)
+PollIntervalMinSec={{ pillar.get('ntp_poll_min', '32') }}
+PollIntervalMaxSec={{ pillar.get('ntp_poll_max', '2048') }}
+
+# Connection retry attempts
+ConnectionRetrySec={{ pillar.get('ntp_connection_retry', '30') }}
