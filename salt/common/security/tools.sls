@@ -1,13 +1,7 @@
 # Security scanning tools installation
 
 # Install Node.js (required for SAF CLI)
-nodejs_repo:
-  pkgrepo.managed:
-    - name: deb https://deb.nodesource.com/node_18.x {{ grains['oscodename'] }} main
-    - key_url: https://deb.nodesource.com/gpgkey/nodesource.gpg.key
-    - require_in:
-      - pkg: nodejs
-
+# Use Ubuntu's default Node.js for better compatibility with 24.04
 nodejs:
   pkg.installed:
     - names:
@@ -21,17 +15,19 @@ saf_cli:
     - require:
       - pkg: nodejs
 
-# Install Chef InSpec
-chef_inspec_repo:
-  pkgrepo.managed:
-    - name: deb https://packages.chef.io/repos/apt/stable {{ grains['oscodename'] }} main
-    - key_url: https://packages.chef.io/chef.asc
-    - require_in:
-      - pkg: inspec
+# Install Chef InSpec using gem (more reliable than apt repo)
+inspec_ruby:
+  pkg.installed:
+    - names:
+      - ruby
+      - ruby-dev
+      - build-essential
 
 inspec:
-  pkg.installed:
+  gem.installed:
     - name: inspec
+    - require:
+      - pkg: inspec_ruby
 
 # Create security scanning directory
 security_scan_directory:
@@ -79,8 +75,8 @@ security_profiles_directory:
 owasp_zap:
   archive.extracted:
     - name: /opt/zap
-    - source: https://github.com/zaproxy/zaproxy/releases/download/v2.14.0/ZAP_2.14.0_Linux.tar.gz
-    - source_hash: sha256=c7c5b7b3e8d6d2e1f3c4a5b6e7f8g9h0i1j2k3l4m5n6o7p8q9r0s1t2u3v4w5x6
+    - source: https://github.com/zaproxy/zaproxy/releases/download/v2.15.0/ZAP_2.15.0_Linux.tar.gz
+    - source_hash: sha256=6410e196baab458a9204e29aafb5745fca003a2a6c0386f2c6e5c04b67621fa7
     - archive_format: tar
     - enforce_toplevel: False
     - user: root
@@ -90,7 +86,7 @@ owasp_zap:
 zap_symlink:
   file.symlink:
     - name: /usr/local/bin/zap.sh
-    - target: /opt/zap/ZAP_2.14.0/zap.sh
+    - target: /opt/zap/ZAP_2.15.0/zap.sh
     - require:
       - archive: owasp_zap
 
