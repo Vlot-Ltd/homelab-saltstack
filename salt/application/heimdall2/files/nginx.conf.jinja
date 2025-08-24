@@ -15,6 +15,10 @@ server {
         proxy_set_header X-Forwarded-Proto http;
         proxy_redirect off;
         
+        # Override problematic CSP headers that force HTTPS upgrades
+        proxy_hide_header Content-Security-Policy;
+        add_header Content-Security-Policy "base-uri 'self';default-src 'self';font-src 'self' https: data:;frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';connect-src 'self' https://api.github.com https://sts.amazonaws.com;form-action 'self'" always;
+        
         # WebSocket support
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
