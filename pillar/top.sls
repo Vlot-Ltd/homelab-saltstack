@@ -7,6 +7,7 @@ base:
     - common.security
   'docker':
     - application.linkwarden
+    - application.heimdall2
   'netbox':
     - application.netbox
   'nlremote*':
