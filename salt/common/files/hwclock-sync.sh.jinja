@@ -16,13 +16,25 @@ if [[ $EUID -ne 0 ]]; then
     exit 1
 fi
 
+# Check if hwclock command exists and hardware clock is available
+if ! command -v hwclock >/dev/null 2>&1; then
+    logger "hwclock-sync: hwclock command not available, skipping"
+    exit 0
+fi
+
+if [ ! -e /dev/rtc0 ] && [ ! -e /dev/rtc ]; then
+    logger "hwclock-sync: No hardware clock device found, skipping"
+    exit 0
+fi
+
 # Check if system time is synchronized
 if timedatectl status | grep -q "System clock synchronized: yes"; then
     # Sync hardware clock to system time
-    hwclock --systohc --utc
-    
-    # Log the sync (optional)
-    logger "hwclock-sync: Hardware clock synchronized with system time"
+    if hwclock --systohc --utc 2>/dev/null; then
+        logger "hwclock-sync: Hardware clock synchronized with system time"
+    else
+        logger "hwclock-sync: Failed to synchronize hardware clock"
+    fi
 else
     # Log that sync was skipped due to unsynchronized system time
     logger "hwclock-sync: Skipping hardware clock sync - system time not synchronized"

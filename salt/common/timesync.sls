@@ -67,6 +67,11 @@ timesyncd_service:
 
 # Hardware clock configuration for Proxmox VMs
 {% if grains.get('virtual', '') == 'kvm' or grains.get('manufacturer', '') == 'QEMU' %}
+# Install util-linux package for hwclock
+hwclock_package:
+  pkg.installed:
+    - name: util-linux
+
 # Configure hardware clock sync for Proxmox VMs
 hwclock_sync:
   file.managed:
@@ -76,13 +81,17 @@ hwclock_sync:
     - user: root
     - group: root
     - mode: '0755'
+    - require:
+      - pkg: hwclock_package
 
-# Set hardware clock to UTC
+# Set hardware clock to UTC (only if hwclock command exists)
 hwclock_utc:
   cmd.run:
     - name: hwclock --systohc --utc
+    - onlyif: which hwclock && test -e /dev/rtc0
     - require:
       - service: timesyncd_service
+      - pkg: hwclock_package
 
 # Configure adjtime for UTC hardware clock
 adjtime_config:
@@ -95,6 +104,8 @@ adjtime_config:
     - user: root
     - group: root
     - mode: '0644'
+    - require:
+      - pkg: hwclock_package
 {% endif %}
 
 # Raspberry Pi specific configuration
