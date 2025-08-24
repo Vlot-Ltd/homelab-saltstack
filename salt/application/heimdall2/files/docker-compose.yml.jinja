@@ -1,19 +1,4 @@
 services:
-  certs:
-    image: registry.access.redhat.com/ubi8/ubi:latest
-    container_name: heimdall2-certs
-    restart: unless-stopped
-    command: sh -c "sh /etc/pki/ca-trust/source/anchors/dodcerts.sh && update-ca-trust && tail -f /dev/null"
-    volumes:
-      - type: volume
-        source: cert_bundles
-        target: /etc/pki/ca-trust/extracted/
-      - type: bind
-        source: ./certs/
-        target: /etc/pki/ca-trust/source/anchors/
-    networks:
-      - heimdall2-network
-
   server:
     image: mitre/heimdall2:2.6.13
     container_name: heimdall2-server
@@ -21,15 +6,6 @@ services:
     env_file: .env
     expose:
       - "3000"
-    volumes:
-      - type: volume
-        source: cert_bundles
-        target: /etc/pki/ca-trust/extracted/
-        read_only: true
-        volume:
-          nocopy: true
-    depends_on:
-      - certs
     networks:
       - heimdall2-network
 
@@ -50,8 +26,7 @@ services:
     networks:
       - heimdall2-network
 
-volumes:
-  cert_bundles:
+# Removed cert_bundles volume - not needed for basic setup
 
 networks:
   heimdall2-network:
