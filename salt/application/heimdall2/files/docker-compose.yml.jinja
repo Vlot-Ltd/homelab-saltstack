@@ -21,6 +21,7 @@ services:
       - ./nginx/conf/:/etc/nginx/templates/
     ports:
       - "8080:80"
+      - "8443:443"
     depends_on:
       - server
     networks:
