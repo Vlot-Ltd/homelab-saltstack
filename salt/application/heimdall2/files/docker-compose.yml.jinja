@@ -4,8 +4,10 @@ services:
     container_name: heimdall2-server
     restart: unless-stopped
     env_file: .env
+    environment:
+      - PORT=3001
     expose:
-      - "3000"
+      - "3001"
     networks:
       - heimdall2-network
 

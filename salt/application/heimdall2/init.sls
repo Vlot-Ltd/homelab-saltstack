@@ -31,15 +31,7 @@ heimdall2_nginx_directory:
     - require:
       - file: heimdall2_directory
 
-heimdall2_certs_directory:
-  file.directory:
-    - name: /docker/heimdall2/certs
-    - user: root
-    - group: docker
-    - mode: '0755'
-    - makedirs: True
-    - require:
-      - file: heimdall2_directory
+# Removed certs directory - not needed for basic setup
 
 heimdall2_env:
   file.managed:

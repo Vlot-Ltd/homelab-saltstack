@@ -1,5 +1,6 @@
 upstream heimdall2_server {
-    server server:3000;
+    server server:3001 max_fails=1 fail_timeout=30s;
+    server 127.0.0.1:3001 backup down;  # Dummy backup server
 }
 
 server {
