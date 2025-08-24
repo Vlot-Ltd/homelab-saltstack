@@ -1,16 +1,17 @@
 # Time synchronization configuration for Ubuntu/Raspbian systems
 
-# Install NTP packages
-ntp_packages:
+# Install time sync packages
+timesyncd_package:
   pkg.installed:
+    - name: systemd-timesyncd
+
+# Remove conflicting packages
+ntp_package_removed:
+  pkg.removed:
     - names:
-{% if grains['os'] == 'Ubuntu' %}
-      - systemd-timesyncd
       - ntp
-{% elif grains['os'] == 'Raspbian' %}
-      - systemd-timesyncd
-      - ntp
-{% endif %}
+      - ntpsec
+      - chrony
 
 # Set timezone
 timezone_set:
@@ -27,15 +28,32 @@ timesyncd_config:
     - group: root
     - mode: '0644'
     - require:
-      - pkg: ntp_packages
+      - pkg: timesyncd_package
 
-# Stop and disable ntp service (conflicts with systemd-timesyncd)
+# Stop and disable conflicting services (if they exist)
 ntp_service_stopped:
   service.dead:
     - name: ntp
     - enable: False
-    - require:
-      - pkg: ntp_packages
+    - prereq_in:
+      - service: timesyncd_service
+    - onlyif: systemctl list-unit-files | grep -q ntp.service
+
+ntpsec_service_stopped:
+  service.dead:
+    - name: ntpsec
+    - enable: False
+    - prereq_in:
+      - service: timesyncd_service
+    - onlyif: systemctl list-unit-files | grep -q ntpsec.service
+
+chrony_service_stopped:
+  service.dead:
+    - name: chrony
+    - enable: False
+    - prereq_in:
+      - service: timesyncd_service
+    - onlyif: systemctl list-unit-files | grep -q chrony.service
 
 # Enable and start systemd-timesyncd
 timesyncd_service:
@@ -44,7 +62,6 @@ timesyncd_service:
     - enable: True
     - require:
       - file: timesyncd_config
-      - service: ntp_service_stopped
     - watch:
       - file: timesyncd_config
 
