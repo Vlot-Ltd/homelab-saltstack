@@ -32,6 +32,14 @@ inspec_download:
     - require:
       - pkg: inspec_ruby
 
+# Accept InSpec license
+inspec_license:
+  cmd.run:
+    - name: echo 'yes' | inspec --chef-license accept
+    - unless: inspec version
+    - require:
+      - cmd: inspec_download
+
 # Create security scanning directory
 security_scan_directory:
   file.directory:
