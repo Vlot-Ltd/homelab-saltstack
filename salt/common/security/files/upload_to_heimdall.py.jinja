@@ -29,38 +29,43 @@ def upload_to_heimdall(file_path, heimdall_url, api_key, title=None):
         print(f"Error reading HDF file: {e}")
         return False
     
-    # Prepare the upload payload
+    # Prepare the upload payload using form-data (as per API docs)
     if not title:
         title = Path(file_path).stem
     
-    payload = {
-        "data": hdf_data,
-        "filename": Path(file_path).name,
-        "public": False,
-        "evaluationTags": [
-            "automated-scan",
-            "ubuntu",
-            "compliance"
-        ]
+    # Prepare form data for multipart upload
+    files = {
+        'data': (Path(file_path).name, open(file_path, 'rb'), 'application/json')
     }
     
-    # Prepare headers
+    form_data = {
+        'filename': Path(file_path).name,
+        'public': 'false',
+        'evaluationTags': 'automated-scan,ubuntu,compliance'
+    }
+    
+    # Prepare headers (Heimdall2 uses Api-Key not Bearer)
     headers = {
-        "Authorization": f"Bearer {api_key}",
-        "Content-Type": "application/json"
+        "Authorization": f"Api-Key {api_key}"
     }
     
-    # Upload to Heimdall2
+    # Upload to Heimdall2 using correct endpoint
+    upload_endpoint = f"{heimdall_url}/evaluations"  # Not /api/v1/evaluations
+    
     try:
-        print(f"Uploading {file_path} to {heimdall_url}...")
+        print(f"Uploading {file_path} to {upload_endpoint}...")
         
         response = requests.post(
-            api_endpoint,
-            json=payload,
+            upload_endpoint,
+            files=files,
+            data=form_data,
             headers=headers,
             verify=False,  # Skip SSL verification for self-signed certs
             timeout=60
         )
+        
+        # Close the file
+        files['data'][1].close()
         
         if response.status_code in [200, 201]:
             print(f"✓ Successfully uploaded: {title}")

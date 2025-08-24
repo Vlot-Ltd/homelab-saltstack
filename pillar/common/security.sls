@@ -5,7 +5,7 @@
 heimdall2_reporting:
   # URL to the Heimdall2 security results viewer (running on docker server)
   # Options: "https://docker:8443", "https://heimdall2:8443", or "https://192.168.0.20:8443"
-  url: "https://docker:8443"
+  url: "http://docker:8080"
   
   # API key for uploading scan results
   # Generate this from Heimdall2 web interface: User Settings -> API Keys

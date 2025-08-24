@@ -13,6 +13,7 @@ heimdall2:
   database_user: heimdall2_user
   nginx_host: localhost
   jwt_secret: h31md@ll2_jwt_s3cr3t_k3y_ch@ng3_th1s_1n_pr0d
+  api_key_secret: e791900e55d54c1023ca9c9fcbfdbb230085fcc92c597e7d6b3b843912e9a4f6
   
   # LDAP Configuration (optional)
   ldap_enabled: false
