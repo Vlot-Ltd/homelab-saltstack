@@ -1,6 +1,6 @@
 services:
   certs:
-    image: registry.access.redhat.com/ubi9/ubi:latest
+    image: registry.access.redhat.com/ubi8/ubi:latest
     container_name: heimdall2-certs
     restart: unless-stopped
     command: sh -c "sh /etc/pki/ca-trust/source/anchors/dodcerts.sh && update-ca-trust && tail -f /dev/null"
@@ -15,7 +15,7 @@ services:
       - heimdall2-network
 
   server:
-    image: mitre/heimdall2:release-latest
+    image: mitre/heimdall2:2.6.13
     container_name: heimdall2-server
     restart: unless-stopped
     env_file: .env
