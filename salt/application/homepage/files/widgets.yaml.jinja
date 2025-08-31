@@ -1,0 +1,36 @@
+# salt/application/homepage/files/widgets.yaml.jinja
+
+{% set homepage_config = salt['pillar.get']('homepage', {}) %}
+
+---
+- logo:
+    icon: {{ homepage_config.get('logo_url', 'https://avatars.githubusercontent.com/u/1818869?s=400&u=4670671282b7bbb00087c6acf361cd850ec07adf&v=4') }}
+
+- datetime:
+    format:
+      dateStyle: {{ homepage_config.get('date_style', 'long') }}
+      timeStyle: {{ homepage_config.get('time_style', 'long') }}
+      hour12: {{ homepage_config.get('hour12', false) | lower }}
+
+- search:
+    provider: {{ homepage_config.get('search_provider', 'duckduckgo') }}
+    target: {{ homepage_config.get('search_target', '_blank') }}
+
+{% if homepage_config.get('show_resources', true) %}
+- resources:
+    cpu: {{ homepage_config.get('show_cpu', true) | lower }}
+    memory: {{ homepage_config.get('show_memory', true) | lower }}
+    disk: {{ homepage_config.get('disk_path', '/') }}
+    {% if homepage_config.get('show_uptime') %}uptime: true{% endif %}
+    {% if homepage_config.get('show_network') %}
+    network:
+      - {{ homepage_config.get('network_interface', 'eth0') }}
+    {% endif %}
+{% endif %}
+
+{% for custom_widget in homepage_config.get('custom_widgets', []) %}
+- {{ custom_widget.type }}:
+  {% for key, value in custom_widget.get('config', {}).items() %}
+    {{ key }}: {{ value }}
+  {% endfor %}
+{% endfor %}

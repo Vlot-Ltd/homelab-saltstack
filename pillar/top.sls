@@ -5,9 +5,11 @@ base:
     - common.timesync
     - application.zabbixagent
     - common.security
+    - vault_secrets
   'docker':
     - application.linkwarden
     - application.heimdall2
+    - application.homepage
   'netbox':
     - application.netbox
   'nlremote*':

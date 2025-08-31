@@ -1,0 +1,52 @@
+# salt/application/homepage/files/settings.yaml.jinja
+
+{% set homepage_config = salt['pillar.get']('homepage', {}) %}
+
+---
+title: "{{ homepage_config.get('title', 'Homelab Entertainment Hub') }}"
+favicon: https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/homepage.png
+theme: "{{ homepage_config.get('theme', 'dark') }}"
+color: "{{ homepage_config.get('color', 'slate') }}"
+headerStyle: boxed
+hideVersion: true
+useEqualHeights: false
+
+layout:
+  # Entertainment sections
+  {% for section_key, section in homepage_config.get('entertainment', {}).items() %}
+  {{ section.title }}:
+    style: {{ section.layout.style }}
+    columns: {{ section.layout.columns }}
+    {% if section.layout.get('header') %}header: {{ section.layout.header | lower }}{% endif %}
+  {% endfor %}
+  
+  # Service groups
+  {% for group_key, group in homepage_config.get('service_groups', {}).items() %}
+  {{ group.title }}:
+    style: {{ group.layout.style }}
+    columns: {{ group.layout.columns }}
+    {% if group.layout.get('header') %}header: {{ group.layout.header | lower }}{% endif %}
+  {% endfor %}
+
+quicklaunch:
+  searchDescriptions: true
+  hideInternetSearch: false
+  hideVisitURL: false
+
+language: en
+dateFormat: "YYYY/MM/DD"
+timeFormat: "HH:mm"() %}
+  {{ section }}:
+    style: {{ config.style }}
+    columns: {{ config.columns }}
+    {% if config.get('header') %}header: {{ config.header | lower }}{% endif %}
+{% endfor %}
+
+quicklaunch:
+  searchDescriptions: true
+  hideInternetSearch: false
+  hideVisitURL: false
+
+language: en
+dateFormat: "YYYY/MM/DD"
+timeFormat: "HH:mm"

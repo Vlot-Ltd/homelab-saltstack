@@ -1,0 +1,134 @@
+# salt/application/homepage/files/services.yaml.jinja
+
+{% set homepage_config = salt['pillar.get']('homepage', {}) %}
+{% set hosts = salt['pillar.get']('hosts_entries', []) %}
+
+{# Helper macro to build URLs #}
+{% macro build_service_url(service, hosts) -%}
+  {% if service.get('static_url') %}
+    {{- service.static_url -}}
+  {% elif service.get('static_ip') %}
+    {{- service.get('protocol', 'http') }}://{{ service.static_ip }}{% if service.get('port') %}:{{ service.port }}{% endif %}{% if service.get('path') %}{{ service.path }}{% endif %}
+  {% elif service.get('host_lookup') %}
+    {% set host = hosts | selectattr('name', 'equalto', service.host_lookup) | list | first %}
+    {% if host %}
+      {{- service.get('protocol', 'http') }}://{{ host.ip }}{% if service.get('port') %}:{{ service.port }}{% endif %}{% if service.get('path') %}{{ service.path }}{% endif %}
+    {% else %}
+      {{- '#' -}}
+    {% endif %}
+  {% else %}
+    {{- '#' -}}
+  {% endif %}
+{%- endmacro %}
+
+{# Helper macro to get Vault secret safely #}
+{% macro get_vault_secret(vault_path, vault_key) -%}
+  {% if vault_path and vault_key %}
+    {{- salt['vault.read_secret'](vault_path, vault_key) if salt['vault.read_secret'](vault_path, vault_key) else '' -}}
+  {% endif %}
+{%- endmacro %}
+
+---
+# Entertainment Releases
+{% for section_key, section in homepage_config.get('entertainment', {}).items() %}
+- {{ section.title }}:
+  {% for feed_key, feed in section.get('feeds', {}).items() %}
+    - {{ feed.name }}:
+        icon: {{ feed.icon }}
+        href: {{ feed.href }}
+        description: {{ feed.get('description', feed.name) }}
+        widget:
+          type: rss
+          url: {{ feed.url }}
+          limit: {{ feed.limit }}
+  {% endfor %}
+
+  {% for api_key, api_service in section.get('api_services', {}).items() %}
+    {% set api_key_value = get_vault_secret(api_service.get('vault_path'), api_service.get('vault_key')) %}
+    {% if api_key_value %}
+    - {{ api_service.name }}:
+        icon: {{ api_service.icon }}
+        href: {{ api_service.href }}
+        description: {{ api_service.description }}
+        widget:
+          type: customapi
+          url: {{ api_service.api_url }}
+          {% if api_service.get('api_header') %}
+          headers:
+            {{ api_service.api_header }}: "{{ api_service.get('api_header_prefix', '') }}{{ api_key_value }}"
+          {% endif %}
+          mappings:
+            - field: {{ api_service.get('response_field', 'results') }}
+              label: {{ api_service.get('label', 'Items') }}
+              format: list
+    {% endif %}
+  {% endfor %}
+
+  {% for custom_key, custom_service in section.get('custom_services', {}).items() %}
+    {% if custom_service.get('vault_path') %}
+      {% set required_key = get_vault_secret(custom_service.vault_path, custom_service.vault_key) %}
+      {% if required_key %}
+    - {{ custom_service.name }}:
+        icon: {{ custom_service.icon }}
+        href: {{ custom_service.href }}
+        description: {{ custom_service.description }}
+        widget:
+          type: customapi
+          url: {{ custom_service.api_url }}
+          mappings:
+            - field: games
+              label: Games
+              format: list
+      {% endif %}
+    {% else %}
+    - {{ custom_service.name }}:
+        icon: {{ custom_service.icon }}
+        href: {{ custom_service.href }}
+        description: {{ custom_service.description }}
+        widget:
+          type: customapi
+          url: {{ custom_service.api_url }}
+          mappings:
+            - field: games
+              label: Games
+              format: list
+    {% endif %}
+  {% endfor %}
+
+{% endfor %}
+
+# Service Groups
+{% for group_key, group in homepage_config.get('service_groups', {}).items() %}
+- {{ group.title }}:
+  {% for service_key, service in group.get('services', {}).items() %}
+    - {{ service.name }}:
+        icon: {{ service.icon }}
+        href: {{ build_service_url(service, hosts) }}
+        description: {{ service.description }}
+        {% if service.get('widget') %}
+        widget:
+          type: {{ service.widget.type }}
+          {% if service.widget.type == 'grafana' %}
+          url: {{ build_service_url(service, hosts) }}
+          username: {{ get_vault_secret(service.widget.get('username_vault_path'), service.widget.get('username_vault_key')) }}
+          password: {{ get_vault_secret(service.widget.get('password_vault_path'), service.widget.get('password_vault_key')) }}
+          {% elif service.widget.type == 'zabbix' %}
+          url: {{ build_service_url(service, hosts) }}
+          username: {{ get_vault_secret(service.widget.get('username_vault_path'), service.widget.get('username_vault_key')) }}
+          password: {{ get_vault_secret(service.widget.get('password_vault_path'), service.widget.get('password_vault_key')) }}
+          {% elif service.widget.type == 'proxmox' %}
+          url: {{ build_service_url(service, hosts) }}
+          username: {{ get_vault_secret(service.widget.get('username_vault_path'), service.widget.get('username_vault_key')) }}
+          password: {{ get_vault_secret(service.widget.get('password_vault_path'), service.widget.get('password_vault_key')) }}
+          node: {{ service.widget.get('node', 'proxmox') }}
+          {% elif service.widget.type == 'truenas' %}
+          url: {{ build_service_url(service, hosts) }}
+          key: {{ get_vault_secret(service.widget.get('api_key_vault_path'), service.widget.get('api_key_vault_key')) }}
+          enablePools: {{ service.widget.get('enablePools', true) | lower }}
+          {% elif service.widget.type == 'homebox' %}
+          url: {{ build_service_url(service, hosts) }}
+          {% endif %}
+        {% endif %}
+  {% endfor %}
+
+{% endfor %}
