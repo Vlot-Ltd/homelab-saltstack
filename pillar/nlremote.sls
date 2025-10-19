@@ -19,3 +19,4 @@ hosts_entries:
     name: salt
 
 default_domain: taile3eee.ts.net
+__merge_strategy: 'overwrite'
