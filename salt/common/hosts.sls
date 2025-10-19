@@ -15,16 +15,16 @@
     - clean: True
 {% endfor %}
 
-{% for service in  salt['pillar.get']('docker:services', {}) %}
-{{ service.container }}-host:
+{% for service_name, service_data in salt['pillar.get']('docker:services', {}).items() %}
+{{ service_data.container }}-host:
   host.present:
-    - name: {{ service.container }}
+    - name: {{ service_data.container }}
     - ip: {{ docker_host_ip }}
     - clean: True
 
-{{ service.container }}-fqdn:
+{{ service_data.container }}-fqdn:
   host.present:
-    - name: {{ service.container }}.{{ domain }}
+    - name: {{ service_data.container }}.{{ domain }}
     - ip: {{ docker_host_ip }}
     - clean: True
 {% endfor %}
