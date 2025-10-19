@@ -7,8 +7,6 @@ hosts_entries:
     name: salt
   - ip: 192.168.0.20
     name: docker
-  - ip: 192.168.0.20
-    name: heimdall2
   - ip: 192.168.0.23
     name: zabbix
   - ip: 192.168.0.25
