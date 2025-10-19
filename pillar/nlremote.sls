@@ -20,4 +20,4 @@ hosts_entries:
 
 default_domain: taile3eee.ts.net
 
-merge_strategy: overwrite
+__merge_strategy__: 'overwrite'
