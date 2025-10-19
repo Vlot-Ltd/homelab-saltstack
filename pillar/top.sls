@@ -4,8 +4,9 @@ base:
     - common.hosts
     - common.timesync
     - application.zabbixagent
+    - application.docker
     - common.security
-    - vault_secrets
+    - common.vault_secrets
   'docker':
     - application.linkwarden
     - application.heimdall2

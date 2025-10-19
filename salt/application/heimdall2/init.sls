@@ -1,5 +1,6 @@
 include:
   - application.docker
+  - application.tailscale-docker
 
 heimdall2_directory:
   file.directory:
@@ -82,6 +83,7 @@ heimdall2_start:
       - file: heimdall2_env
       - file: heimdall2_nginx_config
       - cmd: heimdall2_status
+      - cmd: start-tailscale-docker
 
 heimdall2_restart:
   cmd.run:

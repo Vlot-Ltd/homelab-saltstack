@@ -1,1 +1,0 @@
-tailscale_auth_key: "tskey-auth-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"

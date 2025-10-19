@@ -1,5 +1,6 @@
 include:
   - application.docker
+  - application.tailscale-docker
 
 homepage-directory:
   file.directory:
@@ -103,12 +104,20 @@ homepage-docker-compose:
   file.managed:
     - name: /docker/homepage/docker-compose.yml
     - contents: |
+        networks:
+          tailnet:
+            external: true
+            name: tailnet
+
         services:
           homepage:
             image: ghcr.io/gethomepage/homepage:latest
+            container_name: homepage
             restart: unless-stopped
             ports:
-              - "0.0.0.0:3000:3000"
+              - "3000:3000"
+            networks:
+              - tailnet
             volumes:
               - ./config:/app/config
               - ./images:/app/public/images
@@ -127,6 +136,8 @@ homepage-docker-compose:
               - STEAM_USER_ID={{ salt['vault.read_secret']('secret/data/homepage', 'steam_user_id') if salt['vault.read_secret']('secret/data/homepage', 'steam_user_id') else '' }}
             ports:
               - "5000:5000"
+            networks:
+              - tailnet
             restart: unless-stopped
             healthcheck:
               test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
@@ -165,3 +176,4 @@ start-homepage:
     - onlyif: "grep -q STOPPED /var/cache/salt/minion/check-homepage"
     - require:
         - cmd: check-homepage
+        - cmd: start-tailscale-docker

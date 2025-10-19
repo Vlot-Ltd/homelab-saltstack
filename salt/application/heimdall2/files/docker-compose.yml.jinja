@@ -13,7 +13,7 @@ services:
 
   nginx:
     image: nginx:alpine
-    container_name: heimdall2-nginx
+    container_name: heimdall2
     restart: unless-stopped
     environment:
       NGINX_HOST: ${NGINX_HOST}
@@ -26,9 +26,13 @@ services:
       - server
     networks:
       - heimdall2-network
+      - tailnet
 
 # Removed cert_bundles volume - not needed for basic setup
 
 networks:
   heimdall2-network:
     driver: bridge
+  tailnet:
+    external: true
+    name: tailnet

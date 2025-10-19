@@ -1,5 +1,6 @@
 include:
   - application.docker
+  - application.tailscale-docker
 
 {% set postgres_host = salt['pillar.get']('hosts_entries', []) | selectattr('name', 'equalto', 'postgres') | list | first %}
 {% set postgres_ip = postgres_host['ip'] if postgres_host and 'ip' in postgres_host else 'postgres' %}
@@ -32,13 +33,21 @@ linkwarden-docker-compose:
   file.managed:
     - name: /docker/linkwarden/docker-compose.yml
     - contents: |
+        networks:
+          tailnet:
+            external: true
+            name: tailnet
+
         services:
           linkwarden:
             env_file: .env
             restart: always
             image: ghcr.io/linkwarden/linkwarden:latest
+            container_name: linkwarden
             ports:
-              - "3200:3000"  # Corrected port to 3200
+              - "3200:3000"
+            networks:
+              - tailnet
             volumes:
               - ./data:/data/data
     - user: root
@@ -68,3 +77,4 @@ start-linkwarden:
     - onlyif: "grep -q STOPPED /var/cache/salt/minion/check-linkwarden"
     - require:
         - cmd: check-linkwarden
+        - cmd: start-tailscale-docker

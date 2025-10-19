@@ -21,8 +21,6 @@ fing-docker-compose:
   file.managed:
     - name: /docker/fing/docker-compose.yml
     - contents: |
-        version: '3.8'
-        
         services:
           fing-agent:
             image: fing/fing-agent:latest

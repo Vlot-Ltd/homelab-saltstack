@@ -1,5 +1,6 @@
 include:
   - application.docker
+  - application.tailscale-docker
 
 webdriver-directory:
   file.directory:
@@ -13,6 +14,11 @@ webdriver-docker-compose:
     - name: /docker/webdriver/docker-compose.yml
     - mode: "0644"
     - contents: |
+        networks:
+          tailnet:
+            external: true
+            name: tailnet
+
         services:
           webdriver:
             container_name: webdriver
@@ -21,6 +27,8 @@ webdriver-docker-compose:
             ports:
               - "4444:4444"
               - "7900:7900"
+            networks:
+              - tailnet
             shm_size: '2gb'
     - require:
         - file: webdriver-directory
@@ -31,3 +39,4 @@ start-webdriver:
     - cwd: /docker/webdriver
     - require:
         - file: webdriver-docker-compose
+        - cmd: start-tailscale-docker
