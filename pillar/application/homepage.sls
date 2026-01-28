@@ -130,13 +130,12 @@ homepage:
             
         patchmon:
           name: "Patch Mon"
-          icon: http://patch.taile3eee.ts.net:3791/assets/favicon.svg
-          description: "Pathch Mon"
+          icon: "http://patch.taile3eee.ts.net:3791/assets/favicon.svg"
+          description: "Patch Mon"
           static_url: "http://patch.taile3eee.ts.net/"
-              description: PatchMon Statistics
           widget:
             type: customapi
-            url: http://patch.taile3eee.ts.net:3791/api/v1/gethomepage/stats
+            url: "http://patch.taile3eee.ts.net:3791/api/v1/gethomepage/stats"
             headers:
               Authorization: Basic cGF0Y2htb25fYWVfZGNmYWE3NzcxZjJmN2JhOTJkMDIyZjc0M2YwNDk0ZWE6ODFmOTA5MWJjOTJkOGQ4MmJiMDFjOWJmMThkODEyYzJiMTRiMzgyMTkzNjVmN2JmNjQwZjZhNjg0OGZmNWViZGNkYmJmNzI4OWY2YzA2M2M0MjlkYTZjYjRjM2Y1Njkw
             mappings:
