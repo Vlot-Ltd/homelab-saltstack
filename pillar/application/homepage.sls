@@ -68,6 +68,12 @@ homepage:
           description: "Linkwarden Password Manager"
           static_url: "https://linkwarden.taile3eee.ts.net/"
           
+        patchmon:
+          name: "Patch Mon"
+          icon: "linkwarden-light.png"
+          description: "Pathch Mon"
+          static_url: "http://patch.taile3eee.ts.net/"
+          
         plex:
           name: "Plex"
           icon: "plex-alt-light.png"
