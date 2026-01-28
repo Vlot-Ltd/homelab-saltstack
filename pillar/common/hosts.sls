@@ -7,14 +7,16 @@ hosts_entries:
     name: salt
   - ip: 192.168.0.20
     name: docker
-  - ip: 192.168.0.23
-    name: zabbix
-  - ip: 192.168.0.25
-    name: vault
-  - ip: 192.168.0.24
-    name: homeassistant
   - ip: 192.168.0.22
     name: postgres
+  - ip: 192.168.0.23
+    name: zabbix
+  - ip: 192.168.0.24
+    name: homeassistant
+  - ip: 192.168.0.25
+    name: vault
+  - ip: 192.168.0.26
+    name: patch
   - ip: 192.168.0.170
     name: colossus
 

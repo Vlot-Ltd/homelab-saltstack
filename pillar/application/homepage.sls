@@ -53,8 +53,7 @@ homepage:
           name: "Heimdall2"
           icon: "heimdall.png"
           description: "Heimdall2 Security Overview"
-          host_lookup: "docker"
-          port: 8080
+          static_url: "https://heimdall2.taile3eee.ts.net/"
           
         home_assistant:
           name: "Home Assistant"
@@ -62,13 +61,18 @@ homepage:
           description: "Home Assistant"
           host_lookup: "homeassistant"
           port: 32400
+
+        linkwarden:
+          name: "Linkwarden"
+          icon: "linkwarden-light.png"
+          description: "Linkwarden Password Manager"
+          static_url: "https://linkwarden.taile3eee.ts.net/"
           
         plex:
           name: "Plex"
           icon: "plex-alt-light.png"
           description: "Plex Media Server"
-          host_lookup: "plex"
-          port: 32400
+          static_url: "https://plexmedia.taile3eee.ts.net/"
           
         vault:
           name: "Vault"
