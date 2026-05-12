@@ -1,0 +1,37 @@
+# PEP Framework Configuration
+# This file is sourced by pep-tools.sh and contains project-specific settings
+
+# Author information (used in PEP/BLOG templates)
+PEP_AUTHOR="Your Name"
+
+# Default editor for creating/editing PEPs and BLOGs
+DEFAULT_EDITOR="vi"
+
+# Project information
+PROJECT_NAME="Generic PEP Framework"
+
+# Directory configuration (relative to project root)
+# Uncomment and modify if you want different paths
+# PEP_DIR="docs/peps"
+# BLOG_DIR="docs/blogs" 
+# TEMPLATE_DIR="docs/templates"
+
+# Integration settings for monitoring
+ZABBIX_HOST=""
+GRAFANA_URL=""
+
+# Git integration
+# Set to true to require all commits reference a PEP (strict mode)
+REQUIRE_PEP_REFERENCE=false
+
+# Notification settings (optional)
+SLACK_WEBHOOK=""
+EMAIL_NOTIFICATIONS="false"
+
+# Debug mode - set to true for verbose output
+DEBUG="false"
+
+# Template customization
+# Set to true to automatically open editor after creating PEP/BLOG
+AUTO_OPEN_EDITOR="false"
+# CREATE_GIT_BRANCH="false"

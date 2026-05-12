@@ -1,0 +1,86 @@
+#!/bin/bash
+# Git commit message hook to enforce PEP references
+# This hook validates commit messages that reference PEPs
+
+commit_msg_file="$1"
+commit_msg=$(cat "$commit_msg_file")
+
+# Configuration
+PEP_DIR="docs/peps"
+REQUIRE_PEP_REFERENCE=false  # Set to true to require all commits reference a PEP
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
+# Check if commit message references a PEP
+if [[ "$commit_msg" =~ pep-[0-9]{3} ]]; then
+    # Extract PEP number from commit message
+    pep_ref=$(echo "$commit_msg" | grep -o 'pep-[0-9]*' | head -1)
+    pep_num=$(echo "$pep_ref" | sed 's/pep-//')
+    
+    # Check if PEP exists
+    pep_files=($PEP_DIR/pep-$(printf "%03d" "$pep_num")-*.md)
+    if [ ! -f "${pep_files[0]}" ]; then
+        echo -e "${RED}Error: Referenced $pep_ref does not exist!${NC}" >&2
+        echo -e "${YELLOW}Create the PEP first: ./tools/pep-tools.sh new-pep $pep_num 'Your Title'${NC}" >&2
+        exit 1
+    fi
+    
+    # Validate commit message format for PEP references
+    if [[ ! "$commit_msg" =~ ^pep-[0-9]{3}:\ .+ ]]; then
+        echo -e "${RED}Error: PEP commit messages should follow format: 'pep-XXX: description'${NC}" >&2
+        echo -e "${YELLOW}Example: 'pep-005: Add Nutanix API integration'${NC}" >&2
+        echo -e "${YELLOW}Your message: '$commit_msg'${NC}" >&2
+        exit 1
+    fi
+    
+    # Check PEP status - warn if committing to rejected/superseded PEP
+    if [ -f "${pep_files[0]}" ]; then
+        pep_status=$(grep "^**Status:**" "${pep_files[0]}" | sed 's/**Status:** //' | head -1)
+        case "$pep_status" in
+            "Rejected")
+                echo -e "${YELLOW}Warning: You're committing to a rejected PEP ($pep_ref)${NC}" >&2
+                echo -e "${YELLOW}Consider creating a new PEP if this work should continue${NC}" >&2
+                ;;
+            "Superseded")
+                superseded_by=$(grep "^**Superseded-By:**" "${pep_files[0]}" | sed 's/**Superseded-By:** //' | head -1)
+                echo -e "${YELLOW}Warning: You're committing to a superseded PEP ($pep_ref)${NC}" >&2
+                if [ -n "$superseded_by" ]; then
+                    echo -e "${YELLOW}Consider using $superseded_by instead${NC}" >&2
+                fi
+                ;;
+            "Implemented")
+                echo -e "${GREEN}Info: Committing to implemented PEP ($pep_ref)${NC}" >&2
+                echo -e "${GREEN}Consider updating PEP status if making significant changes${NC}" >&2
+                ;;
+        esac
+    fi
+    
+elif [ "$REQUIRE_PEP_REFERENCE" = "true" ]; then
+    # Skip merge commits and certain types of commits
+    if [[ ! "$commit_msg" =~ ^Merge\ branch ]] && \
+       [[ ! "$commit_msg" =~ ^Revert ]] && \
+       [[ ! "$commit_msg" =~ ^Initial\ commit ]] && \
+       [[ ! "$commit_msg" =~ ^docs: ]] && \
+       [[ ! "$commit_msg" =~ ^chore: ]]; then
+        echo -e "${RED}Error: Commit message must reference a PEP${NC}" >&2
+        echo -e "${YELLOW}Format: 'pep-XXX: description'${NC}" >&2
+        echo -e "${YELLOW}Or use prefixes like 'docs:', 'chore:' for non-PEP commits${NC}" >&2
+        exit 1
+    fi
+fi
+
+# Validate general commit message format
+if [ ${#commit_msg} -gt 72 ]; then
+    first_line=$(echo "$commit_msg" | head -n1)
+    if [ ${#first_line} -gt 72 ]; then
+        echo -e "${YELLOW}Warning: First line of commit message is longer than 72 characters${NC}" >&2
+        echo -e "${YELLOW}Consider shortening: '${first_line:0:50}...'${NC}" >&2
+    fi
+fi
+
+# Success
+exit 0
