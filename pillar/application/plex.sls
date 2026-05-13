@@ -5,4 +5,4 @@ plex_auto_update: True
 plex_beta_updates: True
 plex_backup_retention: 15
 plex_url: 'http://192.168.0.28:32400'
-plex_token: '99-PNk6bX9qLWBf8HWk5'
+plex_token: "{{ salt['vault.read_secret']('salt/minions/plex', 'plex_token') }}"

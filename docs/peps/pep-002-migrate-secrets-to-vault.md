@@ -3,16 +3,64 @@
 **PEP:** 002  
 **Title:** Migrate Hardcoded Secrets to HashiCorp Vault  
 **Author:** Timo Vlot  
-**Status:** Draft  
+**Status:** Testing  
 **Type:** Infrastructure  
 **Created:** 2026-05-12  
-**Updated:** 2026-05-12  
+**Updated:** 2026-05-13  
 **Supersedes:** N/A  
 **Superseded-By:** N/A  
 
 ## Abstract
 
-Multiple pillar files contain plaintext credentials stored directly in the repository. This PEP replaces all hardcoded secrets with Vault references, using the `vault_secrets.sls` pattern that already exists in the codebase as the target model.
+Multiple pillar files contain plaintext credentials stored directly in the repository. This PEP replaces all hardcoded secrets with Vault references. Implementation is complete and staged for testing — see Implementation Notes below.
+
+## Implementation Notes (2026-05-13)
+
+The migration is implemented and staged in git. The approach differed from the original plan:
+
+- **`vault_secrets.sls` was deleted** rather than extended. Secrets are now looked up inline in each service pillar file, removing the indirection through a central file.
+- **Vault path structure used:**
+
+| Vault Path | Keys |
+|---|---|
+| `salt/roles/db` | `zabbix_password`, `heimdall2_password`, `linkwarden_password`, `netbox_password` |
+| `salt/roles/monitoring` | `grafana_password`, `zabbix_password` |
+| `salt/minions/docker/heimdall2` | `jwt_secret`, `api_key_secret` |
+| `salt/minions/netbox` | `netbox_secret`, `redis_cache_password`, `redis_password`, `superuser_password`, `superuser_email` |
+| `salt/minions/plex` | `plex_token` |
+
+- **New role pillar files** added: `pillar/database/roles.sls` and `pillar/monitoring/roles.sls`, with `pillar/top.sls` updated to assign roles to the correct minions.
+
+**Staged files:** `pillar/application/grafana.sls`, `pillar/application/heimdall2.sls`, `pillar/application/homepage.sls`, `pillar/application/linkwarden.sls`, `pillar/application/netbox.sls`, `pillar/application/plex.sls`, `pillar/application/zabbix.sls`, `pillar/common/vault_secrets.sls` (deleted), `pillar/database/roles.sls` (new), `pillar/monitoring/roles.sls` (new), `pillar/top.sls`.
+
+**Still outstanding (not in this commit):**
+- `pillar/database/postgres.sls` — monitor user password
+- `pillar/common/security.sls` — Heimdall2 JWT API key
+
+### To complete testing
+
+```bash
+# 1. Confirm all Vault secrets exist at the correct paths
+vault kv get salt/roles/db
+vault kv get salt/roles/monitoring
+vault kv get salt/minions/docker/heimdall2
+vault kv get salt/minions/netbox
+vault kv get salt/minions/plex
+
+# 2. Test pillar compilation resolves correctly for each affected minion
+salt 'docker' pillar.get heimdall2:database_password
+salt 'zabbix' pillar.get grafana_admin_password
+salt 'postgres' pillar.get postgres_databases
+salt 'plex' pillar.get plex_token
+salt 'netbox' pillar.get netbox_secret
+
+# 3. Run highstate on each affected minion and confirm services healthy
+salt 'docker' state.apply
+salt 'zabbix' state.apply
+salt 'postgres' state.apply
+salt 'plex' state.apply
+salt 'netbox' state.apply
+```
 
 ## Motivation
 

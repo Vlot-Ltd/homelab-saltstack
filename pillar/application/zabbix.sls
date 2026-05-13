@@ -2,7 +2,7 @@ postgres_databases:
   - name: zabbix
     users:
       - name: zabbix_user
-        password: ZabbixP@ss
+        password: "{{ salt['vault.read_secret']('salt/roles/db', 'zabbix_password') }}"
 
 zabbix_server:
   StartSNMPTrappers: 0

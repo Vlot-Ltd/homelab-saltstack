@@ -2,10 +2,10 @@ postgres_databases:
   - name: netbox
     users:
       - name: netbox_user
-        password: NetBoxP@ss
+        password: "{{ salt['vault.read_secret']('salt/roles/db', 'netbox_password') }}"
 
-netbox_secret: 'r(m)9nLGnz$(_q3N4z1k(EFsMCjjjzx08x9VhNVcfd%6RF#r!6DE@+V5Zk2X'
-redis_cache_password: t4Ph722qJ5QHeQ1qfu36
-redis_password: H733Kdjndks81
-superuser_password: 'YSfq#VL0c^fIUKT78dUO^t2%M'
-superuser_email: 'netbox@vlot.scot'
+netbox_secret: "{{ salt['vault.read_secret']('salt/minions/netbox', 'netbox_secret') }}"
+redis_cache_password: "{{ salt['vault.read_secret']('salt/minions/netbox', 'redis_cache_password') }}"
+redis_password: "{{ salt['vault.read_secret']('salt/minions/netbox', 'redis_password') }}"
+superuser_password: "{{ salt['vault.read_secret']('salt/minions/netbox', 'superuser_password') }}"
+superuser_email: "{{ salt['vault.read_secret']('salt/minions/netbox', 'superuser_email') }}"

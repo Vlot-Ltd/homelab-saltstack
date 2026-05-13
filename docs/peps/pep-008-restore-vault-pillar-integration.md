@@ -3,16 +3,38 @@
 **PEP:** 008  
 **Title:** Restore Vault Pillar Integration  
 **Author:** Timo Vlot  
-**Status:** Draft  
+**Status:** Testing  
 **Type:** Infrastructure  
 **Created:** 2026-05-12  
-**Updated:** 2026-05-12  
+**Updated:** 2026-05-13  
 **Supersedes:** N/A  
 **Superseded-By:** N/A  
 
 ## Abstract
 
-`salt['vault.read_secret']()` calls in `pillar/common/vault_secrets.sls` were breaking pillar compilation on all minions, causing highstate failures across the entire homelab. As a workaround the calls were replaced with `pillar.get()` stubs that silently return empty strings. This PEP diagnoses the root cause of the Vault lookup failure, fixes the Salt master Vault configuration, and restores proper secret resolution.
+`salt['vault.read_secret']()` calls in `pillar/common/vault_secrets.sls` were breaking pillar compilation on all minions, causing highstate failures across the entire homelab. As a workaround the calls were replaced with `pillar.get()` stubs that silently return empty strings. This PEP diagnoses the root cause of the Vault lookup failure, fixes the Salt master Vault configuration, and restores proper secret resolution. The pillar-side changes are implemented and staged — only Salt master configuration and testing remain.
+
+## Implementation Notes (2026-05-13)
+
+The broken `vault_secrets.sls` has been deleted. Vault lookups are now inline in each service pillar file (see PEP-002 for the full set of changes staged). The path convention used is `salt/roles/<role>` and `salt/minions/<minion>` — no `secret/data/` prefix, using the Salt vault extension path format directly.
+
+**What remains before this PEP is complete:**
+
+1. **Salt master Vault runner must be correctly configured** — `/etc/salt/master.d/vault.conf` (or equivalent) must point at the Vault server with a valid token. This is not in the repository. Verify with:
+   ```bash
+   salt-run vault.read_secret salt/roles/db zabbix_password
+   ```
+   If this returns the password, the master config is working. If it errors, fix the runner config before testing pillar compilation.
+
+2. **All required secrets must exist in Vault** at the paths defined in PEP-002's implementation notes. Verify each path with `vault kv get <path>` before running pillar tests.
+
+3. **Test pillar compilation** — once steps 1 and 2 pass, confirm each minion resolves its secrets:
+   ```bash
+   salt '*' pillar.items
+   ```
+   No minion should error. Check for any `None` or empty string values where secrets are expected.
+
+4. **Run highstate** on each affected minion and confirm services are healthy in Zabbix.
 
 ## Motivation
 

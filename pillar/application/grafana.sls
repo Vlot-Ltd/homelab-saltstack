@@ -1,4 +1,4 @@
-grafana_admin_password: "SuperSecureGrafanaPass"
+grafana_admin_password: "{{ salt['vault.read_secret']('salt/roles/monitoring', 'grafana_password') }}"
 
 grafana_datasources:
   - name: Zabbix
@@ -17,7 +17,7 @@ grafana_datasources:
         enabled: true
         dataSource: "ZabbixDB"
     secureJsonData:
-      password: "zabbix"
+      password: "{{ salt['vault.read_secret']('salt/roles/monitoring', 'zabbix_password') }}"
 
   - name: ZabbixDB
     type: "postgres"
@@ -26,6 +26,6 @@ grafana_datasources:
     database: "zabbix"
     user: "zabbix_user"
     secureJsonData:
-      password: "ZabbixP@ss"
+      password: "{{ salt['vault.read_secret']('salt/roles/db', 'zabbix_password') }}"
     jsonData:
       sslmode: "disable"

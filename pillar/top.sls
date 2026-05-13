@@ -11,14 +11,18 @@ base:
     - application.linkwarden
     - application.heimdall2
     - application.homepage
+    - database.roles
+    - monitoring.roles
   'netbox':
     - application.netbox
+    - database.roles
   'nlremote*':
     - nlremote
   'plex':
     - application.plex
   'postgres':
     - database.postgres
+    - database.roles
     - application.netbox
     - application.linkwarden
     - application.zabbix
@@ -26,3 +30,5 @@ base:
   'zabbix':
     - application.zabbix
     - application.grafana
+    - database.roles
+    - monitoring.roles

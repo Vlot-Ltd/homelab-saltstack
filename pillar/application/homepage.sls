@@ -4,13 +4,13 @@ homepage:
   title: "Vlot Ltd Homelab"
   theme: "dark"
   color: "slate"
-  
+
   # Widget configuration
   logo_url: "https://avatars.githubusercontent.com/u/1818869?s=400&u=4670671282b7bbb00087c6acf361cd850ec07adf&v=4"
   search_provider: "duckduckgo"  # google, duckduckgo, bing, baidu, brave, custom
   search_target: "_blank"
   date_style: "long"  # full, long, medium, short
-  time_style: "long"  # full, long, medium, short  
+  time_style: "long"  # full, long, medium, short
   hour12: false
   show_resources: true
   show_cpu: true
@@ -19,14 +19,14 @@ homepage:
   show_network: false
   disk_path: "/"
   network_interface: "eth0"
-  
+
   # Optional custom widgets
   custom_widgets:
     - type: "greeting"
       config:
         text_size: "xl"
         text: "Welcome to your Entertainment Hub"
-  
+
   # Service definitions - fully data-driven
   service_groups:
     main_services:
@@ -44,17 +44,17 @@ homepage:
           port: 3000
           widget:
             type: "grafana"
-            username_vault_path: "secret/data/grafana"
-            username_vault_key: "username"
-            password_vault_path: "secret/data/grafana"
-            password_vault_key: "admin_password"
-            
+            username_vault_path: "salt/roles/monitoring"
+            username_vault_key: "grafana_username"
+            password_vault_path: "salt/roles/monitoring"
+            password_vault_key: "grafana_password"
+
         heimdall2:
           name: "Heimdall2"
           icon: "heimdall.png"
           description: "Heimdall2 Security Overview"
           static_url: "https://heimdall2.taile3eee.ts.net/"
-          
+
         home_assistant:
           name: "Home Assistant"
           icon: "home-assistant.png"
@@ -67,20 +67,20 @@ homepage:
           icon: "linkwarden-light.png"
           description: "Linkwarden Password Manager"
           static_url: "https://linkwarden.taile3eee.ts.net/"
-          
+
         plex:
           name: "Plex"
           icon: "plex-alt-light.png"
           description: "Plex Media Server"
           static_url: "https://plexmedia.taile3eee.ts.net/"
-          
+
         vault:
           name: "Vault"
           icon: "vault.png"
           description: "Hashicorp Vault"
           host_lookup: "vault"
           port: 8200
-          
+
         zabbix:
           name: "Zabbix"
           icon: "zabbix.png"
@@ -89,10 +89,10 @@ homepage:
           path: "/zabbix/"
           widget:
             type: "zabbix"
-            username_vault_path: "secret/data/zabbix"
-            username_vault_key: "username"
-            password_vault_path: "secret/data/zabbix"
-            password_vault_key: "admin_password"
+            username_vault_path: "salt/roles/monitoring"
+            username_vault_key: "zabbix_username"
+            password_vault_path: "salt/roles/monitoring"
+            password_vault_key: "zabbix_password"
 
     infrastructure:
       title: "Infrastructure"
@@ -110,12 +110,12 @@ homepage:
           protocol: "https"
           widget:
             type: "proxmox"
-            username_vault_path: "secret/data/proxmox"
-            username_vault_key: "homepage_username"
-            password_vault_path: "secret/data/proxmox"
-            password_vault_key: "homepage_password"
+            username_vault_path: "salt/minions/docker"
+            username_vault_key: "proxmox_username"
+            password_vault_path: "salt/minions/docker"
+            password_vault_key: "proxmox_password"
             node: "proxmox"
-            
+
         truenas:
           name: "TrueNas"
           icon: "truenas.png"
@@ -124,10 +124,10 @@ homepage:
           protocol: "https"
           widget:
             type: "truenas"
-            api_key_vault_path: "secret/data/truenas"
-            api_key_vault_key: "api_key"
+            api_key_vault_path: "salt/minions/docker"
+            api_key_vault_key: "truenas_api"
             enablePools: true
-            
+
         patchmon:
           name: "Patch Mon"
           icon: "http://patch.taile3eee.ts.net:3791/assets/favicon.svg"
@@ -137,7 +137,7 @@ homepage:
             type: customapi
             url: "http://patch.taile3eee.ts.net:3791/api/v1/gethomepage/stats"
             headers:
-              Authorization: Basic cGF0Y2htb25fYWVfZGNmYWE3NzcxZjJmN2JhOTJkMDIyZjc0M2YwNDk0ZWE6ODFmOTA5MWJjOTJkOGQ4MmJiMDFjOWJmMThkODEyYzJiMTRiMzgyMTkzNjVmN2JmNjQwZjZhNjg0OGZmNWViZGNkYmJmNzI4OWY2YzA2M2M0MjlkYTZjYjRjM2Y1Njkw
+              Authorization: "{{ salt['vault.read_secret']('salt/minions/docker', 'patchmon_auth') }}"
             mappings:
               - field: total_hosts
                 label: Total Hosts
@@ -145,33 +145,33 @@ homepage:
                 label: Needs Updates
               - field: security_updates
                 label: Security Updates
-          
+
         virgin_network:
           name: "Virgin Network"
           icon: "si-virgin.svg"
           description: "Virgin Media Network"
           static_ip: "192.168.0.1"
-          
+
         creality_k1:
           name: "Creality K1 Rooted"
           icon: "octoprint.png"
           description: "Creality K1"
           static_ip: "192.168.0.172"
           port: 4408
-          
+
         desk_kvm:
           name: "Desk KVM"
           icon: "pigallery2.png"
           description: "Desk KVM"
           static_ip: "192.168.0.148"
           path: "/#/"
-          
+
         proxmox_kvm:
           name: "Proxmox KVM"
           icon: "proxmox-light.png"
           description: "Proxmox KVM"
           static_ip: "192.168.0.141"
-          
+
         fing:
           name: "Fing"
           icon: "mdi-wifi-#f0d453"
@@ -206,13 +206,13 @@ homepage:
           icon: "tailscale-light.png"
           description: "Tailscale"
           static_url: "https://login.tailscale.com/admin/machines"
-          
+
         github:
           name: "Github"
           icon: "github-light.png"
           description: "Github"
           static_url: "https://github.com/belnarlo?tab=repositories"
-          
+
         wakatime:
           name: "WakaTime"
           icon: "wakatime-light.png"
@@ -233,21 +233,21 @@ homepage:
           url: "https://www.dvdsreleasedates.com/rss.xml"
           href: "https://www.dvdsreleasedates.com/"
           limit: 5
-          
+
         bluray_weekly:
           name: "Blu-ray.com Weekly"
           icon: "mdi-disc-player"
           url: "https://www.blu-ray.com/rss/newreleasesfeed.xml"
           href: "https://www.blu-ray.com/movies/releasedates.php"
           limit: 5
-          
+
         movie_insider:
           name: "Movie Insider Releases"
           icon: "mdi-movie"
           url: "https://www.movieinsider.com/rss/movies-in-theaters.rss"
           href: "https://www.movieinsider.com/movies/in-theaters"
           limit: 5
-      
+
       # API-based services
       api_services:
         tmdb:
@@ -260,7 +260,7 @@ homepage:
           api_url: "https://api.themoviedb.org/3/movie/upcoming"
           api_header: "Authorization"
           api_header_prefix: "Bearer "
-    
+
     game_releases:
       title: "Game Releases"
       layout:
@@ -273,28 +273,28 @@ homepage:
           url: "https://news.xbox.com/en-us/feed/"
           href: "https://news.xbox.com/"
           limit: 6
-          
+
         xbox_gamepass:
           name: "Xbox Game Pass Updates"
           icon: "mdi-xbox"
           url: "https://majornelson.com/feed/"
           href: "https://www.xbox.com/en-GB/xbox-game-pass/games/coming-soon"
           limit: 5
-          
+
         steam_releases:
           name: "Steam New Releases"
           icon: "mdi-steam"
           url: "https://store.steampowered.com/feeds/newreleases.xml"
           href: "https://store.steampowered.com/explore/new/"
           limit: 6
-          
+
         pc_gaming:
           name: "PC Gaming News"
           icon: "mdi-gamepad-variant"
           url: "https://www.pcgamer.com/rss/"
           href: "https://www.pcgamer.com/"
           limit: 5
-      
+
       # Custom API services
       custom_services:
         xbox_tracker:
@@ -303,7 +303,7 @@ homepage:
           href: "https://www.xbox.com/en-GB/xbox-game-pass/games/coming-soon"
           description: "Xbox Game Pass releases via custom tracker"
           api_url: "http://steam-tracker:5000/xbox-gamepass"
-          
+
         steam_wishlist:
           name: "Steam Wishlist"
           icon: "mdi-steam"

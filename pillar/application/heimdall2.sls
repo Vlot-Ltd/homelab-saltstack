@@ -3,18 +3,18 @@ postgres_databases:
   - name: heimdall2
     users:
       - name: heimdall2_user
-        password: H31md@ll2P@ss
+        password: "{{ salt['vault.read_secret']('salt/roles/db', 'heimdall2_password') }}"
 
 # Heimdall2 Application Configuration
 heimdall2:
-  database_password: H31md@ll2P@ss
+  database_password: "{{ salt['vault.read_secret']('salt/roles/db', 'heimdall2_password') }}"
   database_host: postgres
   database_name: heimdall2
   database_user: heimdall2_user
   nginx_host: localhost
-  jwt_secret: h31md@ll2_jwt_s3cr3t_k3y_ch@ng3_th1s_1n_pr0d
-  api_key_secret: e791900e55d54c1023ca9c9fcbfdbb230085fcc92c597e7d6b3b843912e9a4f6
-  
+  jwt_secret: "{{ salt['vault.read_secret']('salt/minions/docker/heimdall2', 'jwt_secret') }}"
+  api_key_secret: "{{ salt['vault.read_secret']('salt/minions/docker/heimdall2', 'api_key_secret') }}"
+
   # LDAP Configuration (optional)
   ldap_enabled: false
   # ldap_host: ldap.example.com
