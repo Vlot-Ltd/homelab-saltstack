@@ -6,7 +6,6 @@ base:
     - application.zabbixagent
     - application.docker
     - common.security
-    - common.vault_secrets
   'docker':
     - application.linkwarden
     - application.heimdall2
