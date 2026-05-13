@@ -9,7 +9,7 @@ heimdall2_reporting:
 
   # API key for uploading scan results
   # Generated programmatically via API login
-  api_key: "{{ salt['vault.read_secret']('salt/general/heimdall2', 'api_key') }}"
+  api_key: "{{ pillar.get('api_key') }}"
 
   # Optional: Alternative URL for external access
   # external_url: "https://heimdall.yourdomain.com"

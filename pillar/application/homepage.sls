@@ -137,7 +137,7 @@ homepage:
             type: customapi
             url: "http://patch.taile3eee.ts.net:3791/api/v1/gethomepage/stats"
             headers:
-              Authorization: "{{ salt['vault.read_secret']('salt/minions/docker', 'patchmon_auth') }}"
+              Authorization: "{{ pillar.get('patchmon_auth') }}"
             mappings:
               - field: total_hosts
                 label: Total Hosts

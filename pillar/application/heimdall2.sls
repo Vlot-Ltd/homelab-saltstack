@@ -3,17 +3,17 @@ postgres_databases:
   - name: heimdall2
     users:
       - name: heimdall2_user
-        password: "{{ salt['vault.read_secret']('salt/roles/db', 'heimdall2_password') }}"
+        password: "{{ pillar.get('heimdall2_password') }}"
 
 # Heimdall2 Application Configuration
 heimdall2:
-  database_password: "{{ salt['vault.read_secret']('salt/roles/db', 'heimdall2_password') }}"
+  database_password: "{{ pillar.get('heimdall2_password') }}"
   database_host: postgres
   database_name: heimdall2
   database_user: heimdall2_user
   nginx_host: localhost
-  jwt_secret: "{{ salt['vault.read_secret']('salt/minions/docker/heimdall2', 'jwt_secret') }}"
-  api_key_secret: "{{ salt['vault.read_secret']('salt/minions/docker/heimdall2', 'api_key_secret') }}"
+  jwt_secret: "{{ pillar.get('heimdall2_jwt_secret') }}"
+  api_key_secret: "{{ pillar.get('heimdall2_api_secret') }}"
 
   # LDAP Configuration (optional)
   ldap_enabled: false
