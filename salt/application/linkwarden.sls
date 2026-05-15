@@ -6,8 +6,9 @@ include:
 {% set postgres_ip = postgres_host['ip'] if postgres_host and 'ip' in postgres_host else 'postgres' %}
 
 {% set db_info = salt['pillar.get']('postgres_databases', []) | selectattr('name', 'equalto', 'linkwarden') | list | first %}
-{% set db_user = db_info['users'][0]['name'] if db_info and 'users' in db_info else 'linkwarden_user' %}
-{% set db_password = db_info['users'][0]['password'] if db_info and 'users' in db_info else 'linkwarden_securepassword' %}
+{% set db_user = salt['pillar.get'](db_info['users'][0]['name_key']) if db_info else '' %}
+{% set db_password = salt['pillar.get'](db_info['users'][0]['password_key']) if db_info else '' %}
+{% set nextauth_secret = salt['pillar.get']('linkwarden_nextauth_secret', '') %}
 
 linkwarden-directory:
   file.directory:
@@ -24,7 +25,7 @@ linkwarden-env:
         POSTGRES_PASSWORD={{ db_password }}
         POSTGRES_DB=linkwarden
         DATABASE_URL=postgresql://{{ db_user }}:{{ db_password }}@{{ postgres_ip }}:5432/linkwarden
-        NEXTAUTH_SECRET=5ecr£t
+        NEXTAUTH_SECRET={{ nextauth_secret }}
     - user: root
     - group: docker
     - mode: "0640"

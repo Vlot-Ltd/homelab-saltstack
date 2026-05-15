@@ -1,5 +1,3 @@
-grafana_admin_password: "{{ pillar.get('grafana_password') }}"
-
 grafana_datasources:
   - name: Zabbix
     type: "alexanderzobnin-zabbix-datasource"
@@ -7,7 +5,7 @@ grafana_datasources:
     url: "http://localhost/zabbix/api_jsonrpc.php"
     isDefault: true
     jsonData:
-      username: "Admin"
+      username_key: "zabbix_api_user"
       trends: true
       trendsFrom: "7d"
       trendsRange: "4d"
@@ -17,15 +15,15 @@ grafana_datasources:
         enabled: true
         dataSource: "ZabbixDB"
     secureJsonData:
-      password: "{{ pillar.get('zabbix_password') }}"
+      password_key: "zabbix_api_password"
 
   - name: ZabbixDB
     type: "postgres"
     access: "proxy"
     url: "postgres:5432"
     database: "zabbix"
-    user: "zabbix_user"
+    user_key: "zabbix_db_user"
     secureJsonData:
-      password: "{{ pillar.get('zabbix_password') }}"
+      password_key: "zabbix_db_password"
     jsonData:
       sslmode: "disable"

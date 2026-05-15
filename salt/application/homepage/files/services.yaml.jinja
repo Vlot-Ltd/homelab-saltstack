@@ -21,10 +21,10 @@
   {% endif %}
 {%- endmacro %}
 
-{# Helper macro to get Vault secret safely #}
+{# Helper macro to get secret from pillar (injected by ext_pillar from Vault) #}
 {% macro get_vault_secret(vault_path, vault_key) -%}
-  {% if vault_path and vault_key %}
-    {{- salt['vault.read_secret'](vault_path, vault_key) if salt['vault.read_secret'](vault_path, vault_key) else '' -}}
+  {% if vault_key %}
+    {{- salt['pillar.get'](vault_key, '') -}}
   {% endif %}
 {%- endmacro %}
 
@@ -65,8 +65,8 @@
   {% endfor %}
 
   {% for custom_key, custom_service in section.get('custom_services', {}).items() %}
-    {% if custom_service.get('vault_path') %}
-      {% set required_key = get_vault_secret(custom_service.vault_path, custom_service.vault_key) %}
+    {% if custom_service.get('vault_key') %}
+      {% set required_key = get_vault_secret(None, custom_service.vault_key) %}
       {% if required_key %}
     - {{ custom_service.name }}:
         icon: {{ custom_service.icon }}
@@ -127,6 +127,25 @@
           enablePools: {{ service.widget.get('enablePools', true) | lower }}
           {% elif service.widget.type == 'homebox' %}
           url: {{ build_service_url(service, hosts) }}
+          {% elif service.widget.type == 'customapi' %}
+          url: {{ service.widget.url }}
+          {% if service.widget.get('headers') %}
+          headers:
+            {% for header_name, header_value in service.widget.headers.items() %}
+            {% if header_name.endswith('_key') %}
+            {{ header_name[:-4] }}: {{ salt['pillar.get'](header_value, '') }}
+            {% else %}
+            {{ header_name }}: {{ header_value }}
+            {% endif %}
+            {% endfor %}
+          {% endif %}
+          {% if service.widget.get('mappings') %}
+          mappings:
+            {% for mapping in service.widget.mappings %}
+            - field: {{ mapping.field }}
+              label: {{ mapping.label }}
+            {% endfor %}
+          {% endif %}
           {% endif %}
         {% endif %}
   {% endfor %}

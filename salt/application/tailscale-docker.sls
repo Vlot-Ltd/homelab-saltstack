@@ -23,7 +23,7 @@ tailscale-docker-compose:
             container_name: tailscale-sidecar
             hostname: homelab
             environment:
-              - TS_AUTHKEY={{ salt['vault.read_secret']('secret/data/tailscale', 'auth_key') if salt['vault.read_secret']('secret/data/tailscale', 'auth_key') else '' }}
+              - TS_AUTHKEY={{ salt['pillar.get']('tailscale_api', '') }}
               - TS_STATE_DIR=/var/lib/tailscale
               - TS_USERSPACE=false
               - TS_EXTRA_ARGS=--advertise-tags=tag:container

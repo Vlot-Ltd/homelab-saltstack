@@ -132,8 +132,8 @@ homepage-docker-compose:
             build: ./steam-tracker
             container_name: steam-tracker
             environment:
-              - STEAM_API_KEY={{ salt['vault.read_secret']('secret/data/homepage', 'steam_api_key') if salt['vault.read_secret']('secret/data/homepage', 'steam_api_key') else '' }}
-              - STEAM_USER_ID={{ salt['vault.read_secret']('secret/data/homepage', 'steam_user_id') if salt['vault.read_secret']('secret/data/homepage', 'steam_user_id') else '' }}
+              - STEAM_API_KEY={{ salt['pillar.get']('steam_api_key', '') }}
+              - STEAM_USER_ID={{ salt['pillar.get']('steam_user_id', '') }}
             ports:
               - "5000:5000"
             networks:

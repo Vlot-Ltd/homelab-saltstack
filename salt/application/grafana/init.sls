@@ -36,7 +36,8 @@ grafana-set-admin-password:
     - mode: "0644"
     - contents: |
         [security]
-        admin_password = {{ salt['pillar.get']('grafana_admin_password', 'admin') }}
+        admin_user = {{ salt['pillar.get']('grafana_user', 'admin') }}
+        admin_password = {{ salt['pillar.get']('grafana_password', 'admin') }}
     - watch_in:
         - service: grafana-service
 
@@ -71,18 +72,18 @@ grafana-datasources:
     - contents: |
         apiVersion: 1
         datasources:
-        {% for datasource in salt['pillar.get']('grafana_datasources', []) %}
-          - name: {{ datasource.name }}
-            type: {{ datasource.type }}
-            access: {{ datasource.access }}
-            url: {{ datasource.url }}
-            database: {{ datasource.get('database', '') }}
-            user: {{ datasource.get('user', '') }}
+        {% for ds in salt['pillar.get']('grafana_datasources', []) %}
+          - name: {{ ds.name }}
+            type: {{ ds.type }}
+            access: {{ ds.access }}
+            url: {{ ds.url }}
+            database: {{ ds.get('database', '') }}
+            user: {{ salt['pillar.get'](ds.user_key) if 'user_key' in ds else ds.get('user', '') }}
             secureJsonData:
-              password: {{ datasource.secureJsonData.password }}
+              password: {{ salt['pillar.get'](ds.secureJsonData.password_key) }}
             jsonData:
-              sslmode: {{ datasource.jsonData.get('sslmode', 'disable') }}
-              username: {{ datasource.jsonData.get('username', '') }}
+              sslmode: {{ ds.jsonData.get('sslmode', 'disable') }}
+              username: {{ salt['pillar.get'](ds.jsonData.username_key) if 'username_key' in ds.jsonData else ds.jsonData.get('username', '') }}
         {% endfor %}
     - watch_in:
         - service: grafana-service

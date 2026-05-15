@@ -1,5 +1,5 @@
 postgres_databases:
   - name: linkwarden
     users:
-      - name: linkwardenuser
-        password: "{{ pillar.get('linkwarden_password') }}"
+      - name_key: linkwarden_db_user
+        password_key: linkwarden_db_password

@@ -1,8 +1,8 @@
 postgres_databases:
   - name: zabbix
     users:
-      - name: zabbix_user
-        password: "{{ pillar.get('zabbix_password') }}"
+      - name_key: zabbix_db_user
+        password_key: zabbix_db_password
 
 zabbix_server:
   StartSNMPTrappers: 0

@@ -5,4 +5,4 @@ plex_auto_update: True
 plex_beta_updates: True
 plex_backup_retention: 15
 plex_url: 'http://192.168.0.28:32400'
-plex_token: "{{ pillar.get('plex_token') }}"
+plex_token_key: plex_token

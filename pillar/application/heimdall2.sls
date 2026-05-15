@@ -2,18 +2,14 @@
 postgres_databases:
   - name: heimdall2
     users:
-      - name: heimdall2_user
-        password: "{{ pillar.get('heimdall2_password') }}"
+      - name_key: heimdall2_db_user
+        password_key: heimdall2_db_password
 
 # Heimdall2 Application Configuration
 heimdall2:
-  database_password: "{{ pillar.get('heimdall2_password') }}"
   database_host: postgres
   database_name: heimdall2
-  database_user: heimdall2_user
   nginx_host: localhost
-  jwt_secret: "{{ pillar.get('heimdall2_jwt_secret') }}"
-  api_key_secret: "{{ pillar.get('heimdall2_api_secret') }}"
 
   # LDAP Configuration (optional)
   ldap_enabled: false

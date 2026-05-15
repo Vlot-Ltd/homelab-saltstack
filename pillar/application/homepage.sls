@@ -45,7 +45,7 @@ homepage:
           widget:
             type: "grafana"
             username_vault_path: "salt/roles/monitoring"
-            username_vault_key: "grafana_username"
+            username_vault_key: "grafana_user"
             password_vault_path: "salt/roles/monitoring"
             password_vault_key: "grafana_password"
 
@@ -90,9 +90,9 @@ homepage:
           widget:
             type: "zabbix"
             username_vault_path: "salt/roles/monitoring"
-            username_vault_key: "zabbix_username"
+            username_vault_key: "zabbix_api_user"
             password_vault_path: "salt/roles/monitoring"
-            password_vault_key: "zabbix_password"
+            password_vault_key: "zabbix_api_password"
 
     infrastructure:
       title: "Infrastructure"
@@ -137,7 +137,7 @@ homepage:
             type: customapi
             url: "http://patch.taile3eee.ts.net:3791/api/v1/gethomepage/stats"
             headers:
-              Authorization: "{{ pillar.get('patchmon_auth') }}"
+              Authorization_key: patchmon_auth
             mappings:
               - field: total_hosts
                 label: Total Hosts
@@ -255,7 +255,6 @@ homepage:
           icon: "mdi-movie-star"
           href: "https://www.themoviedb.org/movie/upcoming"
           description: "TMDB upcoming releases"
-          vault_path: "secret/data/homepage"
           vault_key: "tmdb_api_key"
           api_url: "https://api.themoviedb.org/3/movie/upcoming"
           api_header: "Authorization"
@@ -310,5 +309,4 @@ homepage:
           href: "https://store.steampowered.com/wishlist/"
           description: "Your Steam wishlist updates"
           api_url: "http://steam-tracker:5000/wishlist"
-          vault_path: "secret/data/homepage"
           vault_key: "steam_api_key"
