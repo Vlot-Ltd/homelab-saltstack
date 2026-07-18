@@ -11,6 +11,9 @@ install_required_packages:
       - lshw
       - lsof
       - net-tools
+      - openscap-scanner
+      - openscap-utils
+      - ssg-debderived
       - tree
       - wget
       - zsh
