@@ -26,6 +26,7 @@ base:
     - application.linkwarden
     - application.zabbix
     - application.heimdall2
+    - application.manyfold
   'zabbix':
     - application.zabbix
     - application.grafana
