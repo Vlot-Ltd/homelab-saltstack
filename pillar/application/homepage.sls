@@ -68,6 +68,12 @@ homepage:
           description: "Linkwarden Password Manager"
           static_url: "https://linkwarden.taile3eee.ts.net/"
 
+        manyfold:
+          name: "manyfold"
+          icon: "3d.png"
+          description: "Manyfold STL Library Manager"
+          static_url: "https://mayfold.taile3eee.ts.net/"
+
         plex:
           name: "Plex"
           icon: "plex-alt-light.png"
