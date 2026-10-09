@@ -134,12 +134,12 @@ homepage:
 
         patchmon:
           name: "Patch Mon"
-          icon: "http://patch.taile3eee.ts.net:3791/assets/favicon.svg"
+          icon: "http://patch.taile3eee.ts.net:3000/assets/favicon.svg"
           description: "Patch Mon"
           static_url: "http://patch.taile3eee.ts.net/"
           widget:
             type: customapi
-            url: "http://patch.taile3eee.ts.net:3791/api/v1/gethomepage/stats"
+            url: "http://patch.taile3eee.ts.net:3000/api/v1/gethomepage/stats"
             headers:
               Authorization_key: patchmon_auth
             mappings:
