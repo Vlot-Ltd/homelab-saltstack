@@ -92,13 +92,12 @@ homepage:
           icon: "zabbix.png"
           description: "Zabbix"
           host_lookup: "zabbix"
-          path: "/zabbix/"
+          path: "/zabbix"
           widget:
             type: "zabbix"
-            username_vault_path: "salt/roles/monitoring"
-            username_vault_key: "zabbix_api_user"
-            password_vault_path: "salt/roles/monitoring"
-            password_vault_key: "zabbix_api_password"
+            # API token: Zabbix → Users → API tokens; stored in Vault
+            api_key_vault_path: "salt/roles/monitoring"
+            api_key_vault_key: "zabbix_api_token"
 
     infrastructure:
       title: "Infrastructure"

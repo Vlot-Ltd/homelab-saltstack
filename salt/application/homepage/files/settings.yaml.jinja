@@ -12,20 +12,20 @@ hideVersion: true
 useEqualHeights: false
 
 layout:
-  # Entertainment sections
-  {% for section_key, section in homepage_config.get('entertainment', {}).items() %}
-  {{ section.title }}:
-    style: {{ section.layout.style }}
-    columns: {{ section.layout.columns }}
-    {% if section.layout.get('header') %}header: {{ section.layout.header | lower }}{% endif %}
-  {% endfor %}
-  
   # Service groups
   {% for group_key, group in homepage_config.get('service_groups', {}).items() %}
   {{ group.title }}:
     style: {{ group.layout.style }}
     columns: {{ group.layout.columns }}
     {% if group.layout.get('header') %}header: {{ group.layout.header | lower }}{% endif %}
+  {% endfor %}
+  
+  # Entertainment sections
+  {% for section_key, section in homepage_config.get('entertainment', {}).items() %}
+  {{ section.title }}:
+    style: {{ section.layout.style }}
+    columns: {{ section.layout.columns }}
+    {% if section.layout.get('header') %}header: {{ section.layout.header | lower }}{% endif %}
   {% endfor %}
 
 quicklaunch:
