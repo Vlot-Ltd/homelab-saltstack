@@ -136,15 +136,12 @@ homepage-docker-compose:
     - require:
         - file: homepage-directory
 
-check-homepage:
-  cmd.run:
-    - name: docker ps -f status=running | grep -q homepage && echo RUNNING || echo STOPPED
-    - output_loglevel: quiet
-
 restart-homepage-on-config-change:
   cmd.run:
     - name: docker compose down && docker compose up -d --build
     - cwd: /docker/homepage
+    - require:
+        - cmd: start-tailscale-docker
     - onchanges:
         - file: homepage-services-config
         - file: homepage-settings-config  
@@ -155,7 +152,7 @@ start-homepage:
   cmd.run:
     - name: docker compose up -d --build
     - cwd: /docker/homepage
-    - onlyif: "grep -q STOPPED /var/cache/salt/minion/check-homepage"
+    - unless: docker ps -q --filter name=^homepage$ --filter status=running | grep -q .
     - require:
-        - cmd: check-homepage
+        - file: homepage-docker-compose
         - cmd: start-tailscale-docker

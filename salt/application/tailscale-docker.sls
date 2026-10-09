@@ -43,25 +43,21 @@ tailscale-docker-compose:
     - group: docker
     - mode: "0644"
 
-check-tailscale-docker:
-  cmd.run:
-    - name: docker ps -f status=running | grep -q tailscale-sidecar && echo RUNNING || echo STOPPED
-    - output_loglevel: quiet
-
+# Running-state checks query docker directly. The old checks grepped
+# /var/cache/salt/minion/check-tailscale-docker, which nothing writes, so the
+# sidecar was never started (PEP-HL-SLT-006).
 restart-tailscale-docker:
   cmd.run:
     - name: docker compose down && docker compose up -d
     - cwd: /docker/tailscale
-    - onlyif: "grep -q RUNNING /var/cache/salt/minion/check-tailscale-docker"
+    - onlyif: docker ps -q --filter name=^tailscale-sidecar$ --filter status=running | grep -q .
     - onchanges:
         - file: tailscale-docker-compose
-    - require:
-        - cmd: check-tailscale-docker
 
 start-tailscale-docker:
   cmd.run:
     - name: docker compose up -d
     - cwd: /docker/tailscale
-    - onlyif: "grep -q STOPPED /var/cache/salt/minion/check-tailscale-docker"
+    - unless: docker ps -q --filter name=^tailscale-sidecar$ --filter status=running | grep -q .
     - require:
-        - cmd: check-tailscale-docker
+        - file: tailscale-docker-compose
