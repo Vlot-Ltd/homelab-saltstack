@@ -72,7 +72,7 @@ homepage:
           name: "manyfold"
           icon: "3d.png"
           description: "Manyfold STL Library Manager"
-          static_url: "https://mayfold.taile3eee.ts.net/"
+          static_url: "https://manyfold.taile3eee.ts.net/"
 
         plex:
           name: "Plex"
@@ -111,9 +111,7 @@ homepage:
           name: "Proxmox"
           icon: "proxmox.png"
           description: "Proxmox Cluster"
-          host_lookup: "proxmox"
-          port: 8006
-          protocol: "https"
+          static_url: "https://proxmox.taile3eee.ts.net:8006/"
           widget:
             type: "proxmox"
             username_vault_path: "salt/minions/docker"

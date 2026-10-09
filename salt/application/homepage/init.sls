@@ -27,45 +27,48 @@ homepage-files-directory:
     - group: root
     - mode: "0755"
 
-# Create Steam tracker service directory and files
-steam-tracker-directory:
-  file.directory:
-    - name: /docker/homepage/steam-tracker
-    - user: root
-    - group: docker
-    - mode: "0755"
-    - require:
-      - file: homepage-directory
+# steam-tracker: designed but never built (2026-10-09). The source files below
+# don't exist, so these states are disabled until the service is written.
+# Spec: vault note entertainment-release-tracker. Tracked in homelab-salt-fix.
+# # Create Steam tracker service directory and files
+# steam-tracker-directory:
+#   file.directory:
+#     - name: /docker/homepage/steam-tracker
+#     - user: root
+#     - group: docker
+#     - mode: "0755"
+#     - require:
+#       - file: homepage-directory
 
-steam-tracker-app:
-  file.managed:
-    - name: /docker/homepage/steam-tracker/app.py
-    - source: salt://application/homepage/files/steam_tracker_app.py
-    - user: root
-    - group: docker
-    - mode: "0644"
-    - require:
-      - file: steam-tracker-directory
+# steam-tracker-app:
+#   file.managed:
+#     - name: /docker/homepage/steam-tracker/app.py
+#     - source: salt://application/homepage/files/steam_tracker_app.py
+#     - user: root
+#     - group: docker
+#     - mode: "0644"
+#     - require:
+#       - file: steam-tracker-directory
 
-steam-tracker-requirements:
-  file.managed:
-    - name: /docker/homepage/steam-tracker/requirements.txt
-    - source: salt://application/homepage/files/steam_tracker_requirements.txt
-    - user: root
-    - group: docker
-    - mode: "0644"
-    - require:
-      - file: steam-tracker-directory
+# steam-tracker-requirements:
+#   file.managed:
+#     - name: /docker/homepage/steam-tracker/requirements.txt
+#     - source: salt://application/homepage/files/steam_tracker_requirements.txt
+#     - user: root
+#     - group: docker
+#     - mode: "0644"
+#     - require:
+#       - file: steam-tracker-directory
 
-steam-tracker-dockerfile:
-  file.managed:
-    - name: /docker/homepage/steam-tracker/Dockerfile
-    - source: salt://application/homepage/files/steam_tracker_dockerfile
-    - user: root
-    - group: docker
-    - mode: "0644"
-    - require:
-      - file: steam-tracker-directory
+# steam-tracker-dockerfile:
+#   file.managed:
+#     - name: /docker/homepage/steam-tracker/Dockerfile
+#     - source: salt://application/homepage/files/steam_tracker_dockerfile
+#     - user: root
+#     - group: docker
+#     - mode: "0644"
+#     - require:
+#       - file: steam-tracker-directory
 
 homepage-services-config:
   file.managed:
@@ -125,26 +128,8 @@ homepage-docker-compose:
               - HOMEPAGE_ALLOWED_HOSTS=*
               - PUID=1000
               - PGID=1000
-            depends_on:
-              - steam-tracker
-          
-          steam-tracker:
-            build: ./steam-tracker
-            container_name: steam-tracker
-            environment:
-              - STEAM_API_KEY={{ salt['pillar.get']('steam_api_key', '') }}
-              - STEAM_USER_ID={{ salt['pillar.get']('steam_user_id', '') }}
-            ports:
-              - "5000:5000"
-            networks:
-              - tailnet
-            restart: unless-stopped
-            healthcheck:
-              test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
-              interval: 30s
-              timeout: 10s
-              retries: 3
-              start_period: 60s
+        # steam-tracker service disabled until it's built (see the note above).
+        # Restore depends_on: [steam-tracker] on homepage when it is.
     - user: root
     - group: docker
     - mode: "0644"
@@ -165,9 +150,6 @@ restart-homepage-on-config-change:
         - file: homepage-settings-config  
         - file: homepage-widgets-config
         - file: homepage-docker-compose
-        - file: steam-tracker-app
-        - file: steam-tracker-requirements
-        - file: steam-tracker-dockerfile
 
 start-homepage:
   cmd.run:

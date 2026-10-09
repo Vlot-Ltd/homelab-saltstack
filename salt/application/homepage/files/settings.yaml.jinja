@@ -35,18 +35,4 @@ quicklaunch:
 
 language: en
 dateFormat: "YYYY/MM/DD"
-timeFormat: "HH:mm"() %}
-  {{ section }}:
-    style: {{ config.style }}
-    columns: {{ config.columns }}
-    {% if config.get('header') %}header: {{ config.header | lower }}{% endif %}
-{% endfor %}
-
-quicklaunch:
-  searchDescriptions: true
-  hideInternetSearch: false
-  hideVisitURL: false
-
-language: en
-dateFormat: "YYYY/MM/DD"
 timeFormat: "HH:mm"

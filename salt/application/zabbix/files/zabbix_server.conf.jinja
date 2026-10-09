@@ -4,9 +4,12 @@
 # Managed by Salt
 # Database configuration
 DBHost={{ salt['pillar.get']('postgres_host', 'postgres') }}
-DBName={{ salt['pillar.get']('postgres_databases', [])[0].get('name', 'zabbix') }}
-DBUser={{ salt['pillar.get']('postgres_databases', [])[0].get('users', [{'name': '', 'password': ''}])[0]['name'] }}
-DBPassword={{ salt['pillar.get']('postgres_databases', [])[0].get('users', [{'name': '', 'password': ''}])[0]['password'] }}
+{#- users carry pillar key names (name_key/password_key); the values come from Vault via ext_pillar #}
+{%- set zabbix_db = salt['pillar.get']('postgres_databases', []) | selectattr('name', 'equalto', 'zabbix') | list | first | default({}, true) %}
+{%- set zabbix_db_user = zabbix_db.get('users', [{}]) | first | default({}, true) %}
+DBName={{ zabbix_db.get('name', 'zabbix') }}
+DBUser={{ salt['pillar.get'](zabbix_db_user.get('name_key', 'zabbix_db_user'), '') }}
+DBPassword={{ salt['pillar.get'](zabbix_db_user.get('password_key', 'zabbix_db_password'), '') }}
 
 # Defaults configuration
 AlertScriptsPath={{ salt['pillar.get']('zabbix_server:AlertScriptsPath', '/usr/lib/zabbix/alertscripts') }}

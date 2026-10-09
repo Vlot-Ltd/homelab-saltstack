@@ -10,8 +10,10 @@
   {% elif service.get('static_ip') %}
     {{- service.get('protocol', 'http') }}://{{ service.static_ip }}{% if service.get('port') %}:{{ service.port }}{% endif %}{% if service.get('path') %}{{ service.path }}{% endif %}
   {% elif service.get('host_lookup') %}
-    {% set host = hosts | selectattr('name', 'equalto', service.host_lookup) | list | first %}
-    {% if host %}
+    {#- an empty match must not hit `first`: Salt's strict undefined makes it raise #}
+    {% set matches = hosts | selectattr('name', 'equalto', service.host_lookup) | list %}
+    {% if matches %}
+      {%- set host = matches[0] %}
       {{- service.get('protocol', 'http') }}://{{ host.ip }}{% if service.get('port') %}:{{ service.port }}{% endif %}{% if service.get('path') %}{{ service.path }}{% endif %}
     {% else %}
       {{- '#' -}}
