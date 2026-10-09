@@ -1,10 +1,11 @@
-# PEP-008: Restore Vault Pillar Integration
+# PEP-HL-SLT-008: Restore Vault Pillar Integration
 
-**PEP:** 008  
+**ID:** PEP-HL-SLT-008
 **Title:** Restore Vault Pillar Integration  
 **Author:** Timo Vlot  
 **Status:** Testing  
 **Type:** Infrastructure  
+**Priority:** Medium
 **Created:** 2026-05-12  
 **Updated:** 2026-05-13  
 **Supersedes:** N/A  
@@ -231,7 +232,7 @@ Most likely finding based on git history: the Salt master Vault runner config is
 ### Context for AI Assistance
 
 ```
-You are helping implement PEP-008 for a homelab SaltStack project.
+You are helping implement PEP-HL-SLT-008 for a homelab SaltStack project.
 Goal: Fix broken Vault pillar lookups in pillar/common/vault_secrets.sls.
 Technology stack: SaltStack, HashiCorp Vault (KV v2 engine, file backend, TLS disabled — see PEP-004)
 Vault address: http://<vault-ip>:8200 (IP sourced from pillar hosts_entries)

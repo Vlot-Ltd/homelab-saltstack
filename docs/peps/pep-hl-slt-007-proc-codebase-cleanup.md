@@ -1,10 +1,11 @@
-# PEP-007: Codebase Cleanup
+# PEP-HL-SLT-007: Codebase Cleanup
 
-**PEP:** 007  
+**ID:** PEP-HL-SLT-007
 **Title:** Codebase Cleanup  
 **Author:** Timo Vlot  
 **Status:** Draft  
 **Type:** Process  
+**Priority:** Medium
 **Created:** 2026-05-12  
 **Updated:** 2026-05-12  
 **Supersedes:** N/A  
@@ -72,7 +73,7 @@ Recommendation: Implement Option A only after PEP-002 has moved the superuser pa
 
 ```jinja
 {%- if false %}
-# Disabled: requires PEP-002 and PEP-007 completion
+# Disabled: requires PEP-002 and PEP-HL-SLT-007 completion
 {%- endif %}
 ```
 
@@ -160,7 +161,7 @@ plex_limits:
 ### Context for AI Assistance
 
 ```
-You are helping implement PEP-007 for a homelab SaltStack project.
+You are helping implement PEP-HL-SLT-007 for a homelab SaltStack project.
 Goal: Clean up dead files and fix incorrect maintenance state behaviour.
 Technology stack: SaltStack, PostgreSQL, Plex Media Server, SQLite3, Jinja2
 Files to remove: salt/application/netbox/initold.sls, salt/application/netbox/webserver.sls

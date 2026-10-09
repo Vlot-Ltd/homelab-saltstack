@@ -1,10 +1,11 @@
-# PEP-006: Salt State Quality Improvements
+# PEP-HL-SLT-006: Salt State Quality Improvements
 
-**PEP:** 006  
+**ID:** PEP-HL-SLT-006
 **Title:** Salt State Quality Improvements  
 **Author:** Timo Vlot  
 **Status:** Draft  
 **Type:** Feature  
+**Priority:** Medium
 **Created:** 2026-05-12  
 **Updated:** 2026-05-12  
 **Supersedes:** N/A  
@@ -135,7 +136,7 @@ Once PEP-002 is implemented, these inline calls should be replaced with `{{ pill
 ### Context for AI Assistance
 
 ```
-You are helping implement PEP-006 for a homelab SaltStack project.
+You are helping implement PEP-HL-SLT-006 for a homelab SaltStack project.
 Goal: Fix Salt state quality issues — missing watch directives, fragile service checks, unconditional debug output.
 Technology stack: SaltStack, Docker, Jinja2, Grafana, HashiCorp Vault
 Files to modify:

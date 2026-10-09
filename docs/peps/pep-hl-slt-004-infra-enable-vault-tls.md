@@ -1,10 +1,11 @@
-# PEP-004: Enable TLS on HashiCorp Vault
+# PEP-HL-SLT-004: Enable TLS on HashiCorp Vault
 
-**PEP:** 004  
+**ID:** PEP-HL-SLT-004
 **Title:** Enable TLS on HashiCorp Vault  
 **Author:** Timo Vlot  
 **Status:** Draft  
 **Type:** Infrastructure  
+**Priority:** Medium
 **Created:** 2026-05-12  
 **Updated:** 2026-05-12  
 **Supersedes:** N/A  
@@ -108,7 +109,7 @@ vault:
 ### Context for AI Assistance
 
 ```
-You are helping implement PEP-004 for a homelab SaltStack project.
+You are helping implement PEP-HL-SLT-004 for a homelab SaltStack project.
 Goal: Enable TLS on HashiCorp Vault by updating salt/application/vault.sls.
 Technology stack: SaltStack, HashiCorp Vault (file backend), Tailscale (tailnet: taile3eee.ts.net)
 Current vault.hcl has: tls_disable = true in the listener block

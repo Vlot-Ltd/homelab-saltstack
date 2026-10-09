@@ -1,10 +1,11 @@
-# PEP-003: Fix SQL Injection in PostgreSQL State Management
+# PEP-HL-SLT-003: Fix SQL Injection in PostgreSQL State Management
 
-**PEP:** 003  
+**ID:** PEP-HL-SLT-003
 **Title:** Fix SQL Injection in PostgreSQL State Management  
 **Author:** Timo Vlot  
 **Status:** Draft  
 **Type:** Feature  
+**Priority:** Medium
 **Created:** 2026-05-12  
 **Updated:** 2026-05-12  
 **Supersedes:** N/A  
@@ -103,7 +104,7 @@ The same pattern applies to:
 ### Context for AI Assistance
 
 ```
-You are helping implement PEP-003 for a homelab SaltStack project.
+You are helping implement PEP-HL-SLT-003 for a homelab SaltStack project.
 Goal: Fix SQL injection in salt/database/postgres/database.sls by replacing cmd.run+psql with Salt postgres module states.
 Technology stack: SaltStack, PostgreSQL, Jinja2
 Pillar structure: pillar data contains 'databases' list and 'users' list, each with 'name' and 'password' keys

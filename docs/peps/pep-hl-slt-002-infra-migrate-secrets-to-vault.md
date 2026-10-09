@@ -1,10 +1,11 @@
-# PEP-002: Migrate Hardcoded Secrets to HashiCorp Vault
+# PEP-HL-SLT-002: Migrate Hardcoded Secrets to HashiCorp Vault
 
-**PEP:** 002  
+**ID:** PEP-HL-SLT-002
 **Title:** Migrate Hardcoded Secrets to HashiCorp Vault  
 **Author:** Timo Vlot  
 **Status:** Testing  
 **Type:** Infrastructure  
+**Priority:** Medium
 **Created:** 2026-05-12  
 **Updated:** 2026-05-13  
 **Supersedes:** N/A  
@@ -177,7 +178,7 @@ After each migration: run `salt <target> state.apply` and confirm the service is
 ### Context for AI Assistance
 
 ```
-You are helping implement PEP-002 for a homelab SaltStack project.
+You are helping implement PEP-HL-SLT-002 for a homelab SaltStack project.
 Goal: Replace hardcoded secrets in SaltStack pillar files with HashiCorp Vault lookups.
 Technology stack: SaltStack, HashiCorp Vault (file backend, TLS currently disabled - see PEP-004), Python/Jinja2
 Existing pattern: pillar/common/vault_secrets.sls uses salt['vault.read_secret']('secret/data/...', 'key')

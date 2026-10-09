@@ -1,10 +1,11 @@
-# PEP-005: Fix Structural State Flaws
+# PEP-HL-SLT-005: Fix Structural State Flaws
 
-**PEP:** 005  
+**ID:** PEP-HL-SLT-005
 **Title:** Fix Structural State Flaws  
 **Author:** Timo Vlot  
 **Status:** Draft  
 **Type:** Feature  
+**Priority:** Medium
 **Created:** 2026-05-12  
 **Updated:** 2026-05-12  
 **Supersedes:** N/A  
@@ -100,7 +101,7 @@ These cause immediate state load failures and should be fixed first:
 ### Context for AI Assistance
 
 ```
-You are helping implement PEP-005 for a homelab SaltStack project.
+You are helping implement PEP-HL-SLT-005 for a homelab SaltStack project.
 Goal: Fix four structural defects in Salt state files.
 Technology stack: SaltStack, Jinja2
 Files to modify:

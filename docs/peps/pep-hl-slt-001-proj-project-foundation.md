@@ -1,10 +1,11 @@
-# PEP-001: Project Foundation
+# PEP-HL-SLT-001: Project Foundation
 
-**PEP:** 001  
+**ID:** PEP-HL-SLT-001
 **Title:** Project Foundation  
 **Author:** Timo Vlot  
 **Status:** Active  
 **Type:** Project  
+**Priority:** Medium
 **Created:** 2026-05-12  
 **Updated:** 2026-05-12  
 **Supersedes:** N/A  

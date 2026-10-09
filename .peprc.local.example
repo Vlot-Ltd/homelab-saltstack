@@ -1,0 +1,15 @@
+# PEP Framework — personal settings (copy to .peprc.local and customise)
+# This file is an example. .peprc.local is gitignored so changes stay local to you.
+
+# Your name, used as author in PEP/BLOG templates
+PEP_AUTHOR="Your Name"
+
+# Editor to open when creating/editing PEPs and BLOGs
+DEFAULT_EDITOR="vi"
+
+# Automatically open the editor after creating a PEP/BLOG (true/false)
+AUTO_OPEN_EDITOR="true"
+
+# Path or URL to your local copy of the pep-framework-cookiecutter repo.
+# Set this so "pep-tools.sh update-tools" works without --source each time.
+# PEP_FRAMEWORK_SOURCE=""

@@ -1,7 +1,7 @@
-# BLOG-XXX: Implementation of PEP-XXX
+# BLOG-XXX: Implementation of PEPID
 
 **BLOG:** XXX  
-**Related PEP:** PEP-XXX  
+**Related PEP:** PEPID  
 **Author:** [Your Name]  
 **Implementation Date:** YYYY-MM-DD  
 **Status:** In Progress  
@@ -41,10 +41,10 @@ What was actually built and how it differs from the original PEP.
 
 ### Code Changes
 
-- Branch: `feature/pep-XXX-[description]`
+- Branch: `feature/PEPID-[description]`
 - Key commits:
-  - `abc1234: pep-XXX: Initial implementation`
-  - `def5678: pep-XXX: Fix integration issues`
+  - `abc1234: PEPID: Initial implementation`
+  - `def5678: PEPID: Fix integration issues`
 
 ### Testing Results
 

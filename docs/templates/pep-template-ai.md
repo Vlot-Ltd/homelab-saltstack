@@ -52,6 +52,25 @@ Why is this change needed? What problem does it solve?
 - Timeline
 - Dependencies
 
+## Claude Prompt Context
+
+### Context for AI Assistance
+
+```
+You are helping implement PEPID: [Title]. 
+Key requirements: [list key requirements]
+Technology stack: [relevant technologies]
+Constraints: [any limitations]
+Current status: [where we are in implementation]
+```
+
+### Specific AI Tasks
+
+- [ ] Code generation for [specific component]
+- [ ] Configuration templates for [system]
+- [ ] Testing strategies
+- [ ] Documentation generation
+
 ## Testing Strategy
 
 - Unit tests

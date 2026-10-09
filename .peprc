@@ -2,23 +2,30 @@
 # This file is sourced by pep-tools.sh and contains project-specific settings
 
 # Author information (used in PEP/BLOG templates)
-PEP_AUTHOR="Your Name"
+PEP_AUTHOR="Timo Vlot"
 
 # Default editor for creating/editing PEPs and BLOGs
-DEFAULT_EDITOR="vi"
+DEFAULT_EDITOR="zed"
 
 # Project information
-PROJECT_NAME="Generic PEP Framework"
+PROJECT_NAME="Homelab SaltStack"
+
+# PEP identifier codes — combined to build IDs like PEP-PROJECT_CODE-REPO_CODE-001
+PROJECT_CODE="HL"
+REPO_CODE="SLT"
+
+# Enable/disable the Blogs (Build Logs) feature
+ENABLE_BLOGS="y"
 
 # Directory configuration (relative to project root)
 # Uncomment and modify if you want different paths
 # PEP_DIR="docs/peps"
-# BLOG_DIR="docs/blogs" 
+# BLOG_DIR="docs/blogs"
 # TEMPLATE_DIR="docs/templates"
 
 # Integration settings for monitoring
-ZABBIX_HOST=""
-GRAFANA_URL=""
+ZABBIX_HOST="http://zabbix.taile3eee.ts.net/zabbix/"
+GRAFANA_URL="http://100.107.102.4:3000/"
 
 # Git integration
 # Set to true to require all commits reference a PEP (strict mode)
@@ -33,5 +40,5 @@ DEBUG="false"
 
 # Template customization
 # Set to true to automatically open editor after creating PEP/BLOG
-AUTO_OPEN_EDITOR="false"
+AUTO_OPEN_EDITOR="true"
 # CREATE_GIT_BRANCH="false"
