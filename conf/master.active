@@ -1,0 +1,35 @@
+user: root
+netapi_enable_clients:
+  - local
+  - local_async
+  - runner
+  - wheel
+  - ssh
+rest_cherrypy:
+  port: 9191
+  host: 0.0.0.0
+  disable_ssl: true
+  collect_stats: true
+  stats_disable_auth: true
+external_auth:
+  pam:
+    testuser:
+      - .*
+      - '@wheel'
+      - '@runner'
+      - '@jobs'
+peer:
+  gibson:
+    - test.*
+    - pkg.*
+fileserver_backend:
+  - roots
+ext_pillar:
+  - vault:
+      path: salt/roles/{pillar[roles]}
+  - vault:
+      path: salt/minions/{minion}
+  - vault:
+      path: salt/general
+log_level: info
+pillar_merge_lists: True

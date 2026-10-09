@@ -51,8 +51,8 @@ expired; `salt-run vault.clear_cache` plus a master restart clears it.
 
 **Remaining before Implemented:**
 
-- [ ] Apply `application.salt-master` to `salt` (`state.apply application.salt-master test=True` first).
-- [ ] Copy `/etc/salt/master.d/` into `conf/master.d/`, with the `role_id` and `secret_id` values removed, so master config is reviewable.
+- [x] Apply `application.salt-master` to `salt` (`state.apply application.salt-master test=True` first). Done 2026-10-09.
+- [x] Copy `/etc/salt/master.d/` into `conf/master.d/`, with the `role_id` and `secret_id` values removed, so master config is reviewable. Done 2026-10-09; active lines of `/etc/salt/master` in `conf/master.active`.
 - [x] Heimdall API key: Vault `salt/general` had `heildall2_api`; `salt/application/heimdall2/files/.env.jinja` reads pillar `heimdall2_api_secret`. Copied to `heimdall2_api_secret` 2026-10-09 (old key left in place, unused).
 - [ ] Highstate each affected minion and confirm services are healthy in Zabbix.
 - [ ] `docs/VAULT_SALT_SETUP.md` is outdated (banner added); rewrite or retire.
