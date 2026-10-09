@@ -17,6 +17,11 @@ REPO_CODE="SLT"
 # Enable/disable the Blogs (Build Logs) feature
 ENABLE_BLOGS="y"
 
+# Git workflow: single-maintainer repo, no feature branches or PRs.
+# "false" makes new-branch stay on the current branch (main); commit with
+# "pep-hl-slt-NNN: message".
+BRANCH_PER_PEP=false
+
 # Directory configuration (relative to project root)
 # Uncomment and modify if you want different paths
 # PEP_DIR="docs/peps"

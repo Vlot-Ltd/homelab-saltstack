@@ -3,17 +3,59 @@
 **ID:** PEP-HL-SLT-008
 **Title:** Restore Vault Pillar Integration  
 **Author:** Timo Vlot  
-**Status:** Testing  
+**Status:** Active  
 **Type:** Infrastructure  
 **Priority:** Medium
 **Created:** 2026-05-12  
-**Updated:** 2026-05-13  
+**Updated:** 2026-10-09  
 **Supersedes:** N/A  
 **Superseded-By:** N/A  
 
 ## Abstract
 
 `salt['vault.read_secret']()` calls in `pillar/common/vault_secrets.sls` were breaking pillar compilation on all minions, causing highstate failures across the entire homelab. As a workaround the calls were replaced with `pillar.get()` stubs that silently return empty strings. This PEP diagnoses the root cause of the Vault lookup failure, fixes the Salt master Vault configuration, and restores proper secret resolution. The pillar-side changes are implemented and staged — only Salt master configuration and testing remain.
+
+## Root cause and fix (2026-10-09)
+
+Pillar secrets resolve again on all minions. Four separate faults, found in this
+order:
+
+1. **`saltext-vault` was missing.** Since Salt 3007, Vault support is the
+   `saltext-vault` extension, installed with `salt-pip` into
+   `/opt/saltstack/salt/extras-3.X`. The upgrade to 3008.3 moved onedir to
+   Python 3.14, which left the extension in `extras-3.10`. Symptom:
+   `ext_pillar interface named vault is unavailable` in the master log, and
+   every `vault.*` function "not available". Fix: `salt-pip install
+   saltext-vault` (1.8.0), now pinned in `salt/application/salt-master.sls`.
+2. **The master's AppRole secret ID had expired.** The `salt-master` role had
+   `secret_id_ttl=720h`. Symptom: `invalid role or secret ID`. Fix: new secret
+   ID; role changed to `secret_id_ttl=0` and `secret_id_bound_cidrs=192.168.0.21/32`
+   (the master's LAN address, the only source that uses it).
+3. **The `salt-master` policy was wrong.** It granted `secret/data/*` (no such
+   mount; secrets are on `salt/`, KV v2) and nothing for issuing minion
+   AppRoles on `salt-minions/` (`issue: type: approle` in `vault.conf`).
+   Symptom: `permission denied`. Fix: `vault/salt-master.hcl`.
+4. **The `salt_minion` policy didn't match the entity metadata.** The policy
+   read `roles__N`; `vault.conf` wrote the metadata key as `role`, giving
+   `role__N`. It also granted `salt/data/general/*` but not `salt/data/general`.
+   Fix: `vault.conf` key renamed to `roles`, `salt-run vault.sync_entities`,
+   and `vault/salt_minion.hcl`.
+
+Also: a stale cached session token caused 403s after the policy change until it
+expired; `salt-run vault.clear_cache` plus a master restart clears it.
+
+**Verified 2026-10-09:** `salt-run vault.show_policies docker` returns
+`salt_minion`, `salt-minion_docker`, `salt-minion_db`, `salt-minion_monitoring`;
+`salt '*' saltutil.refresh_pillar` is `True` on all 11 minions with no
+`Error fetching Vault secret` lines after the change.
+
+**Remaining before Implemented:**
+
+- [ ] Apply `application.salt-master` to `salt` (`state.apply application.salt-master test=True` first).
+- [ ] Copy `/etc/salt/master.d/` into `conf/master.d/`, with the `role_id` and `secret_id` values removed, so master config is reviewable.
+- [ ] Heimdall API key: Vault `salt/general` has `heildall2_api`; `salt/application/heimdall2/files/.env.jinja` reads pillar `heimdall2_api_secret`. Rename the Vault key.
+- [ ] Highstate each affected minion and confirm services are healthy in Zabbix.
+- [ ] `docs/VAULT_SALT_SETUP.md` is outdated (banner added); rewrite or retire.
 
 ## Implementation Notes (2026-05-13)
 
@@ -291,3 +333,4 @@ Current status: Draft - Vault lookups disabled, secrets are empty strings
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
 | 0.1 | 2026-05-12 | Timo Vlot | Initial draft — diagnosed from git history and current file state |
+| 0.2 | 2026-10-09 | Timo Vlot | Root cause found and fixed (saltext-vault missing after onedir Python bump, expired secret ID, wrong policies); live policies committed to vault/ |

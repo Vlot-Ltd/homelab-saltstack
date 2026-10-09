@@ -1,5 +1,11 @@
 # Vault-Salt Integration Setup
 
+> **Outdated (2026-10-09).** This describes the original `secret/` mount and
+> `salt-policy` setup, which no longer exist. The live setup is the `salt/` KV v2
+> mount, the `salt-master` AppRole, and per-minion AppRoles on `salt-minions/`.
+> Current policies: `vault/salt-master.hcl` and `vault/salt_minion.hcl`. History
+> and fixes: PEP-HL-SLT-008.
+
 ## Overview
 Configure Salt to securely retrieve the Tailscale auth key from HashiCorp Vault.
 

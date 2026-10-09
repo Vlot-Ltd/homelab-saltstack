@@ -18,6 +18,8 @@ base:
     - application.homepage
     - application.linkwarden
     - application.webdriver
+  'salt':
+    - application.salt-master
   'postgres':
     - database.postgres
     - application.zabbix.database
