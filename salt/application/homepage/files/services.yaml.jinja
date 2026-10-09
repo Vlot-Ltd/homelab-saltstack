@@ -105,30 +105,30 @@
   {% for service_key, service in group.get('services', {}).items() %}
     - {{ service.name }}:
         icon: {{ service.icon }}
-        href: {{ build_service_url(service, hosts) }}
+        href: {{ build_service_url(service, hosts) | trim }}
         description: {{ service.description }}
         {% if service.get('widget') %}
         widget:
           type: {{ service.widget.type }}
           {% if service.widget.type == 'grafana' %}
-          url: {{ build_service_url(service, hosts) }}
-          username: {{ get_vault_secret(service.widget.get('username_vault_path'), service.widget.get('username_vault_key')) }}
-          password: {{ get_vault_secret(service.widget.get('password_vault_path'), service.widget.get('password_vault_key')) }}
+          url: {{ build_service_url(service, hosts) | trim }}
+          username: {{ get_vault_secret(service.widget.get('username_vault_path'), service.widget.get('username_vault_key')) | trim }}
+          password: {{ get_vault_secret(service.widget.get('password_vault_path'), service.widget.get('password_vault_key')) | trim }}
           {% elif service.widget.type == 'zabbix' %}
-          url: {{ build_service_url(service, hosts) }}
-          username: {{ get_vault_secret(service.widget.get('username_vault_path'), service.widget.get('username_vault_key')) }}
-          password: {{ get_vault_secret(service.widget.get('password_vault_path'), service.widget.get('password_vault_key')) }}
+          url: {{ build_service_url(service, hosts) | trim }}
+          username: {{ get_vault_secret(service.widget.get('username_vault_path'), service.widget.get('username_vault_key')) | trim }}
+          password: {{ get_vault_secret(service.widget.get('password_vault_path'), service.widget.get('password_vault_key')) | trim }}
           {% elif service.widget.type == 'proxmox' %}
-          url: {{ build_service_url(service, hosts) }}
-          username: {{ get_vault_secret(service.widget.get('username_vault_path'), service.widget.get('username_vault_key')) }}
-          password: {{ get_vault_secret(service.widget.get('password_vault_path'), service.widget.get('password_vault_key')) }}
+          url: {{ build_service_url(service, hosts) | trim }}
+          username: {{ get_vault_secret(service.widget.get('username_vault_path'), service.widget.get('username_vault_key')) | trim }}
+          password: {{ get_vault_secret(service.widget.get('password_vault_path'), service.widget.get('password_vault_key')) | trim }}
           node: {{ service.widget.get('node', 'proxmox') }}
           {% elif service.widget.type == 'truenas' %}
-          url: {{ build_service_url(service, hosts) }}
-          key: {{ get_vault_secret(service.widget.get('api_key_vault_path'), service.widget.get('api_key_vault_key')) }}
+          url: {{ build_service_url(service, hosts) | trim }}
+          key: {{ get_vault_secret(service.widget.get('api_key_vault_path'), service.widget.get('api_key_vault_key')) | trim }}
           enablePools: {{ service.widget.get('enablePools', true) | lower }}
           {% elif service.widget.type == 'homebox' %}
-          url: {{ build_service_url(service, hosts) }}
+          url: {{ build_service_url(service, hosts) | trim }}
           {% elif service.widget.type == 'customapi' %}
           url: {{ service.widget.url }}
           {% if service.widget.get('headers') %}

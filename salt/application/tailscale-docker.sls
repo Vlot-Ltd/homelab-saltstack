@@ -23,12 +23,16 @@ tailscale-docker-compose:
             container_name: tailscale-sidecar
             hostname: homelab
             environment:
-              - TS_AUTHKEY={{ salt['pillar.get']('tailscale_api', '') }}
+              - TS_AUTHKEY={{ salt['pillar.get']('tailscale_container_authkey', '') }}
               - TS_STATE_DIR=/var/lib/tailscale
               - TS_USERSPACE=false
+              # tag:container must exist in the tailnet policy (tagOwners).
+              # tailscale_container_authkey (Vault salt/general) is a key generated
+              # with that tag, kept separate from the general tailscale_api key.
               - TS_EXTRA_ARGS=--advertise-tags=tag:container
             volumes:
               - tailscale-state:/var/lib/tailscale
+            devices:
               - /dev/net/tun:/dev/net/tun
             cap_add:
               - NET_ADMIN
