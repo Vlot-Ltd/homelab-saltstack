@@ -166,6 +166,7 @@ homelab-saltstack/
 | PEP-016 | Homelab hardening rollout | Draft |
 | PEP-017 | Homebox Salt takeover | Draft |
 | PEP-018 | Salt-managed users and sudo on all VMs | Draft |
+| PEP-019 | Tailscale Services in Salt; remove the tailscale-sidecar | Draft |
 
 ## References
 
