@@ -3,11 +3,11 @@
 **ID:** PEP-HL-SLT-002
 **Title:** Migrate Hardcoded Secrets to HashiCorp Vault  
 **Author:** Timo Vlot  
-**Status:** Testing  
+**Status:** Implemented  
 **Type:** Infrastructure  
 **Priority:** Medium
 **Created:** 2026-05-12  
-**Updated:** 2026-05-13  
+**Updated:** 2026-10-10  
 **Supersedes:** N/A  
 **Superseded-By:** N/A  
 
@@ -228,3 +228,4 @@ Current status: Draft - secrets still in plaintext pillar files
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
 | 0.1 | 2026-05-12 | Timo Vlot | Initial draft from audit findings |
+| 0.2 | 2026-10-10 | Timo Vlot | Implemented: Vault lookups live since PEP-008 fix (2026-10-09), highstate clean, no plaintext secrets left in pillar |

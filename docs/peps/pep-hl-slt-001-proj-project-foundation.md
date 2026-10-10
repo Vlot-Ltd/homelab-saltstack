@@ -149,7 +149,7 @@ homelab-saltstack/
 
 | PEP | Title | Status |
 |-----|-------|--------|
-| PEP-002 | Migrate Hardcoded Secrets to Vault | Draft |
+| PEP-002 | Migrate Hardcoded Secrets to Vault | Implemented |
 | PEP-003 | Fix SQL Injection in PostgreSQL States | Draft |
 | PEP-004 | Enable TLS on HashiCorp Vault | Draft |
 | PEP-005 | Fix Structural State Flaws | Draft |
