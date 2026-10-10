@@ -72,7 +72,7 @@ homepage:
           name: "manyfold"
           icon: "3d.png"
           description: "Manyfold STL Library Manager"
-          static_url: "https://manyfold.taile3eee.ts.net/"
+          static_url: "https://manyfoldstl.taile3eee.ts.net/"
 
         netbox:
           name: "NetBox"
