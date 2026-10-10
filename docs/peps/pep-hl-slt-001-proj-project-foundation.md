@@ -155,7 +155,7 @@ homelab-saltstack/
 | PEP-005 | Fix Structural State Flaws | Draft |
 | PEP-006 | Salt State Quality Improvements | Draft |
 | PEP-007 | Codebase Cleanup | Draft |
-| PEP-008 | Restore Vault Pillar Integration | Draft |
+| PEP-008 | Restore Vault Pillar Integration | Implemented |
 
 ## References
 
