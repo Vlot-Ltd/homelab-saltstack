@@ -334,3 +334,4 @@ Current status: Draft - Vault lookups disabled, secrets are empty strings
 |---------|------|--------|---------|
 | 0.1 | 2026-05-12 | Timo Vlot | Initial draft — diagnosed from git history and current file state |
 | 0.2 | 2026-10-09 | Timo Vlot | Root cause found and fixed (saltext-vault missing after onedir Python bump, expired secret ID, wrong policies); live policies committed to vault/ |
+| 0.3 | 2026-10-09 | Timo Vlot | Highstate clean on all minions after fixing templates that had never rendered (homepage settings/services, zabbix_server.conf DB lookup); steam-tracker disabled (never built); tailscale sidecar start checks fixed; homepage widget credentials sorted. Remaining: confirm services healthy in Zabbix, then Implemented |
