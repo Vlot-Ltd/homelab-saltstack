@@ -156,6 +156,15 @@ homelab-saltstack/
 | PEP-006 | Salt State Quality Improvements | Draft |
 | PEP-007 | Codebase Cleanup | Draft |
 | PEP-008 | Restore Vault Pillar Integration | Implemented |
+| PEP-009 | Salt master hardening and SaltGUI revival | Draft |
+| PEP-010 | gitfs for states and pillar | Draft |
+| PEP-011 | NetBox Salt takeover | Draft |
+| PEP-012 | Manyfold Salt takeover | Draft |
+| PEP-013 | Local package mirror (debmirror) state | Draft |
+| PEP-014 | friday rebuildable from Salt | Draft |
+| PEP-015 | Loki and Alloy log aggregation states | Draft |
+| PEP-016 | Homelab hardening rollout | Draft |
+| PEP-017 | Homebox Salt takeover | Draft |
 
 ## References
 
