@@ -19,6 +19,12 @@ Make friday, the second-brain box (LiteLLM, vault jobs), rebuildable from Salt (
 
 Why is this change needed? What problem does it solve?
 
+Known hand-made config on `friday` to capture (2026-10-10):
+
+- `/etc/systemd/system/litellm.service`: LiteLLM in Docker, published on `127.0.0.1:4000` only (changed from `0.0.0.0` on 2026-10-10)
+- Tailscale Service `llm`: `tailscale serve --bg --service=svc:llm --https=443 http://localhost:4000` (covered by PEP-HL-SLT-019's per-host Services pillar)
+- `/home/proxmox/litellm/config.yaml`: `local` route uses `ollama_chat/` (changed 2026-10-09)
+
 ## Specification
 
 ### Requirements
