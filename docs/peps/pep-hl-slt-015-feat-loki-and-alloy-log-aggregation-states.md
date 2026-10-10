@@ -5,7 +5,7 @@
 **Author:** Timo Vlot  
 **Status:** Draft  
 **Type:** Feature  
-**Priority:** Low  
+**Priority:** Medium  
 **Created:** 2026-10-10  
 **Updated:** 2026-10-10  
 **Supersedes:** N/A  
@@ -17,7 +17,7 @@ Loki server and Alloy agent states for log aggregation, from the draft in the va
 
 ## Motivation
 
-Why is this change needed? What problem does it solve?
+JARVIS depends on it (raised from Low on 2026-10-10): pulling LLM usage data needs Claude Code's OpenTelemetry output collected, and that needs Alloy configured. See `jarvis-project-overview` in the vault ("To review once OpenTelemetry is running").
 
 ## Specification
 

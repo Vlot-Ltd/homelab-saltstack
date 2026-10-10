@@ -160,7 +160,7 @@ homelab-saltstack/
 | PEP-010 | gitfs for states and pillar | Draft |
 | PEP-011 | NetBox Salt takeover | Draft |
 | PEP-012 | Manyfold Salt takeover | Draft |
-| PEP-013 | Local package mirror (debmirror) state | Draft |
+| PEP-013 | Remove local package mirror POC | Draft |
 | PEP-014 | friday rebuildable from Salt | Draft |
 | PEP-015 | Loki and Alloy log aggregation states | Draft |
 | PEP-016 | Homelab hardening rollout | Draft |
