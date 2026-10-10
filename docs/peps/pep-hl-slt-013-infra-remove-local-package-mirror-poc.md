@@ -23,6 +23,7 @@ Leftovers found on `patch` on 2026-10-10:
 - nginx site `apt-mirror` enabled (port 8080), alongside PatchMon's own site
 - `/etc/cron.d/apt-mirror`, every line commented out (no sync running)
 - Package `apt-mirror` 0.5.4-2 installed
+- Tailscale Service `mirror` (`mirror.taile3eee.ts.net`), hosted by `patch`
 
 No Salt state or pillar for the mirror exists in this repo. `zabbix`, `postgres`, `docker`, `friday` and `netbox` have no apt sources pointing at the mirror; the other minions weren't checked.
 
@@ -45,6 +46,7 @@ Manual cleanup on `patch` and TrueNAS. Nothing to add to Salt.
 - `salt '*' cmd.run 'grep -rl 8080 /etc/apt/sources.list /etc/apt/sources.list.d/'` returns nothing
 - `/var/mirror` unmounted and gone from `/etc/fstab`; `apt-mirror` purged; `/etc/cron.d/apt-mirror` and the nginx site removed; `nginx -t` passes and PatchMon loads
 - The `aptmirror` dataset is gone from TrueNAS and its space is free
+- `mirror` no longer listed under Services in the Tailscale admin console
 
 ## Implementation Plan
 
@@ -58,6 +60,7 @@ Manual cleanup on `patch` and TrueNAS. Nothing to add to Salt.
 2. `rm /etc/cron.d/apt-mirror /etc/nginx/sites-available/apt-mirror`
 3. `apt purge apt-mirror`
 4. `umount /var/mirror`, remove the line from `/etc/fstab`, `rmdir /var/mirror`
+5. Stop hosting the Tailscale Service: `tailscale serve status` to see its config, then turn it off for `svc:mirror`; delete `mirror` in the Tailscale admin console (Services)
 
 ### Phase 3: free the storage
 
@@ -89,3 +92,4 @@ Mark the vault note `local-package-mirror-setup` as the work POC record, not a h
 |---------|------|--------|---------|
 | 0.1 | 2026-10-10 | Timo Vlot | Raised as a debmirror state |
 | 0.2 | 2026-10-10 | Timo Vlot | Rescoped: homelab mirror not needed (built at work instead); cleanup of the POC only |
+| 0.3 | 2026-10-10 | Timo Vlot | Add the `mirror` Tailscale Service to the cleanup |
