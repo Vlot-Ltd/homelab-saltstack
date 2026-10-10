@@ -41,7 +41,7 @@ To decide in this PEP:
 
 - Account names (human admin; automation; Claude Code)
 - sudo for the human account: password or `NOPASSWD`
-- sudo for tool accounts: command allowlists per role, or none
+- ~~sudo for tool accounts~~ Decided 2026-10-10: Claude Code gets its own service account with a small sudo allowlist that grows over time; tools prefer acting through Salt (PEP-HL-SLT-009) over SSH
 - What happens to `proxmox`: removed, or locked as break-glass (console only)
 - SSH keys as `authorized_keys` from pillar, or short-lived certificates from Vault's SSH secrets engine (also fits the JARVIS access model)
 
@@ -99,3 +99,4 @@ Update vault notes that say "as `proxmox`" (e.g. `llm-routing-strategy`, `jarvis
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
 | 0.1 | 2026-10-10 | Timo Vlot | Initial draft |
+| 0.2 | 2026-10-10 | Timo Vlot | Decision: tool accounts get a small, growing sudo allowlist; Salt preferred over SSH |
