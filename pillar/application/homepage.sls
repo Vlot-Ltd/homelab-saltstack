@@ -60,7 +60,7 @@ homepage:
           icon: "home-assistant.png"
           description: "Home Assistant"
           host_lookup: "homeassistant"
-          port: 32400
+          port: 8123
 
         linkwarden:
           name: "Linkwarden"
@@ -73,6 +73,12 @@ homepage:
           icon: "3d.png"
           description: "Manyfold STL Library Manager"
           static_url: "https://manyfold.taile3eee.ts.net/"
+
+        netbox:
+          name: "NetBox"
+          icon: "netbox.png"
+          description: "NetBox IPAM and DCIM"
+          static_url: "https://netbox.taile3eee.ts.net/"
 
         plex:
           name: "Plex"
@@ -154,13 +160,6 @@ homepage:
           icon: "si-virgin.svg"
           description: "Virgin Media Network"
           static_ip: "192.168.0.1"
-
-        creality_k1:
-          name: "Creality K1 Rooted"
-          icon: "octoprint.png"
-          description: "Creality K1"
-          static_ip: "192.168.0.172"
-          port: 4408
 
         desk_kvm:
           name: "Desk KVM"
