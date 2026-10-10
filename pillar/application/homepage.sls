@@ -269,20 +269,6 @@ homepage:
         style: "row"
         columns: 3
       feeds:
-        xbox_wire:
-          name: "Xbox Wire News"
-          icon: "mdi-microsoft-xbox"
-          url: "https://news.xbox.com/en-us/feed/"
-          href: "https://news.xbox.com/"
-          limit: 6
-
-        xbox_gamepass:
-          name: "Xbox Game Pass Updates"
-          icon: "mdi-xbox"
-          url: "https://majornelson.com/feed/"
-          href: "https://www.xbox.com/en-GB/xbox-game-pass/games/coming-soon"
-          limit: 5
-
         steam_releases:
           name: "Steam New Releases"
           icon: "mdi-steam"
@@ -299,13 +285,6 @@ homepage:
 
       # Custom API services
       custom_services:
-        xbox_tracker:
-          name: "Xbox Game Pass Tracker"
-          icon: "mdi-microsoft-xbox"
-          href: "https://www.xbox.com/en-GB/xbox-game-pass/games/coming-soon"
-          description: "Xbox Game Pass releases via custom tracker"
-          api_url: "http://steam-tracker:5000/xbox-gamepass"
-
         steam_wishlist:
           name: "Steam Wishlist"
           icon: "mdi-steam"
