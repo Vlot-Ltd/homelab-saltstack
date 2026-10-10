@@ -165,6 +165,7 @@ homelab-saltstack/
 | PEP-015 | Loki and Alloy log aggregation states | Draft |
 | PEP-016 | Homelab hardening rollout | Draft |
 | PEP-017 | Homebox Salt takeover | Draft |
+| PEP-018 | Salt-managed users and sudo on all VMs | Draft |
 
 ## References
 
