@@ -170,6 +170,10 @@ def main():
     args = ap.parse_args()
 
     token = (os.environ.get("NETBOX_TOKEN") or getpass.getpass("NetBox API token: ")).strip()
+    # NetBox 4.5's copy button gives the whole header value, "Bearer nbt_...".
+    for scheme in ("bearer ", "token "):
+        if token.lower().startswith(scheme):
+            token = token[len(scheme):].strip()
     if not token:
         sys.exit("FAIL: empty token (the paste didn't arrive). Run it again")
     nb = NetBox(args.url, token, args.apply)
