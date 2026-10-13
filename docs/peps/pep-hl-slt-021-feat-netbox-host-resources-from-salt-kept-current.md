@@ -42,7 +42,7 @@ nothing keeps it current: the script runs by hand with a temporary token.
 - Appliances (`homeassistant`, `truenas`): no grains; stay as fixed entries.
 - Proxmox API as the source (it knows VM allocation, which can differ from what the
   guest sees). Possible later; grains first.
-- The NetBox ext_pillar and `/etc/hosts` from NetBox ([[homelab-tailscale-https]]).
+- The NetBox ext_pillar and `/etc/hosts` from NetBox (the vault note homelab-tailscale-https).
 
 ### Success Criteria
 
@@ -71,7 +71,7 @@ Backout: `git revert`; NetBox Change Log lists every write for manual reversal.
 
 ## Documentation Requirements
 
-- Script docstring; note in [[homelab-tailscale-https]] Workstream 2.
+- Script docstring; note in the vault note homelab-tailscale-https Workstream 2.
 
 ## Risks and Mitigation
 
