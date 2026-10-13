@@ -22,8 +22,6 @@ peer:
   gibson:
     - test.*
     - pkg.*
-fileserver_backend:
-  - roots
 ext_pillar:
   - vault:
       path: salt/roles/{pillar[roles]}

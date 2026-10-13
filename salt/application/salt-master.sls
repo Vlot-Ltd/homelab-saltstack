@@ -22,3 +22,19 @@ saltext-vault-restart-master:
     - bg: True
     - onchanges:
         - cmd: saltext-vault
+
+# gitfs and git_pillar provider. Same onedir extras problem as saltext-vault:
+# a Python bump in onedir leaves it behind. See PEP-HL-SLT-010.
+{% set pygit2_version = '1.20.1' %}
+
+pygit2:
+  cmd.run:
+    - name: salt-pip install pygit2=={{ pygit2_version }}
+    - unless: salt-pip list 2>/dev/null | grep -qE '^pygit2 +{{ pygit2_version | replace('.', '\.') }}$'
+
+pygit2-restart-master:
+  cmd.run:
+    - name: sleep 5 && systemctl restart salt-master
+    - bg: True
+    - onchanges:
+        - cmd: pygit2
