@@ -1,3 +1,4 @@
+# Served to the master via git_pillar from origin/main (PEP-HL-SLT-010).
 base:
   '*':
     - common.schedule
