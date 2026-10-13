@@ -180,6 +180,12 @@ def sync_ip(nb, minion, iface, addr, dns_name, tag_id, counts, obj_type):
         "dns_name": dns_name,
     }
 
+    net = ipaddress.ip_interface(cidr).network
+    if net.prefixlen < 31 and ipaddress.ip_address(host) in (net.network_address, net.broadcast_address):
+        print(f"  WARN {label}: network or broadcast address, NetBox won't assign it. Skipped; check the host's config")
+        counts["warn"] += 1
+        return None
+
     found = nb.find("ipam/ip-addresses", address=host)
     if len(found) > 1:
         print(f"  WARN {label}: {len(found)} IP objects for {host} in NetBox, skipped. Merge them by hand")
