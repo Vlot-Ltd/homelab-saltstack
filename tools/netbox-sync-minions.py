@@ -344,11 +344,15 @@ def main():
         if obj and obj["name"] != minion:
             print(f"  WARN NetBox device is named {obj['name']!r}; ext_pillar needs {minion!r}. Rename it")
             counts["warn"] += 1
+        site_id = ensure_named(nb, "dcim/sites", site, "site", status="active")
+        if obj and (obj.get("site") or {}).get("id") != site_id:
+            counts["changed"] += 1
+            nb.update("dcim/devices", obj["id"], {"site": site_id}, f"device {minion} site -> {site}")
         if not obj:
             counts["changed"] += 1
             obj = nb.create("dcim/devices", {
                 "name": minion,
-                "site": ensure_named(nb, "dcim/sites", site, "site", status="active"),
+                "site": site_id,
                 "role": ensure_named(nb, "dcim/device-roles", role, "role"),
                 "device_type": ensure_device_type(nb, manufacturer, model),
                 "status": "active",
