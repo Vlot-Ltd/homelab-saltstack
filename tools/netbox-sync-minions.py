@@ -36,20 +36,29 @@ class NetBox:
         self.api = url.rstrip("/") + "/api"
         self.apply = apply
         self.session = requests.Session()
-        # NetBox 4.5 v2 tokens are <key>.<token> and use Bearer; v1 tokens use Token.
-        scheme = "Bearer" if "." in token else "Token"
-        self.token_shape = (f"{scheme} scheme, {len(token)} chars, "
-                            f"{'starts' if token.startswith('nbt_') else 'does not start'} with nbt_")
-        self.session.headers.update(
-            {"Authorization": f"{scheme} {token}", "Accept": "application/json"}
-        )
+        self.session.headers["Accept"] = "application/json"
+        # NetBox 4.5 v2 tokens go as "Bearer nbt_<key>.<token>"; the UI copy may or
+        # may not carry the nbt_ prefix. v1 tokens go as "Token <token>". Try each
+        # form against /status/ and keep the first one NetBox accepts.
+        self.candidates = []
+        if "." in token:
+            if not token.startswith("nbt_"):
+                self.candidates.append(("Bearer, nbt_ added", f"Bearer nbt_{token}"))
+            self.candidates.append(("Bearer, as pasted", f"Bearer {token}"))
+        self.candidates.append(("Token, as pasted", f"Token {token}"))
+        self.token_shape = f"{len(token)} chars, {'with' if token.startswith('nbt_') else 'no'} nbt_ prefix"
 
     def status(self):
-        r = self.session.get(f"{self.api}/status/", timeout=30)
-        if not r.ok:
-            sys.exit(f"FAIL: NetBox API {r.status_code}: {r.text[:200]}\n"
-                     f"      Token sent: {self.token_shape}")
-        return r.json()
+        tried = []
+        for label, header in self.candidates:
+            self.session.headers["Authorization"] = header
+            r = self.session.get(f"{self.api}/status/", timeout=30)
+            if r.ok:
+                print(f"Auth OK: {label}")
+                return r.json()
+            tried.append(f"{label} -> {r.status_code} {r.text[:120]}")
+        sys.exit("FAIL: NetBox rejected every auth form. Token " + self.token_shape + "\n  "
+                 + "\n  ".join(tried))
 
     def find(self, path, **params):
         r = self.session.get(f"{self.api}/{path}/", params=params, timeout=30)
