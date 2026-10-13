@@ -1,0 +1,20 @@
+[Unit]
+Description=PatchMon Agent Service
+After=network.target
+Wants=network.target
+
+[Service]
+Type=simple
+User=root
+ExecStart=/usr/local/bin/patchmon-agent serve
+Restart=always
+RestartSec=10
+WorkingDirectory=/etc/patchmon
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=patchmon-agent
+
+[Install]
+WantedBy=multi-user.target

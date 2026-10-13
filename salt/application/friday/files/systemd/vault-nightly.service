@@ -1,0 +1,7 @@
+[Unit]
+Description=Nightly vault job: rebuild indexes, audit, health report
+
+[Service]
+Type=oneshot
+User=vault
+ExecStart=/usr/bin/flock -n /tmp/vault-nightly.lock /usr/bin/timeout 600 /usr/bin/bash /home/vault/vaults/second-brain/bin/vault-nightly.sh

@@ -1,0 +1,14 @@
+[Unit]
+Description=Obsidian Sync (headless)
+After=network-online.target
+
+[Service]
+Type=simple
+User=vault
+WorkingDirectory=/home/vault/vaults/second-brain
+ExecStart=/usr/bin/ob sync --continuous
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,9 @@
+[Unit]
+Description=Mirror public repo docs into 99-for-claude
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=vault
+ExecStart=/usr/bin/flock -n /tmp/vault-mirror.lock /usr/bin/timeout 600 /usr/bin/bash /home/vault/vaults/second-brain/bin/mirror-repos.sh

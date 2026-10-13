@@ -1,0 +1,8 @@
+[Unit]
+Description=Commit vault changes to local git history
+After=network.target
+
+[Service]
+Type=oneshot
+User=vault
+ExecStart=/usr/local/bin/vault-commit.sh

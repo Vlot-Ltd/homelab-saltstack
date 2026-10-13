@@ -1,0 +1,10 @@
+[Unit]
+Description=Weekly vault review (Claude, Haiku)
+After=network-online.target
+
+[Service]
+Type=oneshot
+User=vault
+RuntimeDirectory=claude-code
+ExecStartPre=/usr/local/bin/claude-code-fetch-token.sh
+ExecStart=/home/vault/bin/weekly-review.sh

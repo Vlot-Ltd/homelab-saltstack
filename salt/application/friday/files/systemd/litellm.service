@@ -1,0 +1,24 @@
+[Unit]
+Description=LiteLLM routing proxy (local/Haiku/Claude)
+After=network-online.target docker.service
+Requires=docker.service
+
+[Service]
+Type=simple
+User=proxmox
+Group=proxmox
+RuntimeDirectory=litellm
+ExecStartPre=/usr/local/bin/litellm-fetch-secrets.sh
+ExecStartPre=-/usr/bin/docker rm -f litellm
+ExecStart=/usr/bin/docker run --rm --name litellm \
+  -p 127.0.0.1:4000:4000 \
+  -v /home/proxmox/litellm/config.yaml:/app/config.yaml \
+  --env-file /run/litellm/secrets.env \
+  ghcr.io/berriai/litellm:main-latest \
+  --config /app/config.yaml
+ExecStopPost=-/usr/bin/docker rm -f litellm
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
