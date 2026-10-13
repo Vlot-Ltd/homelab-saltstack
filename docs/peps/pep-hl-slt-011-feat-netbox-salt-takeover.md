@@ -3,17 +3,19 @@
 **ID:** PEP-HL-SLT-011  
 **Title:** NetBox Salt takeover  
 **Author:** Timo Vlot  
-**Status:** Draft  
+**Status:** Rejected  
 **Type:** Feature  
 **Priority:** Medium  
 **Created:** 2026-10-10  
-**Updated:** 2026-10-10  
+**Updated:** 2026-10-13  
 **Supersedes:** N/A  
 **Superseded-By:** N/A  
 
 ## Abstract
 
 Bring the hand-built NetBox VM under Salt (netbox-deployment Phase 10 in the vault). Manual build steps were done so the states' idempotency guards detect them and skip recreation. Depends on PEP-003 (shared Postgres state).
+
+**Rejected 2026-10-13:** NetBox is being retired (PEP-HL-SLT-023), so there is nothing to bring under Salt.
 
 ## Motivation
 
