@@ -3,7 +3,7 @@
 **ID:** PEP-HL-SLT-021  
 **Title:** NetBox host resources from Salt, kept current  
 **Author:** Timo Vlot  
-**Status:** Draft  
+**Status:** Rejected  
 **Type:** Feature  
 **Priority:** Low  
 **Created:** 2026-10-13  
@@ -14,6 +14,8 @@
 ## Abstract
 
 Extend netbox-sync-minions.py so NetBox holds and keeps current each host's resources (vCPUs, memory, disks) and platform (OS) from Salt grains, and run it on a schedule with a Vault-held token instead of by hand.
+
+**Rejected 2026-10-13:** NetBox is being retired (PEP-HL-SLT-023); host addresses come from the Salt mine (PEP-HL-SLT-022).
 
 ## Motivation
 
