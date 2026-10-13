@@ -37,6 +37,21 @@ nothing keeps it current: the script runs by hand with a temporary token.
 - Scheduled run (Salt schedule or cron on the master), with a permanent NetBox token
   scoped to what the script writes, stored in Vault, never in the repo or argv.
 
+### Field ownership and drift (added 2026-10-13)
+
+NetBox is meant to become the source of truth, so each field gets exactly one writer:
+
+- **OpenTofu** (future, homelab-terraform PEP-HL-TOFU-002): name, cluster, site, role,
+  interface and LAN IP, set when the VM is created, IP allocated from NetBox IPAM.
+- **This script**: observed facts only: Tailscale IP, platform, vCPUs, memory, disks.
+  Once Tofu owns identity and LAN IP, the script must stop writing those and report
+  differences instead.
+- **Salt reactor** on minion key accept (`salt/key` event) runs the script for that
+  one minion, so a host built outside Tofu still appears without a manual run.
+- **Drift check**: the scheduled run in dry-run mode sends "changes planned" and
+  "warnings" to Zabbix; a trigger on > 0 catches a host missing from NetBox, or NetBox
+  disagreeing with the host. One item, not a set of hand-written checks.
+
 ### Out of scope
 
 - Appliances (`homeassistant`, `truenas`): no grains; stay as fixed entries.
@@ -57,10 +72,12 @@ nothing keeps it current: the script runs by hand with a temporary token.
 - Add the grains to the script's Salt calls; extend `sync_host`.
 - Dry run, compare against the Proxmox UI for two VMs, apply.
 
-### Phase 2: Schedule
+### Phase 2: Schedule, reactor, drift alert
 
 - Permanent token in Vault; the job reads it at run time.
-- Schedule on the master; failures reach Zabbix (exit code or log item).
+- Schedule on the master: apply for script-owned fields, dry run for the rest.
+- Reactor on `salt/key` accept runs the script with `--target <minion>`.
+- Zabbix item for changes planned and warnings; trigger on > 0.
 
 ## Testing Strategy
 
