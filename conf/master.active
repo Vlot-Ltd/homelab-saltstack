@@ -22,12 +22,5 @@ peer:
   gibson:
     - test.*
     - pkg.*
-ext_pillar:
-  - vault:
-      path: salt/roles/{pillar[roles]}
-  - vault:
-      path: salt/minions/{minion}
-  - vault:
-      path: salt/general
 log_level: info
 pillar_merge_lists: True
