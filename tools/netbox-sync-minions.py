@@ -5,13 +5,17 @@ Run on the Salt master as root, with onedir's Python (it has salt and requests):
 
     /opt/saltstack/salt/bin/python3 tools/netbox-sync-minions.py            # dry run
     /opt/saltstack/salt/bin/python3 tools/netbox-sync-minions.py --apply    # write
+    add --devices to include physical minions as Devices
 
 - NetBox VM name = Salt minion ID, which is what the NetBox ext_pillar matches on.
 - Existing IP address objects are reused (matched on host address, any mask), never
   duplicated. An IP already assigned to something else is reported, not moved.
 - Tailscale IPs (100.64.0.0/10) get the `tailscale` tag and a <host>.<tailnet> DNS
   name. The VM's primary IPv4 is its first LAN address.
-- Physical minions are skipped: they're Devices in NetBox, do those by hand.
+- Physical minions become Devices with --devices, using DEVICE_PLAN below for site
+  and role, and the manufacturer/productname grains for the device type. Physical
+  minions not in DEVICE_PLAN are skipped. On sites other than `home` only the
+  Tailscale IP is recorded (a remote LAN can overlap ours) and is the primary.
 - The API token is read from NETBOX_TOKEN or prompted for; it's never stored.
 
 Safe to re-run: anything already correct is left alone.
@@ -21,14 +25,26 @@ import argparse
 import getpass
 import ipaddress
 import os
+import re
 import sys
 
 import requests
 import salt.client
 
 KEEP_IFACES = ("eth", "ens", "enp", "eno", "wlan", "wlp", "tailscale")
+# Proxmox puts the host's LAN IP on its bridge.
+KEEP_DEVICE_IFACES = KEEP_IFACES + ("vmbr",)
 TAILNET_RANGE = ipaddress.ip_network("100.64.0.0/10")
 VMINTERFACE = "virtualization.vminterface"
+DCIM_INTERFACE = "dcim.interface"
+HOME_SITE = "home"
+
+# Physical minions: minion ID -> (site, role). Decided 2026-10-13.
+DEVICE_PLAN = {
+    "proxmox": ("home", "hypervisor"),
+    "wopr": ("home", "workstation"),
+    "nlremote.taile3eee.ts.net": ("nl", "remote-node"),
+}
 
 
 class NetBox:
@@ -116,13 +132,50 @@ def prefixlen(netmask):
     return ipaddress.ip_network(f"0.0.0.0/{netmask}").prefixlen
 
 
-def sync_ip(nb, minion, iface, addr, dns_name, tag_id, counts):
+def slugify(text):
+    return re.sub(r"[^a-z0-9]+", "-", text.lower()).strip("-")
+
+
+# (path, slug) -> id, so a dry run lists each new site/role/type once, not per device.
+_ensured = {}
+
+
+def ensure_named(nb, path, name, what, **extra):
+    """Find by slug, or create with name + slug (+ extra fields)."""
+    slug = slugify(name)
+    if (path, slug) not in _ensured:
+        obj = nb.one(path, slug=slug) or nb.create(path, {"name": name, "slug": slug, **extra}, f"{what} {name}")
+        _ensured[(path, slug)] = obj["id"]
+    return _ensured[(path, slug)]
+
+
+def ensure_device_type(nb, manufacturer, model):
+    mfr_id = ensure_named(nb, "dcim/manufacturers", manufacturer, "manufacturer")
+    slug = slugify(f"{manufacturer} {model}")
+    if ("dcim/device-types", slug) not in _ensured:
+        dtype = nb.one("dcim/device-types", slug=slug) or nb.create(
+            "dcim/device-types", {"manufacturer": mfr_id, "model": model, "slug": slug},
+            f"device type {manufacturer} {model}",
+        )
+        _ensured[("dcim/device-types", slug)] = dtype["id"]
+    return _ensured[("dcim/device-types", slug)]
+
+
+def iface_type(name):
+    if name.startswith("tailscale"):
+        return "virtual"
+    if name.startswith(("vmbr", "br")):
+        return "bridge"
+    return "other"  # real NIC speed/type: refine by hand in NetBox
+
+
+def sync_ip(nb, minion, iface, addr, dns_name, tag_id, counts, obj_type):
     """Create or attach one IP. Returns its NetBox id (None in a dry run)."""
     host = addr["address"]
     cidr = f"{host}/{prefixlen(addr['netmask'])}"
     label = f"{minion} {iface['name']} {cidr}"
     want = {
-        "assigned_object_type": VMINTERFACE,
+        "assigned_object_type": obj_type,
         "assigned_object_id": iface["id"],
         "dns_name": dns_name,
     }
@@ -144,7 +197,7 @@ def sync_ip(nb, minion, iface, addr, dns_name, tag_id, counts):
         print(f"  WARN {label}: NetBox has {ip['address']} (mask differs), left as is")
         counts["warn"] += 1
     owner_type, owner_id = ip.get("assigned_object_type"), ip.get("assigned_object_id")
-    if owner_id and (owner_type != VMINTERFACE or (iface["id"] and owner_id != iface["id"])):
+    if owner_id and (owner_type != obj_type or (iface["id"] and owner_id != iface["id"])):
         print(f"  CONFLICT {label}: already assigned to {owner_type} {owner_id}, skipped")
         counts["warn"] += 1
         return None
@@ -160,9 +213,55 @@ def sync_ip(nb, minion, iface, addr, dns_name, tag_id, counts):
     return ip["id"]
 
 
+def sync_host(nb, args, minion, host, ifaces, obj, kind, tag_id, counts):
+    """Interfaces, IPs and primary IPv4 for one VM or Device already in NetBox."""
+    if kind == "vm":
+        obj_path, if_path, parent, obj_type, keep = (
+            "virtualization/virtual-machines", "virtualization/interfaces",
+            "virtual_machine", VMINTERFACE, KEEP_IFACES)
+        lan_ok = True
+    else:
+        obj_path, if_path, parent, obj_type, keep = (
+            "dcim/devices", "dcim/interfaces", "device", DCIM_INTERFACE, KEEP_DEVICE_IFACES)
+        lan_ok = DEVICE_PLAN[minion][0] == HOME_SITE
+
+    primary = None
+    for name, data in sorted(ifaces.items()):
+        addrs = data.get("inet") or []
+        if not name.startswith(keep) or not addrs:
+            continue
+        is_ts_iface = all(ipaddress.ip_address(a["address"]) in TAILNET_RANGE for a in addrs)
+        if not lan_ok and not is_ts_iface:
+            print(f"  SKIP {name}: LAN IPs not recorded for a remote site")
+            continue
+        iface = obj["id"] and nb.one(if_path, **{f"{parent}_id": obj["id"]}, name=name)
+        if not iface:
+            counts["changed"] += 1
+            data_new = {parent: obj["id"], "name": name}
+            if kind == "device":
+                data_new["type"] = iface_type(name)
+            iface = nb.create(if_path, data_new, f"{minion} interface {name}")
+        for addr in addrs:
+            is_ts = ipaddress.ip_address(addr["address"]) in TAILNET_RANGE
+            dns = f"{host}.{args.tailnet}" if is_ts else host
+            ip_id = sync_ip(nb, minion, iface, addr, dns, tag_id if is_ts else None, counts, obj_type)
+            # Primary is the first LAN IP; on a remote site, the Tailscale IP.
+            # A skipped IP (conflict, duplicates) returns None even when applying;
+            # never let that clear the primary IP.
+            if (is_ts != lan_ok) and primary is None and (ip_id or not args.apply):
+                primary = (ip_id, addr["address"])
+
+    current = (obj.get("primary_ip4") or {}).get("id")
+    if primary and (primary[0] is None or current != primary[0]):
+        counts["changed"] += 1
+        nb.update(obj_path, obj["id"], {"primary_ip4": primary[0]},
+                  f"{minion} primary IPv4 -> {primary[1]}")
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--apply", action="store_true", help="write to NetBox (default: dry run)")
+    ap.add_argument("--devices", action="store_true", help="also sync physical minions in DEVICE_PLAN")
     ap.add_argument("--url", default="https://netbox.taile3eee.ts.net")
     ap.add_argument("--cluster", default="proxmox", help="NetBox cluster for new VMs")
     ap.add_argument("--tailnet", default="taile3eee.ts.net")
@@ -181,7 +280,8 @@ def main():
           f"{'APPLYING CHANGES' if args.apply else 'DRY RUN, nothing is written'}")
 
     local = salt.client.LocalClient()
-    grains = local.cmd(args.target, "grains.item", ["virtual", "host"], timeout=30)
+    grains = local.cmd(args.target, "grains.item",
+                       ["virtual", "host", "manufacturer", "productname"], timeout=30)
     ifaces = local.cmd(args.target, "network.interfaces", timeout=30)
     print(f"{len(grains)} minions answered\n")
 
@@ -191,51 +291,51 @@ def main():
 
     for minion in sorted(grains):
         print(f"{minion}")
-        if grains[minion].get("virtual") == "physical":
-            print("  SKIP physical: add it as a Device by hand")
+        g = grains[minion]
+        host = g.get("host") or minion
+
+        if g.get("virtual") != "physical":
+            obj = nb.one("virtualization/virtual-machines", name__ie=minion)
+            if obj and obj["name"] != minion:
+                print(f"  WARN NetBox VM is named {obj['name']!r}; ext_pillar needs {minion!r}. Rename it")
+                counts["warn"] += 1
+            if not obj:
+                counts["changed"] += 1
+                obj = nb.create("virtualization/virtual-machines",
+                                {"name": minion, "cluster": cluster_id, "status": "active"},
+                                f"VM {minion}")
+            sync_host(nb, args, minion, host, ifaces.get(minion, {}), obj, "vm", tag_id, counts)
+            continue
+
+        if not args.devices or minion not in DEVICE_PLAN:
+            why = "not in DEVICE_PLAN" if args.devices else "run with --devices"
+            print(f"  SKIP physical: {why}")
             counts["skipped"] += 1
             continue
-        host = grains[minion].get("host") or minion
 
-        vm = nb.one("virtualization/virtual-machines", name__ie=minion)
-        if vm and vm["name"] != minion:
-            print(f"  WARN NetBox VM is named {vm['name']!r}; ext_pillar needs {minion!r}. Rename it")
+        site, role = DEVICE_PLAN[minion]
+        manufacturer, model = g.get("manufacturer", "").strip(), g.get("productname", "").strip()
+        if not manufacturer and model.startswith("Raspberry Pi"):
+            manufacturer = "Raspberry Pi"
+        if not manufacturer or not model:
+            print(f"  WARN no manufacturer/productname grains ({manufacturer!r}, {model!r}), skipped")
             counts["warn"] += 1
-        if not vm:
-            counts["changed"] += 1
-            vm = nb.create(
-                "virtualization/virtual-machines",
-                {"name": minion, "cluster": cluster_id, "status": "active"},
-                f"VM {minion}",
-            )
+            continue
 
-        primary = None
-        for name, data in sorted(ifaces.get(minion, {}).items()):
-            addrs = data.get("inet") or []
-            if not name.startswith(KEEP_IFACES) or not addrs:
-                continue
-            iface = vm["id"] and nb.one("virtualization/interfaces", virtual_machine_id=vm["id"], name=name)
-            if not iface:
-                counts["changed"] += 1
-                iface = nb.create(
-                    "virtualization/interfaces",
-                    {"virtual_machine": vm["id"], "name": name},
-                    f"{minion} interface {name}",
-                )
-            for addr in addrs:
-                is_ts = ipaddress.ip_address(addr["address"]) in TAILNET_RANGE
-                dns = f"{host}.{args.tailnet}" if is_ts else host
-                ip_id = sync_ip(nb, minion, iface, addr, dns, tag_id if is_ts else None, counts)
-                # A skipped IP (conflict, duplicates) returns None even when applying;
-                # never let that clear the VM's primary IP.
-                if not is_ts and primary is None and (ip_id or not args.apply):
-                    primary = (ip_id, addr["address"])
-
-        current = (vm.get("primary_ip4") or {}).get("id")
-        if primary and (primary[0] is None or current != primary[0]):
+        obj = nb.one("dcim/devices", name__ie=minion)
+        if obj and obj["name"] != minion:
+            print(f"  WARN NetBox device is named {obj['name']!r}; ext_pillar needs {minion!r}. Rename it")
+            counts["warn"] += 1
+        if not obj:
             counts["changed"] += 1
-            nb.update("virtualization/virtual-machines", vm["id"], {"primary_ip4": primary[0]},
-                      f"VM {minion} primary IPv4 -> {primary[1]}")
+            obj = nb.create("dcim/devices", {
+                "name": minion,
+                "site": ensure_named(nb, "dcim/sites", site, "site", status="active"),
+                "role": ensure_named(nb, "dcim/device-roles", role, "role"),
+                "device_type": ensure_device_type(nb, manufacturer, model),
+                "status": "active",
+            }, f"device {minion} ({site}, {role}, {manufacturer} {model})")
+        sync_host(nb, args, minion, host, ifaces.get(minion, {}), obj, "device", tag_id, counts)
 
     print(f"\nDone: {counts['changed']} changes {'made' if args.apply else 'planned'}, "
           f"{counts['warn']} warnings, {counts['skipped']} physical skipped")
