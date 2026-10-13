@@ -17,7 +17,5 @@ hosts_entries:
     name: vault
   - ip: 192.168.0.26
     name: patch
-  - ip: 192.168.0.170
-    name: colossus
 
 default_domain: local
