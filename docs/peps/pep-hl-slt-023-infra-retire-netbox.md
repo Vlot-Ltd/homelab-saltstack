@@ -70,6 +70,9 @@ come from Salt as well.
 ### Phase 2: Remove
 
 - Salt repo changes (one commit), apply on `docker` (Homepage) and `postgres`.
+  **Before** dropping the database: `pillar/top.sls` gives `postgres` the
+  `application.netbox` pillar, so a highstate there could recreate the database and
+  role if the pillar is still in place.
 - Drop the database and role on `postgres`; `salt-key -d netbox`; delete the VM.
 - Remove the Zabbix and PatchMon hosts and the Tailscale node; delete the Vault paths.
 
