@@ -16,6 +16,7 @@ Run on the Salt master as root, with onedir's Python (it has salt and requests):
   and role, and the manufacturer/productname grains for the device type. Physical
   minions not in DEVICE_PLAN are skipped. On sites other than `home` only the
   Tailscale IP is recorded (a remote LAN can overlap ours) and is the primary.
+  Sites are the existing NetBox ones: HOME_SITE and Bastion Maurits.
 - --appliances adds the non-minion APPLIANCES below as VMs with role `appliance`.
 - The API token is read from NETBOX_TOKEN or prompted for; it's never stored.
 
@@ -38,12 +39,12 @@ KEEP_DEVICE_IFACES = KEEP_IFACES + ("vmbr",)
 TAILNET_RANGE = ipaddress.ip_network("100.64.0.0/10")
 VMINTERFACE = "virtualization.vminterface"
 DCIM_INTERFACE = "dcim.interface"
-HOME_SITE = "home"
+HOME_SITE = "Scott Drive"
 
 # Physical minions: minion ID -> (site name, role). Decided 2026-10-13.
 DEVICE_PLAN = {
-    "proxmox": ("home", "hypervisor"),
-    "wopr": ("home", "workstation"),
+    "proxmox": (HOME_SITE, "hypervisor"),
+    "wopr": (HOME_SITE, "workstation"),
     "nlremote.taile3eee.ts.net": ("Bastion Maurits", "remote-node"),
 }
 
