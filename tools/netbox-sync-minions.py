@@ -39,11 +39,11 @@ VMINTERFACE = "virtualization.vminterface"
 DCIM_INTERFACE = "dcim.interface"
 HOME_SITE = "home"
 
-# Physical minions: minion ID -> (site, role). Decided 2026-10-13.
+# Physical minions: minion ID -> (site name, role). Decided 2026-10-13.
 DEVICE_PLAN = {
     "proxmox": ("home", "hypervisor"),
     "wopr": ("home", "workstation"),
-    "nlremote.taile3eee.ts.net": ("nl", "remote-node"),
+    "nlremote.taile3eee.ts.net": ("Bastion Maurits", "remote-node"),
 }
 
 
@@ -144,7 +144,9 @@ def ensure_named(nb, path, name, what, **extra):
     """Find by slug, or create with name + slug (+ extra fields)."""
     slug = slugify(name)
     if (path, slug) not in _ensured:
-        obj = nb.one(path, slug=slug) or nb.create(path, {"name": name, "slug": slug, **extra}, f"{what} {name}")
+        # Match an existing object by name too: its slug may not be ours.
+        obj = (nb.one(path, slug=slug) or nb.one(path, name__ie=name)
+               or nb.create(path, {"name": name, "slug": slug, **extra}, f"{what} {name}"))
         _ensured[(path, slug)] = obj["id"]
     return _ensured[(path, slug)]
 
