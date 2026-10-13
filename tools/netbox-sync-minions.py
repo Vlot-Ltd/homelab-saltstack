@@ -16,6 +16,7 @@ Run on the Salt master as root, with onedir's Python (it has salt and requests):
   and role, and the manufacturer/productname grains for the device type. Physical
   minions not in DEVICE_PLAN are skipped. On sites other than `home` only the
   Tailscale IP is recorded (a remote LAN can overlap ours) and is the primary.
+- --appliances adds the non-minion APPLIANCES below as VMs with role `appliance`.
 - The API token is read from NETBOX_TOKEN or prompted for; it's never stored.
 
 Safe to re-run: anything already correct is left alone.
@@ -45,6 +46,14 @@ DEVICE_PLAN = {
     "wopr": ("home", "workstation"),
     "nlremote.taile3eee.ts.net": ("Bastion Maurits", "remote-node"),
 }
+
+# Not Salt minions, so no grains: VMs in the cluster with one fixed LAN IP on eth0.
+# Added with --appliances. Decided 2026-10-13.
+APPLIANCES = {
+    "homeassistant": "192.168.0.24/24",
+    "truenas": "192.168.0.3/24",
+}
+APPLIANCE_ROLE = "appliance"
 
 
 class NetBox:
@@ -270,6 +279,7 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--apply", action="store_true", help="write to NetBox (default: dry run)")
     ap.add_argument("--devices", action="store_true", help="also sync physical minions in DEVICE_PLAN")
+    ap.add_argument("--appliances", action="store_true", help="also sync the fixed APPLIANCES VMs")
     ap.add_argument("--url", default="https://netbox.taile3eee.ts.net")
     ap.add_argument("--cluster", default="proxmox", help="NetBox cluster for new VMs")
     ap.add_argument("--tailnet", default="taile3eee.ts.net")
@@ -344,6 +354,23 @@ def main():
                 "status": "active",
             }, f"device {minion} ({site}, {role}, {manufacturer} {model})")
         sync_host(nb, args, minion, host, ifaces.get(minion, {}), obj, "device", tag_id, counts)
+
+    if args.appliances:
+        role_id = ensure_named(nb, "dcim/device-roles", APPLIANCE_ROLE, "role", vm_role=True)
+        for name, cidr in sorted(APPLIANCES.items()):
+            print(f"{name} (appliance)")
+            obj = nb.one("virtualization/virtual-machines", name__ie=name)
+            if not obj:
+                counts["changed"] += 1
+                obj = nb.create("virtualization/virtual-machines",
+                                {"name": name, "cluster": cluster_id, "role": role_id, "status": "active"},
+                                f"VM {name}")
+            elif not obj.get("role"):
+                counts["changed"] += 1
+                nb.update("virtualization/virtual-machines", obj["id"], {"role": role_id}, f"VM {name} role")
+            iface = ipaddress.ip_interface(cidr)
+            fake = {"eth0": {"inet": [{"address": str(iface.ip), "netmask": str(iface.netmask)}]}}
+            sync_host(nb, args, name, name, fake, obj, "vm", tag_id, counts)
 
     print(f"\nDone: {counts['changed']} changes {'made' if args.apply else 'planned'}, "
           f"{counts['warn']} warnings, {counts['skipped']} physical skipped")
