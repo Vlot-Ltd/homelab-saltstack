@@ -42,7 +42,8 @@ so the MacBook (if a minion) never gets power or SSH changes.
    - restart after power failure on (`autorestart 1`): a smart plug becomes the power button
    - restart after a freeze on
    - system sleep, disk sleep and Power Nap off; display sleep allowed
-   - wake for network access on
+   - no Wake-on-LAN: the box is Wi-Fi only (no cabling where it sits); not needed
+     with sleep off
 2. **SSH**: Remote Login is switched on by hand on day 1 (needs Full Disk Access to
    do from the CLI). Salt manages `/etc/ssh/sshd_config.d/100-homelab.conf`: keys
    only, no root login, and `~timo/.ssh/authorized_keys` from pillar. Reload via
@@ -77,10 +78,10 @@ so the MacBook (if a minion) never gets power or SSH changes.
 
 - After day 1 and key acceptance, one `state.highstate` brings the Mac Mini to the
   baseline with `Failed: 0`; a second run shows no changes.
-- `pmset -g` shows `autorestart 1`, `sleep 0`, `disksleep 0`, `womp 1`.
+- `pmset -g` shows `autorestart 1`, `sleep 0`, `disksleep 0`.
 - Pulling the plug and restoring it brings the box back on the tailnet and in Salt
-  (`salt <mac> test.ping`) without anyone touching it (with FileVault off; with it on,
-  after an SSH unlock).
+  (`salt <mac> test.ping`) over Wi-Fi, nobody logged in, without anyone touching it
+  (with FileVault off; with it on, after an SSH unlock, which needs macOS 26.5+ on Wi-Fi).
 - Zabbix shows the host with agent availability green and the pending-updates item.
 - No highstate runs `brew upgrade`.
 
@@ -128,6 +129,7 @@ so the MacBook (if a minion) never gets power or SSH changes.
 
 | Risk | Impact | Probability | Mitigation |
 |------|--------|-------------|------------|
+| Wi-Fi doesn't rejoin at the login window after a reboot | Box unreachable until someone logs in | Low | Plug-pull test with nobody logged in, on day 2 with the keyboard still attached |
 | Bad sshd drop-in locks out SSH | Box unreachable; needs KVM | Medium | `check_cmd: sshd -t`; first apply on day 2 with keyboard attached |
 | FileVault on, power cut | Box waits at pre-boot; services down until SSH unlock | High if on | Decide FileVault on day 1; macOS 26 allows SSH unlock on Apple Silicon (Remote Login must be on) |
 | Zabbix pkg changes ID/paths between versions | Install state not idempotent | Low | Pin version and hash in pillar; `pkgutil --pkgs` check |
