@@ -36,8 +36,10 @@ class NetBox:
         self.api = url.rstrip("/") + "/api"
         self.apply = apply
         self.session = requests.Session()
-        # NetBox 4.5 v2 tokens (nbt_...) use Bearer; v1 tokens use Token.
-        scheme = "Bearer" if token.startswith("nbt_") else "Token"
+        # NetBox 4.5 v2 tokens are <key>.<token> and use Bearer; v1 tokens use Token.
+        scheme = "Bearer" if "." in token else "Token"
+        self.token_shape = (f"{scheme} scheme, {len(token)} chars, "
+                            f"{'starts' if token.startswith('nbt_') else 'does not start'} with nbt_")
         self.session.headers.update(
             {"Authorization": f"{scheme} {token}", "Accept": "application/json"}
         )
@@ -45,7 +47,8 @@ class NetBox:
     def status(self):
         r = self.session.get(f"{self.api}/status/", timeout=30)
         if not r.ok:
-            sys.exit(f"FAIL: NetBox API {r.status_code}: {r.text[:200]}")
+            sys.exit(f"FAIL: NetBox API {r.status_code}: {r.text[:200]}\n"
+                     f"      Token sent: {self.token_shape}")
         return r.json()
 
     def find(self, path, **params):
@@ -157,7 +160,9 @@ def main():
     ap.add_argument("--target", default="*", help="Salt glob of minions to sync")
     args = ap.parse_args()
 
-    token = os.environ.get("NETBOX_TOKEN") or getpass.getpass("NetBox API token: ")
+    token = (os.environ.get("NETBOX_TOKEN") or getpass.getpass("NetBox API token: ")).strip()
+    if not token:
+        sys.exit("FAIL: empty token (the paste didn't arrive). Run it again")
     nb = NetBox(args.url, token, args.apply)
     print(f"NetBox {nb.status().get('netbox-version', '?')} at {args.url}. "
           f"{'APPLYING CHANGES' if args.apply else 'DRY RUN, nothing is written'}")
