@@ -173,6 +173,7 @@ homepage:
           icon: "proxmox-light.png"
           description: "Proxmox KVM"
           static_ip: "192.168.0.141"
+          protocol: "https"
 
         fing:
           name: "Fing"
