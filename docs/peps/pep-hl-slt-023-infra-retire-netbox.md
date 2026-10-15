@@ -35,9 +35,15 @@ clean"). Differences from the plan below:
   `vault kv metadata delete`. No NetBox policy.
 - Sweep of all minions for cron, timers and containers mentioning netbox or nmap:
   none (the nmap discovery ran on the NetBox VM itself).
-- Found on the way, not NetBox: `pillar/application/manyfold.sls` uses `name:` instead
-  of `name_key`/`password_key`, so `database.postgres` hasn't rendered since
-  2026-07-18 (`064a055`). Separate fix.
+- Vault, second pass: `netbox_db_user`/`netbox_db_password` were also in
+  `salt/roles/db`; removed with `vault kv patch -remove-data`.
+- Found on the way and fixed the same day: `database.postgres` hadn't rendered on
+  `postgres` since 2026-07-18. `pillar/application/manyfold.sls` used `name:` instead of
+  `name_key`/`password_key` (`a3130e2`; `manyfold_db_user`/`manyfold_db_password` added
+  to `salt/roles/db`, misspelt `manifold_db_*` duplicates removed), and
+  `pg_hba.conf.jinja` read `users[0].name`, which no app has had since the May Vault
+  rewrite (`e705065`). Applied: `pg_hba.conf` lost the `netbox_user` lines; Postgres
+  restarted; apps reconnected.
 
 ## Motivation
 
