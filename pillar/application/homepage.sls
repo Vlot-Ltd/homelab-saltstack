@@ -74,12 +74,6 @@ homepage:
           description: "Manyfold STL Library Manager"
           static_url: "https://manyfoldstl.taile3eee.ts.net/"
 
-        netbox:
-          name: "NetBox"
-          icon: "netbox.png"
-          description: "NetBox IPAM and DCIM"
-          static_url: "https://netbox.taile3eee.ts.net/"
-
         plex:
           name: "Plex"
           icon: "plex-alt-light.png"
