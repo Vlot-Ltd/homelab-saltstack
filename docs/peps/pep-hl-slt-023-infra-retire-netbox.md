@@ -3,17 +3,41 @@
 **ID:** PEP-HL-SLT-023  
 **Title:** Retire NetBox  
 **Author:** Timo Vlot  
-**Status:** Draft  
+**Status:** Implemented  
 **Type:** Infrastructure  
 **Priority:** Low  
 **Created:** 2026-10-13  
-**Updated:** 2026-10-13  
+**Updated:** 2026-10-15  
 **Supersedes:** N/A  
 **Superseded-By:** N/A  
 
 ## Abstract
 
 Retire NetBox from the homelab: back up, then remove the VM, its Postgres database and role, Salt states and pillar, Vault secrets, monitoring, patching and Tailscale entries, and archive its vault notes after extracting what's worth keeping.
+
+## Implementation record (2026-10-15)
+
+Done in one session, by decision **without backups** ("if it ever comes back, start
+clean"). Differences from the plan below:
+
+- Zabbix: no `netbox` host existed (template already gone). PatchMon host and Tailscale
+  node removed by hand.
+- Salt repo (`122c13d`): `salt/application/netbox/` (incl. `initold.sls`,
+  `superuser.sls` with its placeholder password), `pillar/application/netbox.sls`, both
+  `pillar/top.sls` entries, the Homepage tile and `tools/netbox-sync-minions.py`.
+  `postgres`'s pillar checked clean of `netbox` before the drop.
+- `postgres`: database `netbox` and role **`netbox_user`** (not `netbox`) dropped with
+  `DROP DATABASE netbox WITH (FORCE)`: Zabbix agent 2's Postgres plugin
+  (`zabbixmonitor`) held an idle session.
+- Proxmox: VM 110 destroyed with `--purge`. NetBox was never a Salt minion, so no key.
+- Vault: no `secret/` mount ever existed; the only path was `salt/minions/netbox`
+  (`netbox_secret`, `nmap_api`, `superuser_email`, `superuser_password`), deleted with
+  `vault kv metadata delete`. No NetBox policy.
+- Sweep of all minions for cron, timers and containers mentioning netbox or nmap:
+  none (the nmap discovery ran on the NetBox VM itself).
+- Found on the way, not NetBox: `pillar/application/manyfold.sls` uses `name:` instead
+  of `name_key`/`password_key`, so `database.postgres` hasn't rendered since
+  2026-07-18 (`064a055`). Separate fix.
 
 ## Motivation
 
