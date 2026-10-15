@@ -15,6 +15,8 @@
 
 The codebase contains dead files, an unfinished state with hardcoded placeholder credentials, and minor issues that add noise and confusion without serving any purpose. This PEP removes or completes them.
 
+**2026-10-15:** the three `salt/application/netbox/` items below (`initold.sls`, `webserver.sls`, `superuser.sls`) are resolved: the whole NetBox state tree was removed by PEP-HL-SLT-023 (`122c13d`).
+
 ## Motivation
 
 Dead code and placeholder values are a maintenance liability: they add confusion when reading the codebase, may be mistakenly applied, and in the case of `netbox/superuser.sls` would create a service account with a well-known default password if ever run. Cleaning these up reduces cognitive overhead and eliminates the risk of accidentally applying placeholder configuration.
