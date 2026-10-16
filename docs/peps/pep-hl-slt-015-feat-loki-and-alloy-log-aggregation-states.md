@@ -138,7 +138,7 @@ docker host:  Alloy (central) ──metrics──► Prometheus (PEP-028)
 |------|--------|-------------|------------|
 | `os.linux` and the agent state fight over the `alloy` package | Package flaps every highstate | High if missed | Same commit removes it from the removal lists; checked in Phase 2 |
 | Loki/homebox both on host port 3100 | One container fails to start | High | Decide the port in Phase 1 before deploying |
-| OTLP endpoint open beyond personal devices | Anyone on the tailnet can write telemetry | Medium | Tailscale ACL limits 4317/4318 to my devices; nothing from the work MacBook |
+| OTLP endpoint open beyond personal devices | Anyone on the tailnet can write telemetry | Medium | Tailscale ACL limits 4317/4318 to my devices |
 | Claude Code events carry prompt text | Prompts stored in Loki | Low | `OTEL_LOG_USER_PROMPTS` left unset on every Mac |
 | Journal volume from the whole fleet | Docker host disk fills | Medium | Retention from pillar; staggered Phase 3; Zabbix disk trigger on the docker host |
 

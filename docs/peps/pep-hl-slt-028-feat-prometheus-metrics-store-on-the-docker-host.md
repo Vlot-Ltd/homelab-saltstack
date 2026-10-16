@@ -76,8 +76,8 @@ No Docker on general servers.
 - Long-term storage (Mimir): `observability-redesign` Phase 2+.
 - Writing the cost exporter itself. It's a small program in its own repo. This PEP
   deploys it.
-- Anything from the work MacBook. Its Claude Code telemetry carries the work org ID
-  and email, so it never points at this stack.
+- Whether the work MacBook reports is decided in the vault project, not here. It
+  uses the personal subscription, so it would only be a client config change.
 
 ### Implementation Approach
 
