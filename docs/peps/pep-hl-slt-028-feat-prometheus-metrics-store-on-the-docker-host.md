@@ -7,7 +7,7 @@
 **Type:** Feature  
 **Priority:** Medium  
 **Created:** 2026-10-16  
-**Updated:** 2026-10-16  
+**Updated:** 2026-10-17  
 **Supersedes:** N/A  
 **Superseded-By:** N/A  
 
@@ -128,6 +128,10 @@ central Alloy (PEP-015) ──remote_write──► Prometheus :9090 ◄──sc
 
 - State, pillar and compose file. Self-scrape only.
 - Apply with `test=True`, then for real. Check readiness.
+- **Done 2026-10-17:** `application.prometheus` applied on `docker` (commit
+  `5328227`). `/-/ready` returns `Prometheus Server is Ready.`, and a second
+  `test=True` run shows no changes. Image `prom/prometheus:v3.5.0`, TSDB in the
+  named volume `prometheus-data`. Added to `salt/top.sls` for `docker`.
 
 ### Phase 2: Scrape Home Assistant
 

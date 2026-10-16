@@ -19,7 +19,7 @@ base:
     - application.homepage
     - application.linkwarden
     - application.webdriver
-    # - application.prometheus  # PEP-HL-SLT-028: uncomment after the first manual apply
+    - application.prometheus
   'salt':
     - application.salt-master
   'postgres':
