@@ -88,6 +88,8 @@ Planning detail lives in the vault note `30-projects/homelab-zabbix-8-upgrade.md
 - Check `unattended-upgrades` on `zabbix` doesn't allow the Zabbix repo origin, so
   the 8.0 repo can't trigger an upgrade outside the window.
 - Check free space on `postgres` for the dump and schema upgrade.
+- Done 2026-10-16: release-package test passes (would install); unattended-upgrades
+  allows Ubuntu origins only; `zabbix` DB 20 GB, 61 GB free on `postgres` `/`.
 - Commit the `repo.sls` change only in Phase 2, after the packages are upgraded.
 
 ### Phase 2: Upgrade window
@@ -136,7 +138,7 @@ Planning detail lives in the vault note `30-projects/homelab-zabbix-8-upgrade.md
 |------|--------|-------------|------------|
 | Schema upgrade fails or is interrupted | High | Low | `pg_dump` of `zabbix` taken with the server stopped; restore plus VM snapshot revert |
 | No supported path from beta to GA | Medium | Medium | Keep the 7.4 dump; restore and upgrade to GA, or reinstall and import |
-| Grafana Zabbix plugin breaks on 8.0 | Medium | Unknown | Accepted; homelab is the canary for work. Plugin update or wait for GA |
+| Grafana Zabbix plugin breaks on 8.0 | Medium | Low | No published 8.0 support (issue #2575 open), but 8.0 removes only write API methods the plugin doesn't use. Accepted; homelab is the canary for work. Check the Grafana API user's role keeps `api.access` (8.0 default changed to disabled) |
 | `pkg.installed` with `sources` doesn't switch the release package | Low | Medium | Phase 1 `state.single` test before committing |
 | 8.0 repo reached by unattended-upgrades outside the window | High | Low | Phase 1 check; commit `repo.sls` only after the window |
 | Snapshot rollback of `postgres` hits other apps' databases | High | Low | Never snapshot-revert `postgres`; backout is the `zabbix` dump only |
@@ -155,3 +157,4 @@ Planning detail lives in the vault note `30-projects/homelab-zabbix-8-upgrade.md
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
 | 0.1 | 2026-10-16 | Timo Vlot | Initial draft |
+| 0.2 | 2026-10-16 | Timo Vlot | Phase 1 checks done; Grafana plugin risk researched |
