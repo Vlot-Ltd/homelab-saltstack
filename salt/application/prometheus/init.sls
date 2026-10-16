@@ -22,6 +22,31 @@ prometheus-directory:
     - group: docker
     - mode: "0755"
 
+# Scrape credentials live outside /docker (application.docker resets /docker to
+# 0644 recursively). Owned by nobody (uid 65534, Prometheus's user in the image).
+prometheus-secrets-directory:
+  file.directory:
+    - name: /etc/prometheus-secrets
+    - user: nobody
+    - group: root
+    - mode: "0500"
+
+{%- if prom.get('homeassistant', {}).get('enabled', False) %}
+prometheus-homeassistant-token:
+  file.managed:
+    - name: /etc/prometheus-secrets/homeassistant_token
+    # From Vault salt/minions/docker; fails loudly if the key is missing.
+    - contents_pillar: homeassistant_prometheus_token
+    - user: nobody
+    - group: root
+    - mode: "0400"
+    - show_changes: False
+    - require:
+      - file: prometheus-secrets-directory
+    - require_in:
+      - file: prometheus-config
+{%- endif %}
+
 # Scratch dir for check_cmd, so promtool in the container can see the candidate file.
 prometheus-check-directory:
   file.directory:
@@ -44,9 +69,11 @@ prometheus-config:
     - check_cmd: >-
         docker run --rm --entrypoint promtool
         -v /docker/prometheus/.check:/docker/prometheus/.check:ro
+        -v /etc/prometheus-secrets:/etc/prometheus/secrets:ro
         {{ image }} check config
     - require:
       - file: prometheus-check-directory
+      - file: prometheus-secrets-directory
       - service: docker-service
 
 prometheus-docker-compose:
@@ -68,6 +95,7 @@ prometheus-docker-compose:
               - "{{ port }}:9090"
             volumes:
               - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+              - /etc/prometheus-secrets:/etc/prometheus/secrets:ro
               - prometheus-data:/prometheus
 
         volumes:

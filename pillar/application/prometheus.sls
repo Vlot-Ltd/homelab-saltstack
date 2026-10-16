@@ -10,6 +10,14 @@ prometheus:
   retention: 400d
   scrape_interval: 60s
 
+  # Phase 2: Home Assistant (Bambu A1 via ha-bambulab). Token from Vault
+  # salt/minions/docker, key homeassistant_prometheus_token. IP, not the name:
+  # containers don't read the host's /etc/hosts (192.168.0.24 = homeassistant).
+  homeassistant:
+    enabled: false
+    target: "192.168.0.24:8123"
+    scrape_interval: 60s
+
   # Extra scrape jobs, rendered as-is into prometheus.yml. Phase 2 adds Home
   # Assistant, Phase 4 adds LiteLLM and Pushgateway.
   scrape_configs: []

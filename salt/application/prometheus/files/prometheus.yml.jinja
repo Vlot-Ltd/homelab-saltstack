@@ -8,6 +8,16 @@ scrape_configs:
   - job_name: prometheus
     static_configs:
       - targets: ["localhost:9090"]
+{%- set ha = prom.get('homeassistant', {}) %}
+{%- if ha.get('enabled', False) %}
+  - job_name: homeassistant
+    metrics_path: /api/prometheus
+    scrape_interval: {{ ha.get('scrape_interval', '60s') }}
+    authorization:
+      credentials_file: /etc/prometheus/secrets/homeassistant_token
+    static_configs:
+      - targets: ["{{ ha['target'] }}"]
+{%- endif %}
 {%- for job in prom.get('scrape_configs', []) %}
   - {{ job | json }}
 {%- endfor %}
