@@ -89,7 +89,15 @@ and the template has none.
 - Locate Portainer's data volume and print the stack file:
   `cat "$(docker inspect portainer --format '{{range .Mounts}}{{if eq .Destination "/data"}}{{.Source}}{{end}}{{end}}')/compose/2/v1/docker-compose.yml"`.
   Check it for secrets before pasting it anywhere.
-- Volume backup (Implementation Approach step 2). Record the tarball's size.
+- **Portainer was wiped at some point (Timo, 2026-10-17)**, so the stack file is
+  probably gone. That doesn't matter: the container and its volume are untouched by
+  that. Rebuild the compose file from the running container instead:
+  `docker inspect homebox --format '{{range .Config.Env}}{{println .}}{{end}}' | grep ^HBOX_`
+  gives the env values (not secrets), and the image, port and volume are in the
+  Motivation table.
+- Volume backup (Implementation Approach step 2). Record the tarball's size. Stakes
+  are low (about four boxes in it), and the fallback is a fresh Homebox, but the
+  backup costs a minute.
 
 ### Phase 1: Salt takeover
 
