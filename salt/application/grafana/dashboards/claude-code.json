@@ -9,7 +9,7 @@
   ],
   "description": "Claude Code OTel -> Alloy -> Prometheus on docker. PEP-HL-SLT-015 / PEP-HL-SLT-028. Vault: homelab-telemetry-claude-bambu.",
   "schemaVersion": 39,
-  "version": 5,
+  "version": 6,
   "editable": true,
   "graphTooltip": 1,
   "time": {
@@ -197,7 +197,7 @@
             "uid": "prometheus"
           },
           "refId": "A",
-          "expr": "sum(increase({__name__=~\"litellm_(input|output)_tokens_metric_total\"}[$__range]))",
+          "expr": "sum (increase(litellm_input_tokens_metric_total[$__range])) + sum (increase(litellm_output_tokens_metric_total[$__range]))",
           "legendFormat": "LiteLLM tokens",
           "range": false,
           "instant": true,
@@ -411,7 +411,7 @@
             "uid": "prometheus"
           },
           "refId": "B",
-          "expr": "sum (increase({__name__=~\"litellm_(input|output)_tokens_metric_total\", requested_model=\"local\"}[1d]))",
+          "expr": "sum (increase(litellm_input_tokens_metric_total{requested_model=\"local\"}[1d])) + sum (increase(litellm_output_tokens_metric_total{requested_model=\"local\"}[1d]))",
           "legendFormat": "LiteLLM local (Ollama)",
           "range": true,
           "instant": false,
@@ -424,7 +424,7 @@
             "uid": "prometheus"
           },
           "refId": "C",
-          "expr": "sum (increase({__name__=~\"litellm_(input|output)_tokens_metric_total\", requested_model!=\"local\"}[1d]))",
+          "expr": "sum (increase(litellm_input_tokens_metric_total{requested_model!=\"local\"}[1d])) + sum (increase(litellm_output_tokens_metric_total{requested_model!=\"local\"}[1d]))",
           "legendFormat": "LiteLLM API",
           "range": true,
           "instant": false,
@@ -1579,7 +1579,7 @@
             "uid": "prometheus"
           },
           "refId": "A",
-          "expr": "sum by (requested_model) (increase({__name__=~\"litellm_(input|output)_tokens_metric_total\"}[1d]))",
+          "expr": "sum by (requested_model) (increase(litellm_input_tokens_metric_total[1d])) + sum by (requested_model) (increase(litellm_output_tokens_metric_total[1d]))",
           "legendFormat": "{{requested_model}}",
           "range": true,
           "instant": false,
