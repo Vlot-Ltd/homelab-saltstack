@@ -113,6 +113,13 @@ prometheus-docker-compose:
               - --web.enable-lifecycle
             ports:
               - "{{ port }}:9090"
+{%- if prom.get('extra_hosts') %}
+            # Tailnet names Docker's DNS can't give an IPv4 answer for (pillar).
+            extra_hosts:
+{%- for name, ip in prom['extra_hosts'].items() %}
+              - "{{ name }}:{{ ip }}"
+{%- endfor %}
+{%- endif %}
             volumes:
               - ./config:/etc/prometheus/config:ro
               - /etc/prometheus-secrets:/etc/prometheus/secrets:ro

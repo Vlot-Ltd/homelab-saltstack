@@ -161,6 +161,14 @@ central Alloy (PEP-015) ──remote_write──► Prometheus :9090 ◄──sc
 
 ### Phase 4: Claude usage inputs
 
+- **2026-10-17: LiteLLM scrape added**, covering every tier (`local` = Ollama,
+  `cheap`, `smart`): job `litellm`,
+  `https://llm.taile3eee.ts.net/metrics`. LiteLLM's `/metrics` is unauthenticated
+  (`require_auth_for_metrics_endpoint: false`), because the alternative was giving
+  Prometheus the master key. Docker's DNS answers only AAAA for Tailscale Service
+  names and the container has no IPv6, so the Service's IPv4 VIP `100.65.24.13`
+  is pinned through `extra_hosts` (pillar). HTTPS still verifies against the name.
+
 - Pushgateway container and scrape job. Check one push from a personal Mac.
 - LiteLLM scrape job, using a LiteLLM key from Vault.
 - `billing=api` resource attribute in the `friday` job env files.

@@ -18,6 +18,20 @@ prometheus:
     target: "192.168.0.24:8123"
     scrape_interval: 60s
 
-  # Extra scrape jobs, rendered as-is into prometheus.yml. Phase 2 adds Home
-  # Assistant, Phase 4 adds LiteLLM and Pushgateway.
-  scrape_configs: []
+  # Docker's DNS returns only the IPv6 address for Tailscale Service names, and
+  # the container has no IPv6. Pin the Service's IPv4 VIP (stable unless the
+  # Service is deleted and recreated). From: dig llm.taile3eee.ts.net A @100.100.100.100
+  extra_hosts:
+    llm.taile3eee.ts.net: 100.65.24.13
+
+  # Extra scrape jobs, rendered as-is into prometheus.yml.
+  scrape_configs:
+    # Phase 4: LiteLLM on friday (all tiers: local/Ollama, cheap, smart).
+    # /metrics is unauthenticated (require_auth_for_metrics_endpoint: false in
+    # LiteLLM's config): read-only counters, tailnet-only. Decided 2026-10-17.
+    - job_name: litellm
+      scheme: https
+      metrics_path: /metrics
+      scrape_interval: 60s
+      static_configs:
+        - targets: ["llm.taile3eee.ts.net:443"]
