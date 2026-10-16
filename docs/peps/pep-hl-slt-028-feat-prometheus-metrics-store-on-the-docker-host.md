@@ -140,7 +140,16 @@ central Alloy (PEP-015) ──remote_write──► Prometheus :9090 ◄──sc
 
 ### Phase 3: Grafana
 
-- Datasource provisioning in `application.grafana`.
+- Datasource as a **standalone state**, `application.grafana.datasource-prometheus`,
+  writing `/etc/grafana/provisioning/datasources/prometheus.yaml` and restarting
+  `grafana-server` when the file changes. URL from pillar `grafana_prometheus_url`.
+- Not through `application.grafana` (2026-10-17). That state isn't in
+  `salt/top.sls` and has never been applied by highstate, and applying it would:
+  - overwrite `/etc/grafana/grafana.ini` with only a `[security]` section
+  - fail to render a datasource without `secureJsonData.password_key`
+  - drop `isDefault`, `trends` and `directDbConnection` from the Zabbix datasource
+
+  Fixing that state is separate work, not this PEP.
 
 ### Phase 4: Claude usage inputs
 

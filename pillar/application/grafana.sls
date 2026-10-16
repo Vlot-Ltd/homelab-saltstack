@@ -27,3 +27,6 @@ grafana_datasources:
       password_key: "zabbix_db_password"
     jsonData:
       sslmode: "disable"
+
+# PEP-HL-SLT-028 Phase 3: Prometheus on the docker host
+grafana_prometheus_url: "http://docker:9090"
