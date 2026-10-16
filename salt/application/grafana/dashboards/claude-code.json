@@ -1,6 +1,6 @@
 {
   "uid": "claude-code",
-  "title": "Claude Code usage",
+  "title": "Claude and LLM usage",
   "tags": [
     "claude",
     "ai",
@@ -9,7 +9,7 @@
   ],
   "description": "Claude Code OTel -> Alloy -> Prometheus on docker. PEP-HL-SLT-015 / PEP-HL-SLT-028. Vault: homelab-telemetry-claude-bambu.",
   "schemaVersion": 39,
-  "version": 4,
+  "version": 5,
   "editable": true,
   "graphTooltip": 1,
   "time": {
@@ -98,7 +98,7 @@
     {
       "id": 1,
       "type": "row",
-      "title": "Selected range",
+      "title": "Overview: Claude Code vs LiteLLM",
       "collapsed": false,
       "gridPos": {
         "h": 1,
@@ -111,15 +111,15 @@
     {
       "id": 2,
       "type": "stat",
-      "title": "Estimated cost",
-      "description": "Claude Code's own estimate: tokens x API list prices. On billing=pro it's what the usage would have cost on the API, not money spent. On billing=api it tracks real spend. Converted from USD at a fixed 0.744 (2026 average), so it's a guesstimate in pounds. Each Claude Code session reports its own counter from 0, so this sums each session's highest value in the period. A session running past midnight counts in both days.",
+      "title": "Claude Code tokens",
+      "description": "Claude Code respects the Machine and Billing filters; LiteLLM is always everything. Input plus output, excluding cache. Each Claude Code session reports its own counter from 0, so this sums each session's highest value in the period. A session running past midnight counts in both days.",
       "datasource": {
         "type": "prometheus",
         "uid": "prometheus"
       },
       "gridPos": {
         "h": 4,
-        "w": 4,
+        "w": 6,
         "x": 0,
         "y": 1
       },
@@ -130,8 +130,8 @@
             "uid": "prometheus"
           },
           "refId": "A",
-          "expr": "sum (max_over_time(claude_code_cost_usage_USD_total{host=~\"$host\", billing=~\"$billing\"}[$__range])) * $usd_gbp",
-          "legendFormat": "Estimated cost",
+          "expr": "sum (max_over_time(claude_code_token_usage_tokens_total{host=~\"$host\", billing=~\"$billing\", type=~\"input|output\"}[$__range]))",
+          "legendFormat": "Claude Code tokens",
           "range": false,
           "instant": true,
           "editorMode": "code"
@@ -139,7 +139,7 @@
       ],
       "fieldConfig": {
         "defaults": {
-          "unit": "currencyGBP",
+          "unit": "short",
           "color": {
             "mode": "fixed",
             "fixedColor": "text"
@@ -153,7 +153,7 @@
               }
             ]
           },
-          "decimals": 2
+          "decimals": 1
         },
         "overrides": []
       },
@@ -178,16 +178,16 @@
     {
       "id": 3,
       "type": "stat",
-      "title": "Input tokens",
-      "description": "Each Claude Code session reports its own counter from 0, so this sums each session's highest value in the period. A session running past midnight counts in both days.",
+      "title": "LiteLLM tokens",
+      "description": "Input plus output, all tiers (local and API). LiteLLM on friday, all callers (Home Assistant, scripts, Zed). The Machine and Billing filters don't apply to LiteLLM. Counters from LiteLLM's /metrics/, scraped every 60s.",
       "datasource": {
         "type": "prometheus",
         "uid": "prometheus"
       },
       "gridPos": {
         "h": 4,
-        "w": 4,
-        "x": 4,
+        "w": 6,
+        "x": 6,
         "y": 1
       },
       "targets": [
@@ -197,8 +197,8 @@
             "uid": "prometheus"
           },
           "refId": "A",
-          "expr": "sum (max_over_time(claude_code_token_usage_tokens_total{host=~\"$host\", billing=~\"$billing\", type=\"input\"}[$__range]))",
-          "legendFormat": "Input tokens",
+          "expr": "sum(increase({__name__=~\"litellm_(input|output)_tokens_metric_total\"}[$__range]))",
+          "legendFormat": "LiteLLM tokens",
           "range": false,
           "instant": true,
           "editorMode": "code"
@@ -245,16 +245,16 @@
     {
       "id": 4,
       "type": "stat",
-      "title": "Output tokens",
-      "description": "Each Claude Code session reports its own counter from 0, so this sums each session's highest value in the period. A session running past midnight counts in both days.",
+      "title": "Claude Code estimated cost",
+      "description": "Claude Code respects the Machine and Billing filters; LiteLLM is always everything. Claude Code's own estimate: tokens x API list prices. On billing=pro it's what the usage would have cost on the API, not money spent. On billing=api it tracks real spend. Converted from USD at a fixed 0.744 (2026 average), so it's a guesstimate in pounds.",
       "datasource": {
         "type": "prometheus",
         "uid": "prometheus"
       },
       "gridPos": {
         "h": 4,
-        "w": 4,
-        "x": 8,
+        "w": 6,
+        "x": 12,
         "y": 1
       },
       "targets": [
@@ -264,8 +264,8 @@
             "uid": "prometheus"
           },
           "refId": "A",
-          "expr": "sum (max_over_time(claude_code_token_usage_tokens_total{host=~\"$host\", billing=~\"$billing\", type=\"output\"}[$__range]))",
-          "legendFormat": "Output tokens",
+          "expr": "sum (max_over_time(claude_code_cost_usage_USD_total{host=~\"$host\", billing=~\"$billing\"}[$__range])) * $usd_gbp",
+          "legendFormat": "Claude Code estimated cost",
           "range": false,
           "instant": true,
           "editorMode": "code"
@@ -273,7 +273,7 @@
       ],
       "fieldConfig": {
         "defaults": {
-          "unit": "short",
+          "unit": "currencyGBP",
           "color": {
             "mode": "fixed",
             "fixedColor": "text"
@@ -287,7 +287,7 @@
               }
             ]
           },
-          "decimals": 1
+          "decimals": 2
         },
         "overrides": []
       },
@@ -312,902 +312,8 @@
     {
       "id": 5,
       "type": "stat",
-      "title": "Cache read tokens",
-      "description": "Tokens served from the prompt cache: billed at a fraction of input. Each Claude Code session reports its own counter from 0, so this sums each session's highest value in the period. A session running past midnight counts in both days.",
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
-      "gridPos": {
-        "h": 4,
-        "w": 4,
-        "x": 12,
-        "y": 1
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "refId": "A",
-          "expr": "sum (max_over_time(claude_code_token_usage_tokens_total{host=~\"$host\", billing=~\"$billing\", type=\"cacheRead\"}[$__range]))",
-          "legendFormat": "Cache read tokens",
-          "range": false,
-          "instant": true,
-          "editorMode": "code"
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "unit": "short",
-          "color": {
-            "mode": "fixed",
-            "fixedColor": "text"
-          },
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "text",
-                "value": null
-              }
-            ]
-          },
-          "decimals": 1
-        },
-        "overrides": []
-      },
-      "options": {
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "colorMode": "value",
-        "graphMode": "none",
-        "textMode": "value",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "wideLayout": true,
-        "showPercentChange": false
-      },
-      "transparent": true
-    },
-    {
-      "id": 6,
-      "type": "stat",
-      "title": "Sessions",
-      "description": "Each Claude Code session reports its own counter from 0, so this sums each session's highest value in the period. A session running past midnight counts in both days.",
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
-      "gridPos": {
-        "h": 4,
-        "w": 4,
-        "x": 16,
-        "y": 1
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "refId": "A",
-          "expr": "sum (max_over_time(claude_code_session_count_total{host=~\"$host\", billing=~\"$billing\"}[$__range]))",
-          "legendFormat": "Sessions",
-          "range": false,
-          "instant": true,
-          "editorMode": "code"
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "unit": "short",
-          "color": {
-            "mode": "fixed",
-            "fixedColor": "text"
-          },
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "text",
-                "value": null
-              }
-            ]
-          },
-          "decimals": 0
-        },
-        "overrides": []
-      },
-      "options": {
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "colorMode": "value",
-        "graphMode": "none",
-        "textMode": "value",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "wideLayout": true,
-        "showPercentChange": false
-      },
-      "transparent": true
-    },
-    {
-      "id": 7,
-      "type": "stat",
-      "title": "Active time",
-      "description": "Time Claude Code was actively working or being typed into. Each Claude Code session reports its own counter from 0, so this sums each session's highest value in the period. A session running past midnight counts in both days.",
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
-      "gridPos": {
-        "h": 4,
-        "w": 4,
-        "x": 20,
-        "y": 1
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "refId": "A",
-          "expr": "sum (max_over_time(claude_code_active_time_seconds_total{host=~\"$host\", billing=~\"$billing\"}[$__range]))",
-          "legendFormat": "Active time",
-          "range": false,
-          "instant": true,
-          "editorMode": "code"
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "unit": "s",
-          "color": {
-            "mode": "fixed",
-            "fixedColor": "text"
-          },
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "text",
-                "value": null
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "options": {
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "colorMode": "value",
-        "graphMode": "none",
-        "textMode": "value",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "wideLayout": true,
-        "showPercentChange": false
-      },
-      "transparent": true
-    },
-    {
-      "id": 8,
-      "type": "row",
-      "title": "Per day",
-      "collapsed": false,
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 5
-      },
-      "panels": []
-    },
-    {
-      "id": 9,
-      "type": "timeseries",
-      "title": "Estimated cost per day, by model",
-      "description": "Claude Code's own estimate: tokens x API list prices. On billing=pro it's what the usage would have cost on the API, not money spent. On billing=api it tracks real spend. Converted from USD at a fixed 0.744 (2026 average), so it's a guesstimate in pounds. Each Claude Code session reports its own counter from 0, so this sums each session's highest value in the period. A session running past midnight counts in both days.",
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
-      "gridPos": {
-        "h": 9,
-        "w": 12,
-        "x": 0,
-        "y": 6
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "refId": "A",
-          "expr": "sum by (model) (max_over_time(claude_code_cost_usage_USD_total{host=~\"$host\", billing=~\"$billing\"}[1d])) * $usd_gbp",
-          "legendFormat": "{{model}}",
-          "range": true,
-          "instant": false,
-          "editorMode": "code",
-          "interval": "1d"
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "unit": "currencyGBP",
-          "decimals": 2,
-          "min": 0,
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "drawStyle": "bars",
-            "fillOpacity": 80,
-            "lineWidth": 1,
-            "showPoints": "never",
-            "stacking": {
-              "mode": "normal",
-              "group": "A"
-            }
-          }
-        },
-        "overrides": []
-      },
-      "options": {
-        "legend": {
-          "showLegend": true,
-          "displayMode": "list",
-          "placement": "bottom"
-        },
-        "tooltip": {
-          "mode": "multi",
-          "sort": "desc"
-        }
-      },
-      "transparent": true
-    },
-    {
-      "id": 10,
-      "type": "timeseries",
-      "title": "Tokens per day, by type",
-      "description": "Each Claude Code session reports its own counter from 0, so this sums each session's highest value in the period. A session running past midnight counts in both days.",
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
-      "gridPos": {
-        "h": 9,
-        "w": 12,
-        "x": 12,
-        "y": 6
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "refId": "A",
-          "expr": "sum by (type) (max_over_time(claude_code_token_usage_tokens_total{host=~\"$host\", billing=~\"$billing\"}[1d]))",
-          "legendFormat": "{{type}}",
-          "range": true,
-          "instant": false,
-          "editorMode": "code",
-          "interval": "1d"
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "unit": "short",
-          "decimals": 0,
-          "min": 0,
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "drawStyle": "bars",
-            "fillOpacity": 80,
-            "lineWidth": 1,
-            "showPoints": "never",
-            "stacking": {
-              "mode": "normal",
-              "group": "A"
-            }
-          }
-        },
-        "overrides": []
-      },
-      "options": {
-        "legend": {
-          "showLegend": true,
-          "displayMode": "list",
-          "placement": "bottom"
-        },
-        "tooltip": {
-          "mode": "multi",
-          "sort": "desc"
-        }
-      },
-      "transparent": true
-    },
-    {
-      "id": 11,
-      "type": "timeseries",
-      "title": "Sessions per day, by machine",
-      "description": "Each Claude Code session reports its own counter from 0, so this sums each session's highest value in the period. A session running past midnight counts in both days.",
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 15
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "refId": "A",
-          "expr": "sum by (host) (max_over_time(claude_code_session_count_total{host=~\"$host\", billing=~\"$billing\"}[1d]))",
-          "legendFormat": "{{host}}",
-          "range": true,
-          "instant": false,
-          "editorMode": "code",
-          "interval": "1d"
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "unit": "short",
-          "decimals": 0,
-          "min": 0,
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "drawStyle": "bars",
-            "fillOpacity": 80,
-            "lineWidth": 1,
-            "showPoints": "never",
-            "stacking": {
-              "mode": "normal",
-              "group": "A"
-            }
-          }
-        },
-        "overrides": []
-      },
-      "options": {
-        "legend": {
-          "showLegend": true,
-          "displayMode": "list",
-          "placement": "bottom"
-        },
-        "tooltip": {
-          "mode": "multi",
-          "sort": "desc"
-        }
-      },
-      "transparent": true
-    },
-    {
-      "id": 12,
-      "type": "timeseries",
-      "title": "Active time per day, by machine",
-      "description": "Each Claude Code session reports its own counter from 0, so this sums each session's highest value in the period. A session running past midnight counts in both days.",
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 15
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "refId": "A",
-          "expr": "sum by (host) (max_over_time(claude_code_active_time_seconds_total{host=~\"$host\", billing=~\"$billing\"}[1d]))",
-          "legendFormat": "{{host}}",
-          "range": true,
-          "instant": false,
-          "editorMode": "code",
-          "interval": "1d"
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "unit": "s",
-          "decimals": 0,
-          "min": 0,
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "drawStyle": "bars",
-            "fillOpacity": 80,
-            "lineWidth": 1,
-            "showPoints": "never",
-            "stacking": {
-              "mode": "normal",
-              "group": "A"
-            }
-          }
-        },
-        "overrides": []
-      },
-      "options": {
-        "legend": {
-          "showLegend": true,
-          "displayMode": "list",
-          "placement": "bottom"
-        },
-        "tooltip": {
-          "mode": "multi",
-          "sort": "desc"
-        }
-      },
-      "transparent": true
-    },
-    {
-      "id": 13,
-      "type": "row",
-      "title": "Breakdown (selected range)",
-      "collapsed": false,
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 23
-      },
-      "panels": []
-    },
-    {
-      "id": 14,
-      "type": "bargauge",
-      "title": "Estimated cost by machine",
-      "description": "Claude Code's own estimate: tokens x API list prices. On billing=pro it's what the usage would have cost on the API, not money spent. On billing=api it tracks real spend. Converted from USD at a fixed 0.744 (2026 average), so it's a guesstimate in pounds.",
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 8,
-        "x": 0,
-        "y": 24
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "refId": "A",
-          "expr": "sum by (host) (max_over_time(claude_code_cost_usage_USD_total{host=~\"$host\", billing=~\"$billing\"}[$__range])) * $usd_gbp",
-          "legendFormat": "{{host}}",
-          "range": false,
-          "instant": true,
-          "editorMode": "code"
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "unit": "currencyGBP",
-          "decimals": 2,
-          "min": 0,
-          "color": {
-            "mode": "palette-classic"
-          },
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "text",
-                "value": null
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "options": {
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "orientation": "horizontal",
-        "displayMode": "gradient",
-        "showUnfilled": true,
-        "valueMode": "color",
-        "namePlacement": "auto",
-        "sizing": "auto"
-      },
-      "transparent": true
-    },
-    {
-      "id": 15,
-      "type": "bargauge",
-      "title": "Estimated cost by billing route",
-      "description": "pro = interactive sessions on the subscription; api = friday/JARVIS jobs on the API key (not reporting yet). Claude Code's own estimate: tokens x API list prices. On billing=pro it's what the usage would have cost on the API, not money spent. On billing=api it tracks real spend. Converted from USD at a fixed 0.744 (2026 average), so it's a guesstimate in pounds.",
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 8,
-        "x": 8,
-        "y": 24
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "refId": "A",
-          "expr": "sum by (billing) (max_over_time(claude_code_cost_usage_USD_total{host=~\"$host\", billing=~\"$billing\"}[$__range])) * $usd_gbp",
-          "legendFormat": "{{billing}}",
-          "range": false,
-          "instant": true,
-          "editorMode": "code"
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "unit": "currencyGBP",
-          "decimals": 2,
-          "min": 0,
-          "color": {
-            "mode": "palette-classic"
-          },
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "text",
-                "value": null
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "options": {
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "orientation": "horizontal",
-        "displayMode": "gradient",
-        "showUnfilled": true,
-        "valueMode": "color",
-        "namePlacement": "auto",
-        "sizing": "auto"
-      },
-      "transparent": true
-    },
-    {
-      "id": 16,
-      "type": "bargauge",
-      "title": "Tokens by model",
-      "description": "Each Claude Code session reports its own counter from 0, so this sums each session's highest value in the period. A session running past midnight counts in both days.",
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 8,
-        "x": 16,
-        "y": 24
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "refId": "A",
-          "expr": "sum by (model) (max_over_time(claude_code_token_usage_tokens_total{host=~\"$host\", billing=~\"$billing\"}[$__range]))",
-          "legendFormat": "{{model}}",
-          "range": false,
-          "instant": true,
-          "editorMode": "code"
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "unit": "short",
-          "decimals": 1,
-          "min": 0,
-          "color": {
-            "mode": "palette-classic"
-          },
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "text",
-                "value": null
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "options": {
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "orientation": "horizontal",
-        "displayMode": "gradient",
-        "showUnfilled": true,
-        "valueMode": "color",
-        "namePlacement": "auto",
-        "sizing": "auto"
-      },
-      "transparent": true
-    },
-    {
-      "id": 17,
-      "type": "row",
-      "title": "LiteLLM tiers (local Ollama vs API)",
-      "collapsed": false,
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 32
-      },
-      "panels": []
-    },
-    {
-      "id": 18,
-      "type": "stat",
-      "title": "Local share of requests",
-      "description": "Share of LiteLLM requests answered by the local tier (Ollama). LiteLLM on friday, all callers (Home Assistant, scripts, Zed). Machine and Billing filters don't apply here. Counters from LiteLLM's /metrics/, scraped every 60s.",
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
-      "gridPos": {
-        "h": 4,
-        "w": 6,
-        "x": 0,
-        "y": 33
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "refId": "A",
-          "expr": "sum(increase(litellm_proxy_total_requests_metric_total{requested_model=\"local\"}[$__range])) / sum(increase(litellm_proxy_total_requests_metric_total[$__range]))",
-          "legendFormat": "Local share of requests",
-          "range": false,
-          "instant": true,
-          "editorMode": "code"
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "unit": "percentunit",
-          "color": {
-            "mode": "fixed",
-            "fixedColor": "text"
-          },
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "text",
-                "value": null
-              }
-            ]
-          },
-          "decimals": 0
-        },
-        "overrides": []
-      },
-      "options": {
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "colorMode": "value",
-        "graphMode": "none",
-        "textMode": "value",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "wideLayout": true,
-        "showPercentChange": false
-      },
-      "transparent": true
-    },
-    {
-      "id": 19,
-      "type": "stat",
-      "title": "Local requests",
-      "description": "LiteLLM on friday, all callers (Home Assistant, scripts, Zed). Machine and Billing filters don't apply here. Counters from LiteLLM's /metrics/, scraped every 60s.",
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
-      "gridPos": {
-        "h": 4,
-        "w": 6,
-        "x": 6,
-        "y": 33
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "refId": "A",
-          "expr": "sum(increase(litellm_proxy_total_requests_metric_total{requested_model=\"local\"}[$__range]))",
-          "legendFormat": "Local requests",
-          "range": false,
-          "instant": true,
-          "editorMode": "code"
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "unit": "short",
-          "color": {
-            "mode": "fixed",
-            "fixedColor": "text"
-          },
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "text",
-                "value": null
-              }
-            ]
-          },
-          "decimals": 0
-        },
-        "overrides": []
-      },
-      "options": {
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "colorMode": "value",
-        "graphMode": "none",
-        "textMode": "value",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "wideLayout": true,
-        "showPercentChange": false
-      },
-      "transparent": true
-    },
-    {
-      "id": 20,
-      "type": "stat",
-      "title": "API requests",
-      "description": "cheap and smart tiers (Anthropic). LiteLLM on friday, all callers (Home Assistant, scripts, Zed). Machine and Billing filters don't apply here. Counters from LiteLLM's /metrics/, scraped every 60s.",
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
-      "gridPos": {
-        "h": 4,
-        "w": 6,
-        "x": 12,
-        "y": 33
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "refId": "A",
-          "expr": "sum(increase(litellm_proxy_total_requests_metric_total{requested_model!=\"local\"}[$__range]))",
-          "legendFormat": "API requests",
-          "range": false,
-          "instant": true,
-          "editorMode": "code"
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "unit": "short",
-          "color": {
-            "mode": "fixed",
-            "fixedColor": "text"
-          },
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "text",
-                "value": null
-              }
-            ]
-          },
-          "decimals": 0
-        },
-        "overrides": []
-      },
-      "options": {
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "colorMode": "value",
-        "graphMode": "none",
-        "textMode": "value",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "wideLayout": true,
-        "showPercentChange": false
-      },
-      "transparent": true
-    },
-    {
-      "id": 21,
-      "type": "stat",
       "title": "LiteLLM API spend",
-      "description": "LiteLLM's own cost calculation for the API tiers, converted at the fixed 0.744. Local is free. LiteLLM on friday, all callers (Home Assistant, scripts, Zed). Machine and Billing filters don't apply here. Counters from LiteLLM's /metrics/, scraped every 60s.",
+      "description": "LiteLLM's own cost for the API tiers, at the fixed 0.744. Local is free. LiteLLM on friday, all callers (Home Assistant, scripts, Zed). The Machine and Billing filters don't apply to LiteLLM. Counters from LiteLLM's /metrics/, scraped every 60s.",
       "datasource": {
         "type": "prometheus",
         "uid": "prometheus"
@@ -1216,7 +322,7 @@
         "h": 4,
         "w": 6,
         "x": 18,
-        "y": 33
+        "y": 1
       },
       "targets": [
         {
@@ -1271,10 +377,719 @@
       "transparent": true
     },
     {
-      "id": 22,
+      "id": 6,
       "type": "timeseries",
-      "title": "Requests per day, by tier",
-      "description": "LiteLLM on friday, all callers (Home Assistant, scripts, Zed). Machine and Billing filters don't apply here. Counters from LiteLLM's /metrics/, scraped every 60s.",
+      "title": "Tokens per day: Claude Code vs LiteLLM",
+      "description": "Claude Code respects the Machine and Billing filters; LiteLLM is always everything. Input plus output, excluding cache reads. Each Claude Code session reports its own counter from 0, so this sums each session's highest value in the period. A session running past midnight counts in both days.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 0,
+        "y": 5
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "refId": "A",
+          "expr": "sum (max_over_time(claude_code_token_usage_tokens_total{host=~\"$host\", billing=~\"$billing\", type=~\"input|output\"}[1d]))",
+          "legendFormat": "Claude Code",
+          "range": true,
+          "instant": false,
+          "editorMode": "code",
+          "interval": "1d"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "refId": "B",
+          "expr": "sum (increase({__name__=~\"litellm_(input|output)_tokens_metric_total\", requested_model=\"local\"}[1d]))",
+          "legendFormat": "LiteLLM local (Ollama)",
+          "range": true,
+          "instant": false,
+          "editorMode": "code",
+          "interval": "1d"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "refId": "C",
+          "expr": "sum (increase({__name__=~\"litellm_(input|output)_tokens_metric_total\", requested_model!=\"local\"}[1d]))",
+          "legendFormat": "LiteLLM API",
+          "range": true,
+          "instant": false,
+          "editorMode": "code",
+          "interval": "1d"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "decimals": 0,
+          "min": 0,
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "bars",
+            "fillOpacity": 80,
+            "lineWidth": 1,
+            "showPoints": "never",
+            "stacking": {
+              "mode": "normal",
+              "group": "A"
+            }
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "transparent": true
+    },
+    {
+      "id": 7,
+      "type": "timeseries",
+      "title": "Cost per day (\u00a3): Claude Code vs LiteLLM",
+      "description": "Claude Code respects the Machine and Billing filters; LiteLLM is always everything. Claude Code's own estimate: tokens x API list prices. On billing=pro it's what the usage would have cost on the API, not money spent. On billing=api it tracks real spend. Converted from USD at a fixed 0.744 (2026 average), so it's a guesstimate in pounds.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 12,
+        "y": 5
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "refId": "A",
+          "expr": "sum (max_over_time(claude_code_cost_usage_USD_total{host=~\"$host\", billing=~\"$billing\"}[1d])) * $usd_gbp",
+          "legendFormat": "Claude Code (estimate)",
+          "range": true,
+          "instant": false,
+          "editorMode": "code",
+          "interval": "1d"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "refId": "B",
+          "expr": "sum (increase(litellm_spend_metric_total{api_provider!=\"ollama_chat\"}[1d])) * $usd_gbp",
+          "legendFormat": "LiteLLM API",
+          "range": true,
+          "instant": false,
+          "editorMode": "code",
+          "interval": "1d"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyGBP",
+          "decimals": 2,
+          "min": 0,
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "bars",
+            "fillOpacity": 80,
+            "lineWidth": 1,
+            "showPoints": "never",
+            "stacking": {
+              "mode": "normal",
+              "group": "A"
+            }
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "transparent": true
+    },
+    {
+      "id": 8,
+      "type": "row",
+      "title": "Claude Code details",
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 14
+      },
+      "panels": []
+    },
+    {
+      "id": 9,
+      "type": "stat",
+      "title": "Estimated cost",
+      "description": "Claude Code's own estimate: tokens x API list prices. On billing=pro it's what the usage would have cost on the API, not money spent. On billing=api it tracks real spend. Converted from USD at a fixed 0.744 (2026 average), so it's a guesstimate in pounds. Each Claude Code session reports its own counter from 0, so this sums each session's highest value in the period. A session running past midnight counts in both days.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 0,
+        "y": 15
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "refId": "A",
+          "expr": "sum (max_over_time(claude_code_cost_usage_USD_total{host=~\"$host\", billing=~\"$billing\"}[$__range])) * $usd_gbp",
+          "legendFormat": "Estimated cost",
+          "range": false,
+          "instant": true,
+          "editorMode": "code"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyGBP",
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "text"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          },
+          "decimals": 2
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "value",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "wideLayout": true,
+        "showPercentChange": false
+      },
+      "transparent": true
+    },
+    {
+      "id": 10,
+      "type": "stat",
+      "title": "Input tokens",
+      "description": "Each Claude Code session reports its own counter from 0, so this sums each session's highest value in the period. A session running past midnight counts in both days.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 4,
+        "y": 15
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "refId": "A",
+          "expr": "sum (max_over_time(claude_code_token_usage_tokens_total{host=~\"$host\", billing=~\"$billing\", type=\"input\"}[$__range]))",
+          "legendFormat": "Input tokens",
+          "range": false,
+          "instant": true,
+          "editorMode": "code"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "text"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          },
+          "decimals": 1
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "value",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "wideLayout": true,
+        "showPercentChange": false
+      },
+      "transparent": true
+    },
+    {
+      "id": 11,
+      "type": "stat",
+      "title": "Output tokens",
+      "description": "Each Claude Code session reports its own counter from 0, so this sums each session's highest value in the period. A session running past midnight counts in both days.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 8,
+        "y": 15
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "refId": "A",
+          "expr": "sum (max_over_time(claude_code_token_usage_tokens_total{host=~\"$host\", billing=~\"$billing\", type=\"output\"}[$__range]))",
+          "legendFormat": "Output tokens",
+          "range": false,
+          "instant": true,
+          "editorMode": "code"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "text"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          },
+          "decimals": 1
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "value",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "wideLayout": true,
+        "showPercentChange": false
+      },
+      "transparent": true
+    },
+    {
+      "id": 12,
+      "type": "stat",
+      "title": "Cache read tokens",
+      "description": "Tokens served from the prompt cache: billed at a fraction of input. Each Claude Code session reports its own counter from 0, so this sums each session's highest value in the period. A session running past midnight counts in both days.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 12,
+        "y": 15
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "refId": "A",
+          "expr": "sum (max_over_time(claude_code_token_usage_tokens_total{host=~\"$host\", billing=~\"$billing\", type=\"cacheRead\"}[$__range]))",
+          "legendFormat": "Cache read tokens",
+          "range": false,
+          "instant": true,
+          "editorMode": "code"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "text"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          },
+          "decimals": 1
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "value",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "wideLayout": true,
+        "showPercentChange": false
+      },
+      "transparent": true
+    },
+    {
+      "id": 13,
+      "type": "stat",
+      "title": "Sessions",
+      "description": "Each Claude Code session reports its own counter from 0, so this sums each session's highest value in the period. A session running past midnight counts in both days.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 16,
+        "y": 15
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "refId": "A",
+          "expr": "sum (max_over_time(claude_code_session_count_total{host=~\"$host\", billing=~\"$billing\"}[$__range]))",
+          "legendFormat": "Sessions",
+          "range": false,
+          "instant": true,
+          "editorMode": "code"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "text"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          },
+          "decimals": 0
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "value",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "wideLayout": true,
+        "showPercentChange": false
+      },
+      "transparent": true
+    },
+    {
+      "id": 14,
+      "type": "stat",
+      "title": "Active time",
+      "description": "Time Claude Code was actively working or being typed into. Each Claude Code session reports its own counter from 0, so this sums each session's highest value in the period. A session running past midnight counts in both days.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 20,
+        "y": 15
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "refId": "A",
+          "expr": "sum (max_over_time(claude_code_active_time_seconds_total{host=~\"$host\", billing=~\"$billing\"}[$__range]))",
+          "legendFormat": "Active time",
+          "range": false,
+          "instant": true,
+          "editorMode": "code"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "text"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "value",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "wideLayout": true,
+        "showPercentChange": false
+      },
+      "transparent": true
+    },
+    {
+      "id": 15,
+      "type": "timeseries",
+      "title": "Estimated cost per day, by model",
+      "description": "Claude Code's own estimate: tokens x API list prices. On billing=pro it's what the usage would have cost on the API, not money spent. On billing=api it tracks real spend. Converted from USD at a fixed 0.744 (2026 average), so it's a guesstimate in pounds. Each Claude Code session reports its own counter from 0, so this sums each session's highest value in the period. A session running past midnight counts in both days.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 19
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "refId": "A",
+          "expr": "sum by (model) (max_over_time(claude_code_cost_usage_USD_total{host=~\"$host\", billing=~\"$billing\"}[1d])) * $usd_gbp",
+          "legendFormat": "{{model}}",
+          "range": true,
+          "instant": false,
+          "editorMode": "code",
+          "interval": "1d"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyGBP",
+          "decimals": 2,
+          "min": 0,
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "bars",
+            "fillOpacity": 80,
+            "lineWidth": 1,
+            "showPoints": "never",
+            "stacking": {
+              "mode": "normal",
+              "group": "A"
+            }
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "transparent": true
+    },
+    {
+      "id": 16,
+      "type": "timeseries",
+      "title": "Tokens per day, by type",
+      "description": "Each Claude Code session reports its own counter from 0, so this sums each session's highest value in the period. A session running past midnight counts in both days.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 19
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "refId": "A",
+          "expr": "sum by (type) (max_over_time(claude_code_token_usage_tokens_total{host=~\"$host\", billing=~\"$billing\"}[1d]))",
+          "legendFormat": "{{type}}",
+          "range": true,
+          "instant": false,
+          "editorMode": "code",
+          "interval": "1d"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "decimals": 0,
+          "min": 0,
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "bars",
+            "fillOpacity": 80,
+            "lineWidth": 1,
+            "showPoints": "never",
+            "stacking": {
+              "mode": "normal",
+              "group": "A"
+            }
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "transparent": true
+    },
+    {
+      "id": 17,
+      "type": "timeseries",
+      "title": "Sessions per day, by machine",
+      "description": "Each Claude Code session reports its own counter from 0, so this sums each session's highest value in the period. A session running past midnight counts in both days.",
       "datasource": {
         "type": "prometheus",
         "uid": "prometheus"
@@ -1283,7 +1098,415 @@
         "h": 8,
         "w": 8,
         "x": 0,
-        "y": 37
+        "y": 27
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "refId": "A",
+          "expr": "sum by (host) (max_over_time(claude_code_session_count_total{host=~\"$host\", billing=~\"$billing\"}[1d]))",
+          "legendFormat": "{{host}}",
+          "range": true,
+          "instant": false,
+          "editorMode": "code",
+          "interval": "1d"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "decimals": 0,
+          "min": 0,
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "bars",
+            "fillOpacity": 80,
+            "lineWidth": 1,
+            "showPoints": "never",
+            "stacking": {
+              "mode": "normal",
+              "group": "A"
+            }
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "transparent": true
+    },
+    {
+      "id": 18,
+      "type": "timeseries",
+      "title": "Active time per day, by machine",
+      "description": "Each Claude Code session reports its own counter from 0, so this sums each session's highest value in the period. A session running past midnight counts in both days.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 27
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "refId": "A",
+          "expr": "sum by (host) (max_over_time(claude_code_active_time_seconds_total{host=~\"$host\", billing=~\"$billing\"}[1d]))",
+          "legendFormat": "{{host}}",
+          "range": true,
+          "instant": false,
+          "editorMode": "code",
+          "interval": "1d"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "decimals": 0,
+          "min": 0,
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "bars",
+            "fillOpacity": 80,
+            "lineWidth": 1,
+            "showPoints": "never",
+            "stacking": {
+              "mode": "normal",
+              "group": "A"
+            }
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "transparent": true
+    },
+    {
+      "id": 19,
+      "type": "bargauge",
+      "title": "Estimated cost by billing route",
+      "description": "pro = interactive sessions on the subscription; api = friday/JARVIS jobs on the API key (not reporting yet). Claude Code's own estimate: tokens x API list prices. On billing=pro it's what the usage would have cost on the API, not money spent. On billing=api it tracks real spend. Converted from USD at a fixed 0.744 (2026 average), so it's a guesstimate in pounds.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 27
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "refId": "A",
+          "expr": "sum by (billing) (max_over_time(claude_code_cost_usage_USD_total{host=~\"$host\", billing=~\"$billing\"}[$__range])) * $usd_gbp",
+          "legendFormat": "{{billing}}",
+          "range": false,
+          "instant": true,
+          "editorMode": "code"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyGBP",
+          "decimals": 2,
+          "min": 0,
+          "color": {
+            "mode": "palette-classic"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "horizontal",
+        "displayMode": "gradient",
+        "showUnfilled": true,
+        "valueMode": "color",
+        "namePlacement": "auto",
+        "sizing": "auto"
+      },
+      "transparent": true
+    },
+    {
+      "id": 20,
+      "type": "row",
+      "title": "LiteLLM details (local Ollama vs API tiers)",
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 35
+      },
+      "panels": []
+    },
+    {
+      "id": 21,
+      "type": "stat",
+      "title": "Local share of requests",
+      "description": "Share of LiteLLM requests answered by the local tier (Ollama). LiteLLM on friday, all callers (Home Assistant, scripts, Zed). The Machine and Billing filters don't apply to LiteLLM. Counters from LiteLLM's /metrics/, scraped every 60s.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 8,
+        "x": 0,
+        "y": 36
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "refId": "A",
+          "expr": "sum(increase(litellm_proxy_total_requests_metric_total{requested_model=\"local\"}[$__range])) / sum(increase(litellm_proxy_total_requests_metric_total[$__range]))",
+          "legendFormat": "Local share of requests",
+          "range": false,
+          "instant": true,
+          "editorMode": "code"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "text"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          },
+          "decimals": 0
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "value",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "wideLayout": true,
+        "showPercentChange": false
+      },
+      "transparent": true
+    },
+    {
+      "id": 22,
+      "type": "stat",
+      "title": "Local requests",
+      "description": "LiteLLM on friday, all callers (Home Assistant, scripts, Zed). The Machine and Billing filters don't apply to LiteLLM. Counters from LiteLLM's /metrics/, scraped every 60s.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 8,
+        "x": 8,
+        "y": 36
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "refId": "A",
+          "expr": "sum(increase(litellm_proxy_total_requests_metric_total{requested_model=\"local\"}[$__range]))",
+          "legendFormat": "Local requests",
+          "range": false,
+          "instant": true,
+          "editorMode": "code"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "text"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          },
+          "decimals": 0
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "value",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "wideLayout": true,
+        "showPercentChange": false
+      },
+      "transparent": true
+    },
+    {
+      "id": 23,
+      "type": "stat",
+      "title": "API requests",
+      "description": "cheap and smart tiers (Anthropic). LiteLLM on friday, all callers (Home Assistant, scripts, Zed). The Machine and Billing filters don't apply to LiteLLM. Counters from LiteLLM's /metrics/, scraped every 60s.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 8,
+        "x": 16,
+        "y": 36
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "refId": "A",
+          "expr": "sum(increase(litellm_proxy_total_requests_metric_total{requested_model!=\"local\"}[$__range]))",
+          "legendFormat": "API requests",
+          "range": false,
+          "instant": true,
+          "editorMode": "code"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "text"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          },
+          "decimals": 0
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "value",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "wideLayout": true,
+        "showPercentChange": false
+      },
+      "transparent": true
+    },
+    {
+      "id": 24,
+      "type": "timeseries",
+      "title": "Requests per day, by tier",
+      "description": "LiteLLM on friday, all callers (Home Assistant, scripts, Zed). The Machine and Billing filters don't apply to LiteLLM. Counters from LiteLLM's /metrics/, scraped every 60s.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 40
       },
       "targets": [
         {
@@ -1335,10 +1558,10 @@
       "transparent": true
     },
     {
-      "id": 23,
+      "id": 25,
       "type": "timeseries",
       "title": "Tokens per day, by tier",
-      "description": "Input plus output. LiteLLM on friday, all callers (Home Assistant, scripts, Zed). Machine and Billing filters don't apply here. Counters from LiteLLM's /metrics/, scraped every 60s.",
+      "description": "Input plus output. LiteLLM on friday, all callers (Home Assistant, scripts, Zed). The Machine and Billing filters don't apply to LiteLLM. Counters from LiteLLM's /metrics/, scraped every 60s.",
       "datasource": {
         "type": "prometheus",
         "uid": "prometheus"
@@ -1347,7 +1570,7 @@
         "h": 8,
         "w": 8,
         "x": 8,
-        "y": 37
+        "y": 40
       },
       "targets": [
         {
@@ -1399,10 +1622,10 @@
       "transparent": true
     },
     {
-      "id": 24,
+      "id": 26,
       "type": "timeseries",
       "title": "API spend per day, by model",
-      "description": "Converted at the fixed 0.744. LiteLLM on friday, all callers (Home Assistant, scripts, Zed). Machine and Billing filters don't apply here. Counters from LiteLLM's /metrics/, scraped every 60s.",
+      "description": "Converted at the fixed 0.744. LiteLLM on friday, all callers (Home Assistant, scripts, Zed). The Machine and Billing filters don't apply to LiteLLM. Counters from LiteLLM's /metrics/, scraped every 60s.",
       "datasource": {
         "type": "prometheus",
         "uid": "prometheus"
@@ -1411,7 +1634,7 @@
         "h": 8,
         "w": 8,
         "x": 16,
-        "y": 37
+        "y": 40
       },
       "targets": [
         {
@@ -1463,19 +1686,19 @@
       "transparent": true
     },
     {
-      "id": 25,
+      "id": 27,
       "type": "timeseries",
       "title": "Response time (p95), by tier",
       "datasource": {
         "type": "prometheus",
         "uid": "prometheus"
       },
-      "description": "95th percentile end-to-end time per request, over 30 minutes. Shows whether local is fast enough to be worth it. LiteLLM on friday, all callers (Home Assistant, scripts, Zed). Machine and Billing filters don't apply here. Counters from LiteLLM's /metrics/, scraped every 60s.",
+      "description": "95th percentile end-to-end time per request, over 30 minutes. Shows whether local is fast enough to be worth it. LiteLLM on friday, all callers (Home Assistant, scripts, Zed). The Machine and Billing filters don't apply to LiteLLM. Counters from LiteLLM's /metrics/, scraped every 60s.",
       "gridPos": {
         "h": 8,
         "w": 24,
         "x": 0,
-        "y": 45
+        "y": 48
       },
       "targets": [
         {
