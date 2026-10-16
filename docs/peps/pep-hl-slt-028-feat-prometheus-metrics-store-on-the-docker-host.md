@@ -111,6 +111,10 @@ central Alloy (PEP-015) ──remote_write──► Prometheus :9090 ◄──sc
 
 - Check the docker host for a hand-run `prometheus` or `alertmanager` container. If
   one exists, note its data path and decide whether to adopt or discard its data.
+- **Done 2026-10-16:** `docker ps -a` shows no Prometheus, Loki, Alertmanager or
+  Alloy containers. The `prometheus`, `loki` and `alertmanager` entries in
+  `pillar/application/docker.sls` are reservations only. Homebox holds host port
+  3100 (see PEP-HL-SLT-015). `/docker` is on the root LV: 48 GB, 21 GB free.
 
 ### Phase 1: Prometheus
 
