@@ -1,0 +1,13 @@
+# Managed by Salt (application.prometheus, PEP-HL-SLT-028). Local edits are overwritten.
+{%- set prom = salt['pillar.get']('prometheus', {}) %}
+global:
+  scrape_interval: {{ prom.get('scrape_interval', '60s') }}
+  evaluation_interval: {{ prom.get('scrape_interval', '60s') }}
+
+scrape_configs:
+  - job_name: prometheus
+    static_configs:
+      - targets: ["localhost:9090"]
+{%- for job in prom.get('scrape_configs', []) %}
+  - {{ job | json }}
+{%- endfor %}

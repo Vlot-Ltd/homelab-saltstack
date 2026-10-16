@@ -9,6 +9,7 @@ base:
     - common.security
   'docker':
     - application.linkwarden
+    - application.prometheus
     - application.heimdall2
     - application.homepage
     - database.roles
