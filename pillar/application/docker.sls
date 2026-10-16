@@ -17,7 +17,7 @@ docker:
       port: 3200
       container: linkwarden
     loki:
-      port: 3100
+      port: 3110
       container: loki
     portainer:
       port: 9000

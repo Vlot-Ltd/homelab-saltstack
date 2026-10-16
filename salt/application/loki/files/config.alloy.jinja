@@ -1,0 +1,65 @@
+// Managed by Salt (application.loki, PEP-HL-SLT-015). Local edits are overwritten.
+//
+// Central Alloy: OTLP in (Claude Code on the Macs and friday), metrics to
+// Prometheus on this host, logs/events to Loki in this compose project.
+{%- set alloy = salt['pillar.get']('alloy', {}) %}
+
+otelcol.receiver.otlp "default" {
+  grpc {
+    endpoint = "0.0.0.0:4317"
+  }
+  http {
+    endpoint = "0.0.0.0:4318"
+  }
+  output {
+    metrics = [otelcol.processor.transform.promote.input]
+    logs    = [otelcol.processor.batch.logs.input]
+  }
+}
+
+// Resource attributes don't become Prometheus labels by themselves. Copy the
+// ones the dashboards split by onto every data point.
+otelcol.processor.transform "promote" {
+  error_mode = "ignore"
+  metric_statements {
+    context    = "datapoint"
+    statements = [
+{%- for attr in alloy.get('promote_resource_attributes', ['host', 'billing']) %}
+      `set(attributes["{{ attr }}"], resource.attributes["{{ attr }}"]) where resource.attributes["{{ attr }}"] != nil`,
+{%- endfor %}
+    ]
+  }
+  output {
+    metrics = [otelcol.processor.batch.metrics.input]
+  }
+}
+
+otelcol.processor.batch "metrics" {
+  output {
+    metrics = [otelcol.exporter.prometheus.default.input]
+  }
+}
+
+otelcol.processor.batch "logs" {
+  output {
+    logs = [otelcol.exporter.otlphttp.loki.input]
+  }
+}
+
+otelcol.exporter.prometheus "default" {
+  forward_to = [prometheus.remote_write.local.receiver]
+}
+
+// Prometheus runs in its own compose project on this host (PEP-HL-SLT-028).
+prometheus.remote_write "local" {
+  endpoint {
+    url = "http://host.docker.internal:9090/api/v1/write"
+  }
+}
+
+// Loki 3 takes OTLP natively on /otlp.
+otelcol.exporter.otlphttp "loki" {
+  client {
+    endpoint = "http://loki:3100/otlp"
+  }
+}

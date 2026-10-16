@@ -20,6 +20,7 @@ base:
     - application.linkwarden
     - application.webdriver
     - application.prometheus
+    # - application.loki  # PEP-HL-SLT-015: uncomment after the first manual apply
   'salt':
     - application.salt-master
   'postgres':

@@ -10,6 +10,7 @@ base:
   'docker':
     - application.linkwarden
     - application.prometheus
+    - application.loki
     - application.heimdall2
     - application.homepage
     - database.roles
