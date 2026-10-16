@@ -4,6 +4,10 @@
 # application.docker resets /docker recursively to root:docker 0644 on every
 # highstate, and Prometheus runs as nobody and needs to write.
 #
+# Config sits in /docker/prometheus/config, mounted as a directory: a single-file
+# bind mount pins the inode, and Salt replaces files, so the container would keep
+# reading the old config after a reload (hit 2026-10-17).
+#
 # Config changes reload in place (POST /-/reload, --web.enable-lifecycle);
 # compose changes recreate with up -d. No down/up, no implicit pulls
 # (PEP-HL-SLT-020).
@@ -47,6 +51,22 @@ prometheus-homeassistant-token:
       - file: prometheus-config
 {%- endif %}
 
+prometheus-config-directory:
+  file.directory:
+    - name: /docker/prometheus/config
+    - user: root
+    - group: docker
+    - mode: "0755"
+    - require:
+      - file: prometheus-directory
+
+# Old single-file location, before the directory mount.
+prometheus-config-old-location:
+  file.absent:
+    - name: /docker/prometheus/prometheus.yml
+    - require:
+      - cmd: recreate-prometheus-on-compose-change
+
 # Scratch dir for check_cmd, so promtool in the container can see the candidate file.
 prometheus-check-directory:
   file.directory:
@@ -59,7 +79,7 @@ prometheus-check-directory:
 
 prometheus-config:
   file.managed:
-    - name: /docker/prometheus/prometheus.yml
+    - name: /docker/prometheus/config/prometheus.yml
     - source: salt://application/prometheus/files/prometheus.yml.jinja
     - template: jinja
     - user: root
@@ -73,6 +93,7 @@ prometheus-config:
         {{ image }} check config
     - require:
       - file: prometheus-check-directory
+      - file: prometheus-config-directory
       - file: prometheus-secrets-directory
       - service: docker-service
 
@@ -86,7 +107,7 @@ prometheus-docker-compose:
             container_name: prometheus
             restart: unless-stopped
             command:
-              - --config.file=/etc/prometheus/prometheus.yml
+              - --config.file=/etc/prometheus/config/prometheus.yml
               - --storage.tsdb.path=/prometheus
               - --storage.tsdb.retention.time={{ prom.get('retention', '400d') }}
               - --web.enable-remote-write-receiver
@@ -94,7 +115,7 @@ prometheus-docker-compose:
             ports:
               - "{{ port }}:9090"
             volumes:
-              - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+              - ./config:/etc/prometheus/config:ro
               - /etc/prometheus-secrets:/etc/prometheus/secrets:ro
               - prometheus-data:/prometheus
 

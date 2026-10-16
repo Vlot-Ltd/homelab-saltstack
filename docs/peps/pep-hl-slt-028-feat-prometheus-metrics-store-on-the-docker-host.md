@@ -187,6 +187,7 @@ Alloy's remote write lands with PEP-HL-SLT-015 Phase 1.
 | HA token leaks via the rendered `prometheus.yml` | HA admin access | Low | Token in a separate file (`bearer_token_file`, mode 0600), not inline; file from Vault pillar |
 | Docker host disk fills | Other containers fail | Low | Retention from pillar; Zabbix already watches the docker host's disk |
 | A hand-run container already holds 9090 | Compose fails to start | Medium | Phase 0 survey |
+| Single-file bind mount of `prometheus.yml` | Reload re-reads the old file (Salt replaces the file, the mount pins the old inode) | Hit 2026-10-17 | Config directory mounted instead (`./config:/etc/prometheus/config`) |
 | An API job runs without the `billing=api` tag | API spend shows up as Pro, or is missing | Medium | The tag lives in the same env file that sets `ANTHROPIC_API_KEY`, so one can't exist without the other; weekly comparison with the Console |
 | Stale Pushgateway values when no session runs | Dashboard shows old plan usage as current | High | Push a timestamp metric too; panel greys out past `resets_at` |
 
