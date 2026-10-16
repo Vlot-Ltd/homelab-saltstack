@@ -43,7 +43,7 @@ are genuinely pending (including `bc2ba4c`).
 | `salt/application/homepage/init.sls:141` | `restart-homepage-on-config-change` | `docker compose down && docker compose up -d --build` |
 | `salt/application/linkwarden.sls:65` | `restart-linkwarden` | `down && docker pull ghcr.io/linkwarden/linkwarden:latest && up -d` |
 | `salt/application/fing.sls:52` | `restart-fing` | `down && docker pull fing/fing-agent:latest && up -d` |
-| `salt/application/heimdall2/init.sls:88` | `heimdall2_restart` | `docker compose pull && docker compose up -d`, `watch` on compose, `.env` and nginx config. Missed in the first survey, found 2026-10-17 (PEP-HL-SLT-030) |
+| `salt/application/heimdall2/init.sls:88` | `heimdall2_restart` | `docker compose pull && docker compose up -d`, `watch` on compose, `.env` and nginx config. Missed in the first survey, found 2026-10-16 (PEP-HL-SLT-030) |
 | `salt/application/tailnet-service.sls:47` | `restart-{{ service_name }}` | `down && docker compose pull && up -d` |
 | `salt/application/tailscale-docker.sls:55` | `restart-tailscale-docker` | `down && up -d`. Being removed by PEP-HL-SLT-019; skip |
 | `salt/application/netbox/initold.sls:112` | (old Docker NetBox) | Not in any top file; leave for PEP-HL-SLT-007 cleanup |
@@ -90,7 +90,7 @@ are genuinely pending (including `bc2ba4c`).
 
 ### Progress
 
-- **2026-10-17: handlers rewritten** for homepage, heimdall2, linkwarden, fing,
+- **2026-10-16: handlers rewritten** for homepage, heimdall2, linkwarden, fing,
   webdriver, tailscale-docker and the tailnet-service macro. Pattern:
   `start-<app>` runs `docker compose up -d` unless every service in the project is
   running (`docker compose ps --status running` counted against

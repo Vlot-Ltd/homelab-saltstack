@@ -6,7 +6,7 @@
 #
 # Config sits in /docker/prometheus/config, mounted as a directory: a single-file
 # bind mount pins the inode, and Salt replaces files, so the container would keep
-# reading the old config after a reload (hit 2026-10-17).
+# reading the old config after a reload (hit 2026-10-16).
 #
 # Config changes reload in place (POST /-/reload, --web.enable-lifecycle);
 # compose changes recreate with up -d. No down/up, no implicit pulls

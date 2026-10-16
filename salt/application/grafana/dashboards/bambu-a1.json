@@ -1451,7 +1451,7 @@
       "id": 24,
       "type": "stat",
       "title": "Filament since tracking began (g)",
-      "description": "Running total since the HA helper was added (2026-10-17).",
+      "description": "Running total since the HA helper was added (2026-10-16).",
       "datasource": {
         "type": "prometheus",
         "uid": "prometheus"
@@ -1517,7 +1517,7 @@
       "id": 25,
       "type": "stat",
       "title": "Filament since tracking began (m)",
-      "description": "Running total since the HA helper was added (2026-10-17).",
+      "description": "Running total since the HA helper was added (2026-10-16).",
       "datasource": {
         "type": "prometheus",
         "uid": "prometheus"

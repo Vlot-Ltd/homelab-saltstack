@@ -7,7 +7,7 @@
 **Type:** Feature  
 **Priority:** Medium  
 **Created:** 2026-10-16  
-**Updated:** 2026-10-17  
+**Updated:** 2026-10-16  
 **Supersedes:** N/A  
 **Superseded-By:** N/A  
 
@@ -128,7 +128,7 @@ central Alloy (PEP-015) ──remote_write──► Prometheus :9090 ◄──sc
 
 - State, pillar and compose file. Self-scrape only.
 - Apply with `test=True`, then for real. Check readiness.
-- **Done 2026-10-17:** `application.prometheus` applied on `docker` (commit
+- **Done 2026-10-16:** `application.prometheus` applied on `docker` (commit
   `5328227`). `/-/ready` returns `Prometheus Server is Ready.`, and a second
   `test=True` run shows no changes. Image `prom/prometheus:v3.5.0`, TSDB in the
   named volume `prometheus-data`. Added to `salt/top.sls` for `docker`.
@@ -138,7 +138,7 @@ central Alloy (PEP-015) ──remote_write──► Prometheus :9090 ◄──sc
 - HA token into Vault. HA `prometheus:` block, filtered to Bambu entities (hand step).
 - Add the scrape job. Check `up` and the entity series.
 
-- **Done 2026-10-17:** HA `prometheus:` block filtered to `sensor.a1_*` and
+- **Done 2026-10-16:** HA `prometheus:` block filtered to `sensor.a1_*` and
   `binary_sensor.a1_*`. Token in Vault `salt/minions/docker`
   (`homeassistant_prometheus_token`). Scrape target `192.168.0.24:8123` by IP,
   because containers don't read the host's `/etc/hosts`. Target health `up`.
@@ -148,20 +148,20 @@ central Alloy (PEP-015) ──remote_write──► Prometheus :9090 ◄──sc
 - Datasource as a **standalone state**, `application.grafana.datasource-prometheus`,
   writing `/etc/grafana/provisioning/datasources/prometheus.yaml` and restarting
   `grafana-server` when the file changes. URL from pillar `grafana_prometheus_url`.
-- Not through `application.grafana` (2026-10-17). That state isn't in
+- Not through `application.grafana` (2026-10-16). That state isn't in
   `salt/top.sls` and has never been applied by highstate, and applying it would:
   - overwrite `/etc/grafana/grafana.ini` with only a `[security]` section
   - fail to render a datasource without `secureJsonData.password_key`
   - drop `isDefault`, `trends` and `directDbConnection` from the Zabbix datasource
 
   Fixing that state is separate work, not this PEP.
-- **Done 2026-10-17:** applied on `zabbix` (commit `1740455`). Grafana's datasource
+- **Done 2026-10-16:** applied on `zabbix` (commit `1740455`). Grafana's datasource
   test passes, and Explore returns data. The provisioning directory held only
   Grafana's packaged `sample.yaml`. Added to `salt/top.sls` for `zabbix`.
 
 ### Phase 4: Claude usage inputs
 
-- **2026-10-17: LiteLLM scrape added**, covering every tier (`local` = Ollama,
+- **2026-10-16: LiteLLM scrape added**, covering every tier (`local` = Ollama,
   `cheap`, `smart`): job `litellm`,
   `https://llm.taile3eee.ts.net/metrics`. LiteLLM's `/metrics` is unauthenticated
   (`require_auth_for_metrics_endpoint: false`), because the alternative was giving
@@ -202,7 +202,7 @@ Alloy's remote write lands with PEP-HL-SLT-015 Phase 1.
 | HA token leaks via the rendered `prometheus.yml` | HA admin access | Low | Token in a separate file (`bearer_token_file`, mode 0600), not inline; file from Vault pillar |
 | Docker host disk fills | Other containers fail | Low | Retention from pillar; Zabbix already watches the docker host's disk |
 | A hand-run container already holds 9090 | Compose fails to start | Medium | Phase 0 survey |
-| Single-file bind mount of `prometheus.yml` | Reload re-reads the old file (Salt replaces the file, the mount pins the old inode) | Hit 2026-10-17 | Config directory mounted instead (`./config:/etc/prometheus/config`) |
+| Single-file bind mount of `prometheus.yml` | Reload re-reads the old file (Salt replaces the file, the mount pins the old inode) | Hit 2026-10-16 | Config directory mounted instead (`./config:/etc/prometheus/config`) |
 | An API job runs without the `billing=api` tag | API spend shows up as Pro, or is missing | Medium | The tag lives in the same env file that sets `ANTHROPIC_API_KEY`, so one can't exist without the other; weekly comparison with the Console |
 | Stale Pushgateway values when no session runs | Dashboard shows old plan usage as current | High | Push a timestamp metric too; panel greys out past `resets_at` |
 

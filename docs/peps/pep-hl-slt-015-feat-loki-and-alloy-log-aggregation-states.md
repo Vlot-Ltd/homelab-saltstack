@@ -7,7 +7,7 @@
 **Type:** Feature  
 **Priority:** Medium  
 **Created:** 2026-10-10  
-**Updated:** 2026-10-17  
+**Updated:** 2026-10-16  
 **Supersedes:** N/A  
 **Superseded-By:** N/A  
 
@@ -101,13 +101,13 @@ docker host:  Alloy (central) ──metrics──► Prometheus (PEP-028)
 - Tailscale Service for the OTLP endpoint.
 - Point one personal Mac's Claude Code at it (chezmoi, outside this repo) and check
   both stores.
-- **Stack done 2026-10-17** (commit `263d24f`): `application.loki` applied on
+- **Stack done 2026-10-16** (commit `263d24f`): `application.loki` applied on
   `docker`. Loki `/ready` returns `ready`, Alloy `/-/ready` returns `Alloy is ready.`,
   and a second `test=True` run shows no changes. An OTLP/HTTP test gauge posted from
   the Mac to `docker:4318` arrived in Prometheus as
   `otel_pipeline_test{host="timo-mac", job="otel-test"}`, so the label promotion
   works. Added to `salt/top.sls`.
-- **Claude Code on `gibson` done 2026-10-17:** chezmoi `dot_zshrc.tmpl` sends OTLP/gRPC
+- **Claude Code on `gibson` done 2026-10-16:** chezmoi `dot_zshrc.tmpl` sends OTLP/gRPC
   to `docker.taile3eee.ts.net:4317` (the host's own Tailscale name; ports are
   published on the host, so no Tailscale Service needed). Alloy received the metric
   points and 28 log records, with 0 refused and 0 failed. Prometheus has

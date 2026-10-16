@@ -6,8 +6,8 @@
 **Status:** Draft  
 **Type:** Infrastructure  
 **Priority:** Medium  
-**Created:** 2026-10-17  
-**Updated:** 2026-10-17  
+**Created:** 2026-10-16  
+**Updated:** 2026-10-16  
 **Supersedes:** N/A  
 **Superseded-By:** N/A  
 
@@ -19,7 +19,7 @@ Bring the live Grafana on zabbix under Salt without losing its settings, datasou
 
 Grafana runs on `zabbix` (apt package `grafana`, service `grafana-server`), but no
 highstate manages it. `salt/application/grafana/init.sls` exists, written in the
-early "untested" commits, and has never been in `salt/top.sls`. Found 2026-10-17
+early "untested" commits, and has never been in `salt/top.sls`. Found 2026-10-16
 while adding the Prometheus datasource for PEP-HL-SLT-028.
 
 Applying that state as it is would damage the live Grafana:
@@ -157,4 +157,4 @@ adds its own provisioning file.
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
-| 0.1 | 2026-10-17 | Timo Vlot | Initial draft |
+| 0.1 | 2026-10-16 | Timo Vlot | Initial draft |

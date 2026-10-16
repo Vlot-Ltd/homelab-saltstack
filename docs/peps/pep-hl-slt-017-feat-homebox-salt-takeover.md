@@ -7,7 +7,7 @@
 **Type:** Feature  
 **Priority:** Low  
 **Created:** 2026-10-10  
-**Updated:** 2026-10-17  
+**Updated:** 2026-10-16  
 **Supersedes:** N/A  
 **Superseded-By:** N/A  
 
@@ -21,7 +21,7 @@ Homebox (home inventory) is one of the containers on `docker` that no Salt state
 manages. A rebuild of `docker` from Salt would lose it, and nothing in git says how
 it's configured.
 
-Found 2026-10-17 with `docker inspect homebox`:
+Found 2026-10-16 with `docker inspect homebox`:
 
 | What | Value |
 |---|---|
@@ -89,7 +89,7 @@ and the template has none.
 - Locate Portainer's data volume and print the stack file:
   `cat "$(docker inspect portainer --format '{{range .Mounts}}{{if eq .Destination "/data"}}{{.Source}}{{end}}{{end}}')/compose/2/v1/docker-compose.yml"`.
   Check it for secrets before pasting it anywhere.
-- **Portainer was wiped at some point (Timo, 2026-10-17)**, so the stack file is
+- **Portainer was wiped at some point (Timo, 2026-10-16)**, so the stack file is
   probably gone. That doesn't matter: the container and its volume are untouched by
   that. Rebuild the compose file from the running container instead:
   `docker inspect homebox --format '{{range .Config.Env}}{{println .}}{{end}}' | grep ^HBOX_`
@@ -153,4 +153,4 @@ and the template has none.
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
 | 0.1 | 2026-10-10 | Timo Vlot | Initial draft |
-| 0.2 | 2026-10-17 | Timo Vlot | Full draft from `docker inspect`: Portainer stack 2, volume `homebox_homebox-data`, v0.20.2 |
+| 0.2 | 2026-10-16 | Timo Vlot | Full draft from `docker inspect`: Portainer stack 2, volume `homebox_homebox-data`, v0.20.2 |

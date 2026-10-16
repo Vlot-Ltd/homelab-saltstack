@@ -6,8 +6,8 @@
 **Status:** Draft  
 **Type:** Security  
 **Priority:** Medium  
-**Created:** 2026-10-17  
-**Updated:** 2026-10-17  
+**Created:** 2026-10-16  
+**Updated:** 2026-10-16  
 **Supersedes:** N/A  
 **Superseded-By:** N/A  
 
@@ -33,7 +33,7 @@ So on every highstate, every file under `/docker` becomes `root:docker 0644`, an
 every directory becomes `root:docker 0755`. That includes files that app states
 deliberately set otherwise, and files that containers write themselves.
 
-Found 2026-10-17, while applying `application.loki` (PEP-HL-SLT-015). The `/docker`
+Found 2026-10-16, while applying `application.loki` (PEP-HL-SLT-015). The `/docker`
 state reported these changes:
 
 - `/docker/linkwarden/.env` → mode **0644**. The file holds the Linkwarden database
@@ -176,4 +176,4 @@ its TSDB in a named volume, because anything under `/docker` gets reset.
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
-| 0.1 | 2026-10-17 | Timo Vlot | Initial draft |
+| 0.1 | 2026-10-16 | Timo Vlot | Initial draft |

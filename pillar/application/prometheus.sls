@@ -28,7 +28,7 @@ prometheus:
   scrape_configs:
     # Phase 4: LiteLLM on friday (all tiers: local/Ollama, cheap, smart).
     # /metrics is unauthenticated (require_auth_for_metrics_endpoint: false in
-    # LiteLLM's config): read-only counters, tailnet-only. Decided 2026-10-17.
+    # LiteLLM's config): read-only counters, tailnet-only. Decided 2026-10-16.
     - job_name: litellm
       scheme: https
       # Trailing slash: LiteLLM 307-redirects /metrics to /metrics/, and behind the

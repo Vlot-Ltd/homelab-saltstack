@@ -107,15 +107,15 @@ Once PEP-002 is implemented, these inline calls should be replaced with `{{ pill
 
 ### Progress
 
-- **2026-10-17:** Fix 2 done through PEP-HL-SLT-020 (Docker handlers). Also guarded
+- **2026-10-16:** Fix 2 done through PEP-HL-SLT-020 (Docker handlers). Also guarded
   two states that ran and reported changes on every highstate on every minion:
   `timedatectl` in `common.timesync` (now `unless` the setting is already right),
   and `enable_scheduler` in `common.schedule` (now only when `_schedule.conf` says
   `enabled: false`).
-- **2026-10-17:** `hwclock_utc` in `common.timesync` ran on every highstate on every
+- **2026-10-16:** `hwclock_utc` in `common.timesync` ran on every highstate on every
   KVM VM with `/dev/rtc0`. Now `onchanges` the hourly `hwclock_sync` cron file,
   which keeps the clock in sync afterwards. Found on `zabbix`.
-- **2026-10-17:** `hwclock_sync` failed on `zabbix` ("Parent directory not
+- **2026-10-16:** `hwclock_sync` failed on `zabbix` ("Parent directory not
   present"): no `cron` package, so no `/etc/cron.hourly`. On such hosts the hourly
   sync never existed. `common.timesync` now installs and runs `cron` on KVM VMs
   before writing the script.

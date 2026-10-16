@@ -1,4 +1,4 @@
-# DO NOT APPLY as it stands (2026-10-17, PEP-HL-SLT-029): it overwrites the live
+# DO NOT APPLY as it stands (2026-10-16, PEP-HL-SLT-029): it overwrites the live
 # /etc/grafana/grafana.ini with only [security], and its datasource template fails
 # for datasources without a password and drops the Zabbix datasource's jsonData.
 # Not in salt/top.sls. The Prometheus datasource lives in datasource-prometheus.sls.
