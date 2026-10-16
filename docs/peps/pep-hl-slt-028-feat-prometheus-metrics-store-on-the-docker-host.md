@@ -138,6 +138,11 @@ central Alloy (PEP-015) ──remote_write──► Prometheus :9090 ◄──sc
 - HA token into Vault. HA `prometheus:` block, filtered to Bambu entities (hand step).
 - Add the scrape job. Check `up` and the entity series.
 
+- **Done 2026-10-17:** HA `prometheus:` block filtered to `sensor.a1_*` and
+  `binary_sensor.a1_*`. Token in Vault `salt/minions/docker`
+  (`homeassistant_prometheus_token`). Scrape target `192.168.0.24:8123` by IP,
+  because containers don't read the host's `/etc/hosts`. Target health `up`.
+
 ### Phase 3: Grafana
 
 - Datasource as a **standalone state**, `application.grafana.datasource-prometheus`,
