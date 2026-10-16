@@ -113,6 +113,13 @@ its TSDB in a named volume, because anything under `/docker` gets reset.
 - Edit `application.docker` and `application.heimdall2` (`.env` → 0640).
 - `test=True` on `docker`: expect the `/docker` state to drop its recursion, and
   only the intended permission changes on app files.
+- **Before pushing:** `chmod 0640 /docker/heimdall2/.env` on the host. Otherwise
+  the mode change fires `heimdall2_restart`, which `watch`es the `.env` and runs
+  `docker compose pull && up -d`: an unplanned Heimdall2 upgrade (the PEP-HL-SLT-020
+  bug). With the file already at 0640, the state reports no change and the handler
+  doesn't fire. Linkwarden's handler is gated on a check file Salt never writes, so
+  it doesn't fire either. That's also why the 0644/0640 flapping never restarted
+  Linkwarden.
 - Apply the highstate. Check the success criteria and the three apps.
 
 ### Phase 2: Audit

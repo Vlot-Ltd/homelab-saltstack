@@ -41,7 +41,7 @@ heimdall2_env:
     - template: jinja
     - user: root
     - group: docker
-    - mode: '0644'
+    - mode: '0640'  # secrets: DB password, JWT/API key secrets (PEP-HL-SLT-030)
     - require:
       - file: heimdall2_directory
 

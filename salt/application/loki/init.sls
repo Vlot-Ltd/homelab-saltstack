@@ -5,8 +5,7 @@
 # Same rules as application.prometheus:
 #   - config directories mounted, not single files (a file bind mount pins the
 #     inode and Salt replaces files)
-#   - data in named volumes, not under /docker (application.docker resets
-#     /docker recursively)
+#   - data in named volumes, not under /docker
 #   - pinned images, up -d on compose changes, no down/up, no implicit pulls
 #     (PEP-HL-SLT-020)
 # files/loki-config.yaml is a Jinja template (template: jinja below).

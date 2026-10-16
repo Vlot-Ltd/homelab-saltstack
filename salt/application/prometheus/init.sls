@@ -1,8 +1,8 @@
 # PEP-HL-SLT-028: Prometheus metrics store on the docker host.
 #
-# TSDB lives in the named volume prometheus-data, not under /docker:
-# application.docker resets /docker recursively to root:docker 0644 on every
-# highstate, and Prometheus runs as nobody and needs to write.
+# TSDB lives in the named volume prometheus-data, not under /docker. (Originally
+# because application.docker reset /docker recursively; that's gone since
+# PEP-HL-SLT-030, but a named volume is still the cleaner home for container data.)
 #
 # Config sits in /docker/prometheus/config, mounted as a directory: a single-file
 # bind mount pins the inode, and Salt replaces files, so the container would keep
@@ -26,8 +26,7 @@ prometheus-directory:
     - group: docker
     - mode: "0755"
 
-# Scrape credentials live outside /docker (application.docker resets /docker to
-# 0644 recursively). Owned by nobody (uid 65534, Prometheus's user in the image).
+# Scrape credentials live outside /docker, away from the compose project. Owned by nobody (uid 65534, Prometheus's user in the image).
 prometheus-secrets-directory:
   file.directory:
     - name: /etc/prometheus-secrets

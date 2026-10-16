@@ -34,16 +34,14 @@ docker-group:
         - root
         - proxmox
 
+# /docker itself only. No recurse (PEP-HL-SLT-030): each app state owns the
+# permissions of its own subtree. A recursive reset made secret .env files
+# world-readable and fought app states (and containers) over ownership.
 /docker:
   file.directory:
     - user: root
     - group: docker
-    - dir_mode: "0755"
-    - file_mode: "0644"
-    - recurse:
-        - user
-        - group
-        - mode
+    - mode: "0755"
 
 # /srv/salt/docker-cleanup.sls
 
