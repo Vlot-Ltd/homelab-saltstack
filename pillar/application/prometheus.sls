@@ -14,7 +14,7 @@ prometheus:
   # salt/minions/docker, key homeassistant_prometheus_token. IP, not the name:
   # containers don't read the host's /etc/hosts (192.168.0.24 = homeassistant).
   homeassistant:
-    enabled: false
+    enabled: true
     target: "192.168.0.24:8123"
     scrape_interval: 60s
 
