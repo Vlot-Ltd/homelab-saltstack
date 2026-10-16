@@ -115,6 +115,10 @@ Once PEP-002 is implemented, these inline calls should be replaced with `{{ pill
 - **2026-10-17:** `hwclock_utc` in `common.timesync` ran on every highstate on every
   KVM VM with `/dev/rtc0`. Now `onchanges` the hourly `hwclock_sync` cron file,
   which keeps the clock in sync afterwards. Found on `zabbix`.
+- **2026-10-17:** `hwclock_sync` failed on `zabbix` ("Parent directory not
+  present"): no `cron` package, so no `/etc/cron.hourly`. On such hosts the hourly
+  sync never existed. `common.timesync` now installs and runs `cron` on KVM VMs
+  before writing the script.
 - `docker` verified clean: after applying PEP-HL-SLT-020/030 and these guards, a
   `state.apply test=True` lists no changes.
 

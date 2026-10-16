@@ -72,6 +72,19 @@ hwclock_package:
   pkg.installed:
     - name: util-linux
 
+# The hourly sync below is a cron.hourly script, so cron has to be there.
+# Minimal images (e.g. zabbix) don't ship it: /etc/cron.hourly was missing.
+hwclock_cron_package:
+  pkg.installed:
+    - name: cron
+
+hwclock_cron_service:
+  service.running:
+    - name: cron
+    - enable: True
+    - require:
+      - pkg: hwclock_cron_package
+
 # Configure hardware clock sync for Proxmox VMs
 hwclock_sync:
   file.managed:
@@ -83,6 +96,7 @@ hwclock_sync:
     - mode: '0755'
     - require:
       - pkg: hwclock_package
+      - pkg: hwclock_cron_package
 
 # Set hardware clock to UTC once, when the hourly sync job is first installed.
 # The cron job keeps it in sync after that, so this no longer runs (and reports
