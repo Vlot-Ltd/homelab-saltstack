@@ -61,11 +61,19 @@ No Docker on general servers.
     `honor_labels: true`. Personal Macs' Claude Code status line scripts push the
     Pro plan `rate_limits` (5-hour and 7-day `used_percentage`, `resets_at`) to it.
     Reachable over Tailscale only.
-  - **Cost exporter** container that polls the Admin API
-    `GET /v1/organizations/cost_report` at most hourly (the data is daily buckets)
-    and exposes USD spend per model as Prometheus metrics. It also exposes the
-    credit left as `topup_usd` minus spend since `topup_date`, both from pillar,
-    because no API exposes the prepaid balance. Admin API key from Vault.
+  - **API spend, without the Admin API** (decided 2026-10-16). The Console account
+    is individual, so the Admin API isn't available, and an organization isn't
+    needed. All API (non-Pro) use runs on `friday`, through two routes:
+    - `claude -p` jobs with `ANTHROPIC_API_KEY`: Claude Code's OTel cost metric,
+      tagged `billing=api` by the job's own env file, so Pro sessions
+      (`billing=pro`) never mix in.
+    - LiteLLM on `friday`: Prometheus scrape of its `/metrics`
+      (`litellm_spend_metric` by model and key alias). That needs
+      `callbacks: ["prometheus"]` in LiteLLM's config, and since LiteLLM v1.85.0
+      `/metrics` needs an API key. LiteLLM's virtual key goes in Vault.
+  - **Credit left** is a Grafana calculation: `topup_usd` minus the `billing=api`
+    and LiteLLM spend since `topup_date`. Both values are in pillar and exported by
+    Pushgateway after each top-up, because no API exposes the prepaid balance.
 
 ### Out of scope
 
@@ -74,8 +82,8 @@ No Docker on general servers.
 - The HA side (`prometheus:` block in HA's `configuration.yaml`). HA isn't
   Salt-managed. That's a hand step in the vault project.
 - Long-term storage (Mimir): `observability-redesign` Phase 2+.
-- Writing the cost exporter itself. It's a small program in its own repo. This PEP
-  deploys it.
+- LiteLLM's own config on `friday` (PEP-HL-SLT-014). This PEP only adds the scrape
+  job.
 - Whether the work MacBook reports is decided in the vault project, not here. It
   uses the personal subscription, so it would only be a client config change.
 
@@ -133,10 +141,10 @@ central Alloy (PEP-015) ──remote_write──► Prometheus :9090 ◄──sc
 ### Phase 4: Claude usage inputs
 
 - Pushgateway container and scrape job. Check one push from a personal Mac.
-- Admin API: confirm the Console account is an organization (the Admin API is
-  unavailable for individual accounts). Admin key into Vault.
-- Cost exporter container and scrape job. Compare one day's figure with the
-  Console's Cost page.
+- LiteLLM scrape job, using a LiteLLM key from Vault.
+- `billing=api` resource attribute in the `friday` job env files.
+- Compare one week's `billing=api` + LiteLLM total with the Console's usage page.
+  They should agree within rounding.
 
 Alloy's remote write lands with PEP-HL-SLT-015 Phase 1.
 
@@ -163,7 +171,7 @@ Alloy's remote write lands with PEP-HL-SLT-015 Phase 1.
 | HA token leaks via the rendered `prometheus.yml` | HA admin access | Low | Token in a separate file (`bearer_token_file`, mode 0600), not inline; file from Vault pillar |
 | Docker host disk fills | Other containers fail | Low | Retention from pillar; Zabbix already watches the docker host's disk |
 | A hand-run container already holds 9090 | Compose fails to start | Medium | Phase 0 survey |
-| Admin API key leaks | Full org admin on the Anthropic account | Low | Key only in Vault, read-only use, mounted as a file; rotate on any doubt |
+| An API job runs without the `billing=api` tag | API spend shows up as Pro, or is missing | Medium | The tag lives in the same env file that sets `ANTHROPIC_API_KEY`, so one can't exist without the other; weekly comparison with the Console |
 | Stale Pushgateway values when no session runs | Dashboard shows old plan usage as current | High | Push a timestamp metric too; panel greys out past `resets_at` |
 
 ## References
@@ -180,3 +188,4 @@ Alloy's remote write lands with PEP-HL-SLT-015 Phase 1.
 |---------|------|--------|---------|
 | 0.1 | 2026-10-16 | Timo Vlot | Initial draft |
 | 0.2 | 2026-10-16 | Timo Vlot | Phase 4: Pushgateway for Pro plan usage, cost exporter for API spend |
+| 0.3 | 2026-10-16 | Timo Vlot | Cost exporter dropped (Console account is individual, so no Admin API). API spend from Claude Code OTel `billing=api` plus a LiteLLM scrape |
