@@ -9,7 +9,7 @@
   ],
   "description": "Claude Code OTel -> Alloy -> Prometheus on docker. PEP-HL-SLT-015 / PEP-HL-SLT-028. Vault: homelab-telemetry-claude-bambu.",
   "schemaVersion": 39,
-  "version": 1,
+  "version": 2,
   "editable": true,
   "graphTooltip": 1,
   "time": {
@@ -75,6 +75,17 @@
           ]
         },
         "sort": 1
+      },
+      {
+        "name": "usd_gbp",
+        "label": "USD to GBP",
+        "type": "textbox",
+        "query": "0.74",
+        "current": {
+          "text": "0.74",
+          "value": "0.74"
+        },
+        "description": "Fixed rate, set by hand. 0.74 on 2026-10-17 (2026 average about 0.744)."
       }
     ]
   },
@@ -100,7 +111,7 @@
       "id": 2,
       "type": "stat",
       "title": "Estimated cost",
-      "description": "Claude Code's own estimate: tokens x API list prices. On billing=pro it's what the usage would have cost on the API, not money spent. On billing=api it tracks real spend. Each Claude Code session reports its own counter from 0, so this sums each session's highest value in the period. A session running past midnight counts in both days.",
+      "description": "Claude Code's own estimate: tokens x API list prices. On billing=pro it's what the usage would have cost on the API, not money spent. On billing=api it tracks real spend. Converted from USD with the 'USD to GBP' rate box at the top (a fixed rate you set, not live). Each Claude Code session reports its own counter from 0, so this sums each session's highest value in the period. A session running past midnight counts in both days.",
       "datasource": {
         "type": "prometheus",
         "uid": "prometheus"
@@ -118,7 +129,7 @@
             "uid": "prometheus"
           },
           "refId": "A",
-          "expr": "sum (max_over_time(claude_code_cost_usage_USD_total{host=~\"$host\", billing=~\"$billing\"}[$__range]))",
+          "expr": "sum (max_over_time(claude_code_cost_usage_USD_total{host=~\"$host\", billing=~\"$billing\"}[$__range])) * $usd_gbp",
           "legendFormat": "Estimated cost",
           "range": false,
           "instant": true,
@@ -127,7 +138,7 @@
       ],
       "fieldConfig": {
         "defaults": {
-          "unit": "currencyUSD",
+          "unit": "currencyGBP",
           "color": {
             "mode": "fixed",
             "fixedColor": "text"
@@ -514,7 +525,7 @@
       "id": 9,
       "type": "timeseries",
       "title": "Estimated cost per day, by model",
-      "description": "Claude Code's own estimate: tokens x API list prices. On billing=pro it's what the usage would have cost on the API, not money spent. On billing=api it tracks real spend. Each Claude Code session reports its own counter from 0, so this sums each session's highest value in the period. A session running past midnight counts in both days.",
+      "description": "Claude Code's own estimate: tokens x API list prices. On billing=pro it's what the usage would have cost on the API, not money spent. On billing=api it tracks real spend. Converted from USD with the 'USD to GBP' rate box at the top (a fixed rate you set, not live). Each Claude Code session reports its own counter from 0, so this sums each session's highest value in the period. A session running past midnight counts in both days.",
       "datasource": {
         "type": "prometheus",
         "uid": "prometheus"
@@ -532,7 +543,7 @@
             "uid": "prometheus"
           },
           "refId": "A",
-          "expr": "sum by (model) (max_over_time(claude_code_cost_usage_USD_total{host=~\"$host\", billing=~\"$billing\"}[1d]))",
+          "expr": "sum by (model) (max_over_time(claude_code_cost_usage_USD_total{host=~\"$host\", billing=~\"$billing\"}[1d])) * $usd_gbp",
           "legendFormat": "{{model}}",
           "range": true,
           "instant": false,
@@ -542,7 +553,7 @@
       ],
       "fieldConfig": {
         "defaults": {
-          "unit": "currencyUSD",
+          "unit": "currencyGBP",
           "decimals": 2,
           "min": 0,
           "color": {
@@ -783,7 +794,7 @@
       "id": 14,
       "type": "bargauge",
       "title": "Estimated cost by machine",
-      "description": "Claude Code's own estimate: tokens x API list prices. On billing=pro it's what the usage would have cost on the API, not money spent. On billing=api it tracks real spend.",
+      "description": "Claude Code's own estimate: tokens x API list prices. On billing=pro it's what the usage would have cost on the API, not money spent. On billing=api it tracks real spend. Converted from USD with the 'USD to GBP' rate box at the top (a fixed rate you set, not live).",
       "datasource": {
         "type": "prometheus",
         "uid": "prometheus"
@@ -801,7 +812,7 @@
             "uid": "prometheus"
           },
           "refId": "A",
-          "expr": "sum by (host) (max_over_time(claude_code_cost_usage_USD_total{host=~\"$host\", billing=~\"$billing\"}[$__range]))",
+          "expr": "sum by (host) (max_over_time(claude_code_cost_usage_USD_total{host=~\"$host\", billing=~\"$billing\"}[$__range])) * $usd_gbp",
           "legendFormat": "{{host}}",
           "range": false,
           "instant": true,
@@ -810,7 +821,7 @@
       ],
       "fieldConfig": {
         "defaults": {
-          "unit": "currencyUSD",
+          "unit": "currencyGBP",
           "decimals": 2,
           "min": 0,
           "color": {
@@ -849,7 +860,7 @@
       "id": 15,
       "type": "bargauge",
       "title": "Estimated cost by billing route",
-      "description": "pro = interactive sessions on the subscription; api = friday/JARVIS jobs on the API key (not reporting yet). Claude Code's own estimate: tokens x API list prices. On billing=pro it's what the usage would have cost on the API, not money spent. On billing=api it tracks real spend.",
+      "description": "pro = interactive sessions on the subscription; api = friday/JARVIS jobs on the API key (not reporting yet). Claude Code's own estimate: tokens x API list prices. On billing=pro it's what the usage would have cost on the API, not money spent. On billing=api it tracks real spend. Converted from USD with the 'USD to GBP' rate box at the top (a fixed rate you set, not live).",
       "datasource": {
         "type": "prometheus",
         "uid": "prometheus"
@@ -867,7 +878,7 @@
             "uid": "prometheus"
           },
           "refId": "A",
-          "expr": "sum by (billing) (max_over_time(claude_code_cost_usage_USD_total{host=~\"$host\", billing=~\"$billing\"}[$__range]))",
+          "expr": "sum by (billing) (max_over_time(claude_code_cost_usage_USD_total{host=~\"$host\", billing=~\"$billing\"}[$__range])) * $usd_gbp",
           "legendFormat": "{{billing}}",
           "range": false,
           "instant": true,
@@ -876,7 +887,7 @@
       ],
       "fieldConfig": {
         "defaults": {
-          "unit": "currencyUSD",
+          "unit": "currencyGBP",
           "decimals": 2,
           "min": 0,
           "color": {
