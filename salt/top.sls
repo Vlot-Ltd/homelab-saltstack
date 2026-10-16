@@ -29,3 +29,4 @@ base:
     - application.vault
   'zabbix':
     - application.zabbix.server
+    - application.grafana.datasource-prometheus

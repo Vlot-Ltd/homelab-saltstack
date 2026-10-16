@@ -150,6 +150,9 @@ central Alloy (PEP-015) ──remote_write──► Prometheus :9090 ◄──sc
   - drop `isDefault`, `trends` and `directDbConnection` from the Zabbix datasource
 
   Fixing that state is separate work, not this PEP.
+- **Done 2026-10-17:** applied on `zabbix` (commit `1740455`). Grafana's datasource
+  test passes, and Explore returns data. The provisioning directory held only
+  Grafana's packaged `sample.yaml`. Added to `salt/top.sls` for `zabbix`.
 
 ### Phase 4: Claude usage inputs
 
