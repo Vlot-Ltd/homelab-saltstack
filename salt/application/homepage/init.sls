@@ -136,23 +136,34 @@ homepage-docker-compose:
     - require:
         - file: homepage-directory
 
-restart-homepage-on-config-change:
-  cmd.run:
-    - name: docker compose down && docker compose up -d --build
-    - cwd: /docker/homepage
-    - require:
-        - cmd: start-tailscale-docker
-    - onchanges:
-        - file: homepage-services-config
-        - file: homepage-settings-config  
-        - file: homepage-widgets-config
-        - file: homepage-docker-compose
-
+# PEP-HL-SLT-020: config is bind-mounted YAML that compose can't see, so a
+# config change restarts the container; a compose change recreates in place.
+# No --build (no build: section), no down.
 start-homepage:
   cmd.run:
-    - name: docker compose up -d --build
+    - name: docker compose up -d
     - cwd: /docker/homepage
-    - unless: docker ps -q --filter name=^homepage$ --filter status=running | grep -q .
+    - unless: 'test "$(docker compose ps -q --status running | wc -l)" -ge "$(docker compose config --services | wc -l)"'
     - require:
         - file: homepage-docker-compose
         - cmd: start-tailscale-docker
+
+recreate-homepage:
+  cmd.run:
+    - name: docker compose up -d
+    - cwd: /docker/homepage
+    - onchanges:
+        - file: homepage-docker-compose
+    - require:
+        - cmd: start-homepage
+
+restart-homepage-on-config-change:
+  cmd.run:
+    - name: docker compose restart homepage
+    - cwd: /docker/homepage
+    - onchanges:
+        - file: homepage-services-config
+        - file: homepage-settings-config
+        - file: homepage-widgets-config
+    - require:
+        - cmd: recreate-homepage

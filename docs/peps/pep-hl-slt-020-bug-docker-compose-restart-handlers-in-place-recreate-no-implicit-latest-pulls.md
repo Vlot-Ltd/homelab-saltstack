@@ -88,6 +88,25 @@ are genuinely pending (including `bc2ba4c`).
   `docker inspect`, so nothing changes on first apply).
 - Handlers become `docker compose up -d`.
 
+### Progress
+
+- **2026-10-17: handlers rewritten** for homepage, heimdall2, linkwarden, fing,
+  webdriver, tailscale-docker and the tailnet-service macro. Pattern:
+  `start-<app>` runs `docker compose up -d` unless every service in the project is
+  running (`docker compose ps --status running` counted against
+  `docker compose config --services`). `recreate-<app>` runs `up -d` on compose or
+  `.env` changes. Bind-mounted config changes restart only the affected container
+  (`homepage`, heimdall2's `nginx`). No `down`, no `pull`, no `--build`. That also
+  covers PEP-HL-SLT-006 Fix 2 (the check-file pattern is gone).
+- Before the rewrite, every container was checked to run from its own
+  `/docker/<app>` project (`docker inspect` compose labels), so `up -d` adopts
+  them rather than duplicating. Linkwarden runs as `linkwarden-linkwarden-1`, but
+  the compose file names it `linkwarden`. Its data mount matches
+  (`/docker/linkwarden/data`), so a converge recreates and renames it, with data
+  intact.
+- **Still open: Phase 2 pins.** Images stay `:latest`, but nothing pulls, so a
+  recreate uses the local image.
+
 ## Testing Strategy
 
 - `salt docker state.apply application.<app> test=True` before and after: only the

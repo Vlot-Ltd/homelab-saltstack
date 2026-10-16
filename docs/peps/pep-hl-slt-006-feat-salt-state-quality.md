@@ -105,6 +105,14 @@ Once PEP-002 is implemented, these inline calls should be replaced with `{{ pill
 - A fresh minion with no cache files applies `fing.sls` without error
 - Running highstate on any host does not write files to `/tmp` unless `debug: enabled: true` is in that host's pillar
 
+### Progress
+
+- **2026-10-17:** Fix 2 done through PEP-HL-SLT-020 (Docker handlers). Also guarded
+  two states that ran and reported changes on every highstate on every minion:
+  `timedatectl` in `common.timesync` (now `unless` the setting is already right),
+  and `enable_scheduler` in `common.schedule` (now only when `_schedule.conf` says
+  `enabled: false`).
+
 ## Implementation Plan
 
 ### Phase 1: Add Missing watch Directives (Low Risk)

@@ -33,10 +33,22 @@ webdriver-docker-compose:
     - require:
         - file: webdriver-directory
 
+# PEP-HL-SLT-020 / PEP-HL-SLT-006: start only when not all services are
+# running; recreate in place on compose/env changes. No down, no pull.
 start-webdriver:
   cmd.run:
     - name: docker compose up -d
     - cwd: /docker/webdriver
+    - unless: 'test "$(docker compose ps -q --status running | wc -l)" -ge "$(docker compose config --services | wc -l)"'
     - require:
         - file: webdriver-docker-compose
         - cmd: start-tailscale-docker
+
+recreate-webdriver:
+  cmd.run:
+    - name: docker compose up -d
+    - cwd: /docker/webdriver
+    - onchanges:
+        - file: webdriver-docker-compose
+    - require:
+        - cmd: start-webdriver

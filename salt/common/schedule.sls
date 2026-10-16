@@ -1,8 +1,12 @@
 {% set schedule = salt['pillar.get']('schedule', {}) %}
 
+# Only when the scheduler has been disabled (schedule.disable writes
+# "enabled: false" into _schedule.conf). Otherwise it ran, and reported, every
+# highstate (PEP-HL-SLT-006).
 enable_scheduler:
   module.run:
     - name: schedule.enable
+    - onlyif: "grep -qs 'enabled: false' /etc/salt/minion.d/_schedule.conf"
 
 {%- for job_name, job_details in schedule.items() %}
 apply_{{ job_name }}:

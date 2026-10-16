@@ -55,27 +55,24 @@ linkwarden-docker-compose:
     - group: docker
     - mode: "0644"
 
-check-linkwarden:
-  cmd.run:
-    - name: docker ps -f status=running | grep -q linkwarden && echo RUNNING || echo STOPPED
-    - output_loglevel: quiet
-
-restart-linkwarden:
-  cmd.run:
-    - name: docker compose down && docker pull ghcr.io/linkwarden/linkwarden:latest && docker compose up -d
-    - cwd: /docker/linkwarden
-    - onlyif: "grep -q RUNNING /var/cache/salt/minion/check-linkwarden"
-    - onchanges:
-        - file: linkwarden-docker-compose
-        - file: linkwarden-env
-    - require:
-        - cmd: check-linkwarden
-
+# PEP-HL-SLT-020 / PEP-HL-SLT-006: start only when not all services are
+# running; recreate in place on compose/env changes. No down, no pull.
 start-linkwarden:
   cmd.run:
     - name: docker compose up -d
     - cwd: /docker/linkwarden
-    - onlyif: "grep -q STOPPED /var/cache/salt/minion/check-linkwarden"
+    - unless: 'test "$(docker compose ps -q --status running | wc -l)" -ge "$(docker compose config --services | wc -l)"'
     - require:
-        - cmd: check-linkwarden
+        - file: linkwarden-docker-compose
+        - file: linkwarden-env
         - cmd: start-tailscale-docker
+
+recreate-linkwarden:
+  cmd.run:
+    - name: docker compose up -d
+    - cwd: /docker/linkwarden
+    - onchanges:
+        - file: linkwarden-docker-compose
+        - file: linkwarden-env
+    - require:
+        - cmd: start-linkwarden

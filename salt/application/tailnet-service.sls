@@ -37,28 +37,23 @@
     - group: docker
     - mode: "0644"
 
-check-{{ service_name }}:
-  cmd.run:
-    - name: docker ps -f status=running | grep -q {{ service_name }} && echo RUNNING || echo STOPPED
-    - output_loglevel: quiet
-
-restart-{{ service_name }}:
-  cmd.run:
-    - name: docker compose down && docker compose pull && docker compose up -d
-    - cwd: /docker/{{ service_name }}
-    - onlyif: "grep -q RUNNING /var/cache/salt/minion/check-{{ service_name }}"
-    - onchanges:
-        - file: {{ service_name }}-docker-compose
-    - require:
-        - cmd: check-{{ service_name }}
-
+# PEP-HL-SLT-020 / PEP-HL-SLT-006: start only when not all services are
+# running; recreate in place on compose/env changes. No down, no pull.
 start-{{ service_name }}:
   cmd.run:
     - name: docker compose up -d
     - cwd: /docker/{{ service_name }}
-    - onlyif: "grep -q STOPPED /var/cache/salt/minion/check-{{ service_name }}"
+    - unless: 'test "$(docker compose ps -q --status running | wc -l)" -ge "$(docker compose config --services | wc -l)"'
     - require:
-        - cmd: check-{{ service_name }}
+        - file: {{ service_name }}-docker-compose
         - cmd: start-tailscale-docker
 
+recreate-{{ service_name }}:
+  cmd.run:
+    - name: docker compose up -d
+    - cwd: /docker/{{ service_name }}
+    - onchanges:
+        - file: {{ service_name }}-docker-compose
+    - require:
+        - cmd: start-{{ service_name }}
 {% endmacro %}

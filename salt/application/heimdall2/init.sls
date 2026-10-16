@@ -67,34 +67,35 @@ heimdall2_compose:
     - require:
       - file: heimdall2_directory
 
-heimdall2_status:
-  cmd.run:
-    - name: docker ps -f status=running | grep -q heimdall2
-    - cwd: /docker/heimdall2
-    - success_retcodes: [0, 1]
-
+# PEP-HL-SLT-020 / PEP-HL-SLT-006: no status probe, no pull. Compose or .env
+# changes recreate in place; the nginx template is read at container start, so
+# a template change restarts only nginx.
 heimdall2_start:
   cmd.run:
     - name: docker compose up -d
     - cwd: /docker/heimdall2
-    - unless: docker ps -f status=running | grep -q heimdall2
+    - unless: 'test "$(docker compose ps -q --status running | wc -l)" -ge "$(docker compose config --services | wc -l)"'
     - require:
       - file: heimdall2_compose
       - file: heimdall2_env
       - file: heimdall2_nginx_config
-      - cmd: heimdall2_status
       - cmd: start-tailscale-docker
 
-heimdall2_restart:
+heimdall2_recreate:
   cmd.run:
-    - name: docker compose pull && docker compose up -d
+    - name: docker compose up -d
     - cwd: /docker/heimdall2
-    - onlyif: docker ps -f status=running | grep -q heimdall2
+    - onchanges:
+      - file: heimdall2_compose
+      - file: heimdall2_env
     - require:
-      - file: heimdall2_compose
-      - file: heimdall2_env
+      - cmd: heimdall2_start
+
+heimdall2_restart_nginx:
+  cmd.run:
+    - name: docker compose restart nginx
+    - cwd: /docker/heimdall2
+    - onchanges:
       - file: heimdall2_nginx_config
-    - watch:
-      - file: heimdall2_compose
-      - file: heimdall2_env
-      - file: heimdall2_nginx_config
+    - require:
+      - cmd: heimdall2_recreate

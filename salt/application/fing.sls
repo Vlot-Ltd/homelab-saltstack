@@ -42,26 +42,22 @@ fing-docker-compose:
     - require:
       - file: fing-directory
 
-check-fing:
-  cmd.run:
-    - name: docker ps -f status=running | grep -q fing-agent && echo RUNNING || echo STOPPED
-    - output_loglevel: quiet
-
-restart-fing:
-  cmd.run:
-    - name: docker compose down && docker pull fing/fing-agent:latest && docker compose up -d
-    - cwd: /docker/fing
-    - onlyif: "grep -q RUNNING /var/cache/salt/minion/check-fing"
-    - onchanges:
-        - file: fing-docker-compose
-    - require:
-        - cmd: check-fing
-
+# PEP-HL-SLT-020 / PEP-HL-SLT-006: start only when not all services are
+# running; recreate in place on compose/env changes. No down, no pull.
 start-fing:
   cmd.run:
     - name: docker compose up -d
     - cwd: /docker/fing
-    - onlyif: "grep -q STOPPED /var/cache/salt/minion/check-fing"
+    - unless: 'test "$(docker compose ps -q --status running | wc -l)" -ge "$(docker compose config --services | wc -l)"'
     - require:
-        - cmd: check-fing
+        - file: fing-docker-compose
         - file: fing-data-directory
+
+recreate-fing:
+  cmd.run:
+    - name: docker compose up -d
+    - cwd: /docker/fing
+    - onchanges:
+        - file: fing-docker-compose
+    - require:
+        - cmd: start-fing

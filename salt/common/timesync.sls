@@ -135,12 +135,20 @@ force_time_sync:
       - timezone: timezone_set
 
 # Configure timedatectl settings
-timedatectl_config:
+# Guarded so they only run when the setting is wrong (PEP-HL-SLT-006: no noise on
+# every highstate).
+timedatectl_ntp:
   cmd.run:
-    - names:
-      - timedatectl set-ntp true
-{% if grains.get('virtual', '') == 'kvm' or grains.get('manufacturer', '') == 'QEMU' %}
-      - timedatectl set-local-rtc false
-{% endif %}
+    - name: timedatectl set-ntp true
+    - unless: test "$(timedatectl show -p NTP --value)" = yes
     - require:
       - service: timesyncd_service
+{% if grains.get('virtual', '') == 'kvm' or grains.get('manufacturer', '') == 'QEMU' %}
+
+timedatectl_local_rtc:
+  cmd.run:
+    - name: timedatectl set-local-rtc false
+    - unless: test "$(timedatectl show -p LocalRTC --value)" = no
+    - require:
+      - service: timesyncd_service
+{% endif %}

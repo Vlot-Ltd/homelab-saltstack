@@ -52,7 +52,7 @@ tailscale-docker-compose:
 # sidecar was never started (PEP-HL-SLT-006).
 restart-tailscale-docker:
   cmd.run:
-    - name: docker compose down && docker compose up -d
+    - name: docker compose up -d  # in place, no down (PEP-HL-SLT-020)
     - cwd: /docker/tailscale
     - onlyif: docker ps -q --filter name=^tailscale-sidecar$ --filter status=running | grep -q .
     - onchanges:
