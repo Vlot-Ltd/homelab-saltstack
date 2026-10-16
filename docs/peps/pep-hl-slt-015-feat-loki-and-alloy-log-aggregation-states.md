@@ -78,8 +78,9 @@ docker host:  Alloy (central) ──metrics──► Prometheus (PEP-028)
   `pillar/monitoring/alloy/defaults.sls` (Loki endpoint, agent package version).
   Per-host file lists in host pillar.
 - Host port clash: `pillar/application/docker.sls` gives both `homebox` and `loki`
-  port 3100. Loki moves to another host port (proposed 3110, container still 3100),
-  or homebox does. Decide in Phase 1.
+  port 3100, and homebox really holds it (checked 2026-10-16). **Decided
+  2026-10-16:** Loki publishes host port **3110** on the docker host; the container
+  still listens on 3100. Pillar `loki.port` changes to 3110.
 
 ### Success Criteria
 
@@ -96,7 +97,7 @@ docker host:  Alloy (central) ──metrics──► Prometheus (PEP-028)
 
 ### Phase 1: Loki and central Alloy on the docker host
 
-- Fix the 3100 clash. Loki and central Alloy state, pillar and compose file.
+- Loki on host port 3110. Loki and central Alloy state, pillar and compose file.
 - Tailscale Service for the OTLP endpoint.
 - Point one personal Mac's Claude Code at it (chezmoi, outside this repo) and check
   both stores.
@@ -137,7 +138,7 @@ docker host:  Alloy (central) ──metrics──► Prometheus (PEP-028)
 | Risk | Impact | Probability | Mitigation |
 |------|--------|-------------|------------|
 | `os.linux` and the agent state fight over the `alloy` package | Package flaps every highstate | High if missed | Same commit removes it from the removal lists; checked in Phase 2 |
-| Loki/homebox both on host port 3100 | One container fails to start | High | Decide the port in Phase 1 before deploying |
+| Loki/homebox both on host port 3100 | One container fails to start | High | Decided: Loki on 3110 |
 | OTLP endpoint open beyond personal devices | Anyone on the tailnet can write telemetry | Medium | Tailscale ACL limits 4317/4318 to my devices |
 | Claude Code events carry prompt text | Prompts stored in Loki | Low | `OTEL_LOG_USER_PROMPTS` left unset on every Mac |
 | Journal volume from the whole fleet | Docker host disk fills | Medium | Retention from pillar; staggered Phase 3; Zabbix disk trigger on the docker host |
