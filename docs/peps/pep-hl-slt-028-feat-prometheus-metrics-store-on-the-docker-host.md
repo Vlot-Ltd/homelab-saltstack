@@ -167,7 +167,9 @@ central Alloy (PEP-015) ──remote_write──► Prometheus :9090 ◄──sc
   (`require_auth_for_metrics_endpoint: false`), because the alternative was giving
   Prometheus the master key. Docker's DNS answers only AAAA for Tailscale Service
   names and the container has no IPv6, so the Service's IPv4 VIP `100.65.24.13`
-  is pinned through `extra_hosts` (pillar). HTTPS still verifies against the name.
+  is pinned through `extra_hosts` (pillar). HTTPS still verifies against the name. The path must be
+  `/metrics/` (trailing slash): `/metrics` 307-redirects to `http://…:443/metrics/`
+  through the Service, and Prometheus then gets a 400.
 
 - Pushgateway container and scrape job. Check one push from a personal Mac.
 - LiteLLM scrape job, using a LiteLLM key from Vault.

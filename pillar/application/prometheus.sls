@@ -31,7 +31,9 @@ prometheus:
     # LiteLLM's config): read-only counters, tailnet-only. Decided 2026-10-17.
     - job_name: litellm
       scheme: https
-      metrics_path: /metrics
+      # Trailing slash: LiteLLM 307-redirects /metrics to /metrics/, and behind the
+      # Tailscale Service the redirect points at http://...:443, which fails (400).
+      metrics_path: /metrics/
       scrape_interval: 60s
       static_configs:
         - targets: ["llm.taile3eee.ts.net:443"]
