@@ -106,8 +106,18 @@ docker host:  Alloy (central) ──metrics──► Prometheus (PEP-028)
   and a second `test=True` run shows no changes. An OTLP/HTTP test gauge posted from
   the Mac to `docker:4318` arrived in Prometheus as
   `otel_pipeline_test{host="timo-mac", job="otel-test"}`, so the label promotion
-  works. Added to `salt/top.sls`. Still to do: the Tailscale Service for the OTLP
-  endpoint, and Claude Code on a Mac.
+  works. Added to `salt/top.sls`.
+- **Claude Code on `gibson` done 2026-10-17:** chezmoi `dot_zshrc.tmpl` sends OTLP/gRPC
+  to `docker.taile3eee.ts.net:4317` (the host's own Tailscale name; ports are
+  published on the host, so no Tailscale Service needed). Alloy received the metric
+  points and 28 log records, with 0 refused and 0 failed. Prometheus has
+  `claude_code_token_usage_tokens_total`, `claude_code_cost_usage_USD_total`,
+  `claude_code_session_count_total` and `claude_code_active_time_seconds_total`
+  with `host="gibson"`.
+- **Gotcha:** Claude Code exports **delta** temporality by default, and Alloy's
+  `otelcol.exporter.prometheus` drops delta sums. Clients must set
+  `OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE=cumulative`. That includes
+  `friday`'s API jobs when they get their env file.
 
 ### Phase 2: One agent
 
