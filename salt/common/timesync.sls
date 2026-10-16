@@ -84,11 +84,15 @@ hwclock_sync:
     - require:
       - pkg: hwclock_package
 
-# Set hardware clock to UTC (only if hwclock command exists)
+# Set hardware clock to UTC once, when the hourly sync job is first installed.
+# The cron job keeps it in sync after that, so this no longer runs (and reports
+# a change) on every highstate (PEP-HL-SLT-006).
 hwclock_utc:
   cmd.run:
     - name: hwclock --systohc --utc
     - onlyif: which hwclock && test -e /dev/rtc0
+    - onchanges:
+      - file: hwclock_sync
     - require:
       - service: timesyncd_service
       - pkg: hwclock_package
