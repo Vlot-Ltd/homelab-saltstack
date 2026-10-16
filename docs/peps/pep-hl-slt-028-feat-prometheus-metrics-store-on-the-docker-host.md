@@ -56,6 +56,16 @@ No Docker on general servers.
   Assistant (`/api/prometheus`, bearer token).
 - HA long-lived token in Vault, read through the existing Vault pillar. Never in git.
 - Grafana datasource for Prometheus, provisioned by `application.grafana`.
+- **Claude usage inputs** (Phase 4). Neither is available over OTel:
+  - **Pushgateway** container on the docker host, image pinned, scraped with
+    `honor_labels: true`. Personal Macs' Claude Code status line scripts push the
+    Pro plan `rate_limits` (5-hour and 7-day `used_percentage`, `resets_at`) to it.
+    Reachable over Tailscale only.
+  - **Cost exporter** container that polls the Admin API
+    `GET /v1/organizations/cost_report` at most hourly (the data is daily buckets)
+    and exposes USD spend per model as Prometheus metrics. It also exposes the
+    credit left as `topup_usd` minus spend since `topup_date`, both from pillar,
+    because no API exposes the prepaid balance. Admin API key from Vault.
 
 ### Out of scope
 
@@ -64,6 +74,10 @@ No Docker on general servers.
 - The HA side (`prometheus:` block in HA's `configuration.yaml`). HA isn't
   Salt-managed. That's a hand step in the vault project.
 - Long-term storage (Mimir): `observability-redesign` Phase 2+.
+- Writing the cost exporter itself. It's a small program in its own repo. This PEP
+  deploys it.
+- Anything from the work MacBook. Its Claude Code telemetry carries the work org ID
+  and email, so it never points at this stack.
 
 ### Implementation Approach
 
@@ -112,6 +126,14 @@ central Alloy (PEP-015) ──remote_write──► Prometheus :9090 ◄──sc
 
 - Datasource provisioning in `application.grafana`.
 
+### Phase 4: Claude usage inputs
+
+- Pushgateway container and scrape job. Check one push from a personal Mac.
+- Admin API: confirm the Console account is an organization (the Admin API is
+  unavailable for individual accounts). Admin key into Vault.
+- Cost exporter container and scrape job. Compare one day's figure with the
+  Console's Cost page.
+
 Alloy's remote write lands with PEP-HL-SLT-015 Phase 1.
 
 ## Testing Strategy
@@ -137,6 +159,8 @@ Alloy's remote write lands with PEP-HL-SLT-015 Phase 1.
 | HA token leaks via the rendered `prometheus.yml` | HA admin access | Low | Token in a separate file (`bearer_token_file`, mode 0600), not inline; file from Vault pillar |
 | Docker host disk fills | Other containers fail | Low | Retention from pillar; Zabbix already watches the docker host's disk |
 | A hand-run container already holds 9090 | Compose fails to start | Medium | Phase 0 survey |
+| Admin API key leaks | Full org admin on the Anthropic account | Low | Key only in Vault, read-only use, mounted as a file; rotate on any doubt |
+| Stale Pushgateway values when no session runs | Dashboard shows old plan usage as current | High | Push a timestamp metric too; panel greys out past `resets_at` |
 
 ## References
 
@@ -151,3 +175,4 @@ Alloy's remote write lands with PEP-HL-SLT-015 Phase 1.
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
 | 0.1 | 2026-10-16 | Timo Vlot | Initial draft |
+| 0.2 | 2026-10-16 | Timo Vlot | Phase 4: Pushgateway for Pro plan usage, cost exporter for API spend |
