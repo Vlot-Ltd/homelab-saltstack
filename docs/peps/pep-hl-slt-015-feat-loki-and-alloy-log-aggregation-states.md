@@ -7,7 +7,7 @@
 **Type:** Feature  
 **Priority:** Medium  
 **Created:** 2026-10-10  
-**Updated:** 2026-10-16  
+**Updated:** 2026-10-17  
 **Supersedes:** N/A  
 **Superseded-By:** N/A  
 
@@ -101,6 +101,13 @@ docker host:  Alloy (central) ──metrics──► Prometheus (PEP-028)
 - Tailscale Service for the OTLP endpoint.
 - Point one personal Mac's Claude Code at it (chezmoi, outside this repo) and check
   both stores.
+- **Stack done 2026-10-17** (commit `263d24f`): `application.loki` applied on
+  `docker`. Loki `/ready` returns `ready`, Alloy `/-/ready` returns `Alloy is ready.`,
+  and a second `test=True` run shows no changes. An OTLP/HTTP test gauge posted from
+  the Mac to `docker:4318` arrived in Prometheus as
+  `otel_pipeline_test{host="timo-mac", job="otel-test"}`, so the label promotion
+  works. Added to `salt/top.sls`. Still to do: the Tailscale Service for the OTLP
+  endpoint, and Claude Code on a Mac.
 
 ### Phase 2: One agent
 
