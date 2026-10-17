@@ -9,7 +9,7 @@
   ],
   "description": "Bambu A1 via Home Assistant (ha-bambulab) -> HA prometheus integration -> Prometheus on docker. PEP-HL-SLT-028.",
   "schemaVersion": 39,
-  "version": 4,
+  "version": 5,
   "editable": true,
   "graphTooltip": 1,
   "time": {
@@ -62,8 +62,8 @@
           "refId": "A",
           "expr": "(hass_sensor_unit_percent{entity=\"sensor.a1_combo_print_progress\"}) and on() ((hass_binary_sensor_state{entity=\"binary_sensor.a1_combo_online\"} == 1) and on() (hass_sensor_duration_h{entity=\"sensor.a1_combo_remaining_time\"} > 0))",
           "legendFormat": "Progress",
-          "range": true,
-          "instant": false,
+          "range": false,
+          "instant": true,
           "editorMode": "code"
         }
       ],
@@ -130,8 +130,8 @@
           "refId": "A",
           "expr": "(hass_sensor_state{entity=\"sensor.a1_combo_current_layer\"}) and on() ((hass_binary_sensor_state{entity=\"binary_sensor.a1_combo_online\"} == 1) and on() (hass_sensor_duration_h{entity=\"sensor.a1_combo_remaining_time\"} > 0))",
           "legendFormat": "Current",
-          "range": true,
-          "instant": false,
+          "range": false,
+          "instant": true,
           "editorMode": "code"
         },
         {
@@ -142,8 +142,8 @@
           "refId": "B",
           "expr": "(hass_sensor_state{entity=\"sensor.a1_combo_total_layer_count\"}) and on() ((hass_binary_sensor_state{entity=\"binary_sensor.a1_combo_online\"} == 1) and on() (hass_sensor_duration_h{entity=\"sensor.a1_combo_remaining_time\"} > 0))",
           "legendFormat": "Total",
-          "range": true,
-          "instant": false,
+          "range": false,
+          "instant": true,
           "editorMode": "code"
         }
       ],
@@ -210,8 +210,8 @@
           "refId": "A",
           "expr": "(hass_sensor_duration_h{entity=\"sensor.a1_combo_remaining_time\"} * 3600) and on() ((hass_binary_sensor_state{entity=\"binary_sensor.a1_combo_online\"} == 1) and on() (hass_sensor_duration_h{entity=\"sensor.a1_combo_remaining_time\"} > 0))",
           "legendFormat": "Remaining",
-          "range": true,
-          "instant": false,
+          "range": false,
+          "instant": true,
           "editorMode": "code"
         }
       ],
@@ -277,8 +277,8 @@
           "refId": "A",
           "expr": "(hass_sensor_timestamp_seconds{entity=\"sensor.a1_combo_start_time\"} * 1000) and on() ((hass_binary_sensor_state{entity=\"binary_sensor.a1_combo_online\"} == 1) and on() (hass_sensor_duration_h{entity=\"sensor.a1_combo_remaining_time\"} > 0))",
           "legendFormat": "Started",
-          "range": true,
-          "instant": false,
+          "range": false,
+          "instant": true,
           "editorMode": "code"
         },
         {
@@ -289,8 +289,8 @@
           "refId": "B",
           "expr": "(hass_sensor_timestamp_seconds{entity=\"sensor.a1_combo_end_time\"} * 1000) and on() ((hass_binary_sensor_state{entity=\"binary_sensor.a1_combo_online\"} == 1) and on() (hass_sensor_duration_h{entity=\"sensor.a1_combo_remaining_time\"} > 0))",
           "legendFormat": "Expected end",
-          "range": true,
-          "instant": false,
+          "range": false,
+          "instant": true,
           "editorMode": "code"
         }
       ],
@@ -356,8 +356,8 @@
           "refId": "A",
           "expr": "(hass_sensor_distance_m{entity=\"sensor.a1_combo_print_length\"}) and on() ((hass_binary_sensor_state{entity=\"binary_sensor.a1_combo_online\"} == 1) and on() (hass_sensor_duration_h{entity=\"sensor.a1_combo_remaining_time\"} > 0))",
           "legendFormat": "Length",
-          "range": true,
-          "instant": false,
+          "range": false,
+          "instant": true,
           "editorMode": "code"
         },
         {
@@ -368,8 +368,8 @@
           "refId": "B",
           "expr": "(hass_sensor_weight_g{entity=\"sensor.a1_combo_print_weight\"}) and on() ((hass_binary_sensor_state{entity=\"binary_sensor.a1_combo_online\"} == 1) and on() (hass_sensor_duration_h{entity=\"sensor.a1_combo_remaining_time\"} > 0))",
           "legendFormat": "Weight",
-          "range": true,
-          "instant": false,
+          "range": false,
+          "instant": true,
           "editorMode": "code"
         }
       ],
