@@ -9,7 +9,7 @@
   ],
   "description": "Bambu A1 via Home Assistant (ha-bambulab) -> HA prometheus integration -> Prometheus on docker. PEP-HL-SLT-028.",
   "schemaVersion": 39,
-  "version": 3,
+  "version": 4,
   "editable": true,
   "graphTooltip": 1,
   "time": {
@@ -60,7 +60,7 @@
             "uid": "prometheus"
           },
           "refId": "A",
-          "expr": "hass_sensor_unit_percent{entity=\"sensor.a1_combo_print_progress\"}",
+          "expr": "(hass_sensor_unit_percent{entity=\"sensor.a1_combo_print_progress\"}) and on() ((hass_binary_sensor_state{entity=\"binary_sensor.a1_combo_online\"} == 1) and on() (hass_sensor_duration_h{entity=\"sensor.a1_combo_remaining_time\"} > 0))",
           "legendFormat": "Progress",
           "range": true,
           "instant": false,
@@ -87,7 +87,8 @@
                 "value": 100
               }
             ]
-          }
+          },
+          "noValue": "Idle"
         },
         "overrides": []
       },
@@ -102,13 +103,14 @@
         "showThresholdMarkers": false,
         "showThresholdLabels": false
       },
-      "transparent": true
+      "transparent": true,
+      "description": "Shown only while a job is running (printer online and time remaining); otherwise \"Idle\"."
     },
     {
       "id": 3,
       "type": "stat",
       "title": "Layer",
-      "description": "",
+      "description": "Shown only while a job is running (printer online and time remaining); otherwise \"Idle\".",
       "datasource": {
         "type": "prometheus",
         "uid": "prometheus"
@@ -126,7 +128,7 @@
             "uid": "prometheus"
           },
           "refId": "A",
-          "expr": "hass_sensor_state{entity=\"sensor.a1_combo_current_layer\"}",
+          "expr": "(hass_sensor_state{entity=\"sensor.a1_combo_current_layer\"}) and on() ((hass_binary_sensor_state{entity=\"binary_sensor.a1_combo_online\"} == 1) and on() (hass_sensor_duration_h{entity=\"sensor.a1_combo_remaining_time\"} > 0))",
           "legendFormat": "Current",
           "range": true,
           "instant": false,
@@ -138,7 +140,7 @@
             "uid": "prometheus"
           },
           "refId": "B",
-          "expr": "hass_sensor_state{entity=\"sensor.a1_combo_total_layer_count\"}",
+          "expr": "(hass_sensor_state{entity=\"sensor.a1_combo_total_layer_count\"}) and on() ((hass_binary_sensor_state{entity=\"binary_sensor.a1_combo_online\"} == 1) and on() (hass_sensor_duration_h{entity=\"sensor.a1_combo_remaining_time\"} > 0))",
           "legendFormat": "Total",
           "range": true,
           "instant": false,
@@ -161,7 +163,8 @@
             ]
           },
           "mappings": [],
-          "decimals": 0
+          "decimals": 0,
+          "noValue": "Idle"
         },
         "overrides": []
       },
@@ -187,7 +190,7 @@
       "id": 4,
       "type": "stat",
       "title": "Time remaining",
-      "description": "From the printer. 0 when idle.",
+      "description": "From the printer. 0 when idle. Shown only while a job is running (printer online and time remaining); otherwise \"Idle\".",
       "datasource": {
         "type": "prometheus",
         "uid": "prometheus"
@@ -205,7 +208,7 @@
             "uid": "prometheus"
           },
           "refId": "A",
-          "expr": "hass_sensor_duration_h{entity=\"sensor.a1_combo_remaining_time\"} * 3600",
+          "expr": "(hass_sensor_duration_h{entity=\"sensor.a1_combo_remaining_time\"} * 3600) and on() ((hass_binary_sensor_state{entity=\"binary_sensor.a1_combo_online\"} == 1) and on() (hass_sensor_duration_h{entity=\"sensor.a1_combo_remaining_time\"} > 0))",
           "legendFormat": "Remaining",
           "range": true,
           "instant": false,
@@ -227,7 +230,8 @@
               }
             ]
           },
-          "mappings": []
+          "mappings": [],
+          "noValue": "Idle"
         },
         "overrides": []
       },
@@ -253,7 +257,7 @@
       "id": 5,
       "type": "stat",
       "title": "Started / expected end",
-      "description": "Times of the current job, or the last one when idle.",
+      "description": "Times of the current job, or the last one when idle. Shown only while a job is running (printer online and time remaining); otherwise \"Idle\".",
       "datasource": {
         "type": "prometheus",
         "uid": "prometheus"
@@ -271,7 +275,7 @@
             "uid": "prometheus"
           },
           "refId": "A",
-          "expr": "hass_sensor_timestamp_seconds{entity=\"sensor.a1_combo_start_time\"} * 1000",
+          "expr": "(hass_sensor_timestamp_seconds{entity=\"sensor.a1_combo_start_time\"} * 1000) and on() ((hass_binary_sensor_state{entity=\"binary_sensor.a1_combo_online\"} == 1) and on() (hass_sensor_duration_h{entity=\"sensor.a1_combo_remaining_time\"} > 0))",
           "legendFormat": "Started",
           "range": true,
           "instant": false,
@@ -283,7 +287,7 @@
             "uid": "prometheus"
           },
           "refId": "B",
-          "expr": "hass_sensor_timestamp_seconds{entity=\"sensor.a1_combo_end_time\"} * 1000",
+          "expr": "(hass_sensor_timestamp_seconds{entity=\"sensor.a1_combo_end_time\"} * 1000) and on() ((hass_binary_sensor_state{entity=\"binary_sensor.a1_combo_online\"} == 1) and on() (hass_sensor_duration_h{entity=\"sensor.a1_combo_remaining_time\"} > 0))",
           "legendFormat": "Expected end",
           "range": true,
           "instant": false,
@@ -305,7 +309,8 @@
               }
             ]
           },
-          "mappings": []
+          "mappings": [],
+          "noValue": "Idle"
         },
         "overrides": []
       },
@@ -331,7 +336,7 @@
       "id": 6,
       "type": "stat",
       "title": "Filament this job",
-      "description": "From the slicer estimate of the current or last job. Not a running total.",
+      "description": "From the slicer estimate of the current or last job. Not a running total. Shown only while a job is running (printer online and time remaining); otherwise \"Idle\".",
       "datasource": {
         "type": "prometheus",
         "uid": "prometheus"
@@ -349,7 +354,7 @@
             "uid": "prometheus"
           },
           "refId": "A",
-          "expr": "hass_sensor_distance_m{entity=\"sensor.a1_combo_print_length\"}",
+          "expr": "(hass_sensor_distance_m{entity=\"sensor.a1_combo_print_length\"}) and on() ((hass_binary_sensor_state{entity=\"binary_sensor.a1_combo_online\"} == 1) and on() (hass_sensor_duration_h{entity=\"sensor.a1_combo_remaining_time\"} > 0))",
           "legendFormat": "Length",
           "range": true,
           "instant": false,
@@ -361,7 +366,7 @@
             "uid": "prometheus"
           },
           "refId": "B",
-          "expr": "hass_sensor_weight_g{entity=\"sensor.a1_combo_print_weight\"}",
+          "expr": "(hass_sensor_weight_g{entity=\"sensor.a1_combo_print_weight\"}) and on() ((hass_binary_sensor_state{entity=\"binary_sensor.a1_combo_online\"} == 1) and on() (hass_sensor_duration_h{entity=\"sensor.a1_combo_remaining_time\"} > 0))",
           "legendFormat": "Weight",
           "range": true,
           "instant": false,
@@ -384,7 +389,8 @@
             ]
           },
           "mappings": [],
-          "decimals": 1
+          "decimals": 1,
+          "noValue": "Idle"
         },
         "overrides": [
           {
