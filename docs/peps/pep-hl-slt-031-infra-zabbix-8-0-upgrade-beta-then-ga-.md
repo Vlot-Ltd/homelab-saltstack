@@ -3,11 +3,11 @@
 **ID:** PEP-HL-SLT-031  
 **Title:** Zabbix 8.0 upgrade (beta, then GA)  
 **Author:** Timo Vlot  
-**Status:** Draft  
+**Status:** Active  
 **Type:** Infrastructure  
 **Priority:** Medium  
 **Created:** 2026-10-16  
-**Updated:** 2026-10-16  
+**Updated:** 2026-10-17  
 **Supersedes:** N/A  
 **Superseded-By:** N/A  
 
@@ -104,6 +104,11 @@ Planning detail lives in the vault note `30-projects/homelab-zabbix-8-upgrade.md
   check frontend and latest data.
 - Commit the `repo.sls` change, `test=True`, unpause highstate.
 
+- **Done 2026-10-17:** 8.0.0rc1 (`2:8.0.0~rc1-2`, from the `8.0/unstable` repo).
+  Schema upgraded automatically by the server on start in about two minutes. All
+  steps ran from the master via `cmd.run` (use `cmd='…'` when the command contains
+  `=`). Old 7.4 repo file removed; `test=True` clean; schedule re-enabled.
+
 ### Phase 3: Vault integration
 
 - Vault policy (read on Zabbix's paths only) and an AppRole for `zabbix`.
@@ -158,3 +163,4 @@ Planning detail lives in the vault note `30-projects/homelab-zabbix-8-upgrade.md
 |---------|------|--------|---------|
 | 0.1 | 2026-10-16 | Timo Vlot | Initial draft |
 | 0.2 | 2026-10-16 | Timo Vlot | Phase 1 checks done; Grafana plugin risk researched |
+| 0.3 | 2026-10-17 | Timo Vlot | Phase 2 done: 8.0.0rc1 live |
