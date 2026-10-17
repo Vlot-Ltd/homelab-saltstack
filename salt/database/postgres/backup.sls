@@ -16,6 +16,16 @@ backup-nfs-mount:
       - pkg: nfs-common
       - file: /backups
 
+# The postgres user writes here; before 2026-10-17 it was root-owned and every run failed.
+postgres-backup-dir:
+  file.directory:
+    - name: /backups/postgresql
+    - user: postgres
+    - group: postgres
+    - mode: '0750'
+    - require:
+      - mount: /backups
+
 postgres-backup-script:
   file.managed:
     - name: /usr/local/bin/postgres_backup.sh
@@ -38,12 +48,19 @@ postgres-backup-cron:
     - require:
       - pkg: cron
 
-  cron.present:
+  cron.absent:
     - name: /usr/local/bin/postgres_backup.sh
+    - user: postgres
+
+postgres-backup-cron-logged:
+  cron.present:
+    - name: /usr/local/bin/postgres_backup.sh >> /var/log/postgresql/postgres_backup.log 2>&1
+    - identifier: postgres-backup
     - user: postgres
     - minute: '0'
     - hour: '2'
     - comment: "Daily PostgreSQL backup at 2 AM"
     - require:
       - file: /usr/local/bin/postgres_backup.sh
+      - file: postgres-backup-dir
       - service: cron
