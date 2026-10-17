@@ -65,8 +65,13 @@ adds its own provisioning file.
 - **Dashboards:** a file provider (`/etc/grafana/provisioning/dashboards/`)
   pointing at a git-managed directory, so dashboards from the observability work
   are committed JSON (`allowUiUpdates: false` for those).
-- **Plugins:** `alexanderzobnin-zabbix-app` installed with an `unless` guard; the
-  unguarded `list-remote` check removed.
+- **Plugins:** `alexanderzobnin-zabbix-app` (and `yesoreyeram-infinity-datasource`)
+  installed with an `unless` guard; the unguarded `list-remote` check removed.
+  Use **`grafana cli`, not the deprecated `grafana-cli`**, with the paths spelled
+  out, because outside the service it can't find them:
+  `grafana cli --homepath /usr/share/grafana --config /etc/grafana/grafana.ini --pluginsDir /var/lib/grafana/plugins plugins install <id>`,
+  guarded by `unless: test -d /var/lib/grafana/plugins/<id>`. That's the pattern in
+  `datasource-homeassistant.sls` (2026-10-17).
 - **Repo:** `apt.grafana.com` with the current keyring method. The package version
   pinned in pillar, upgraded by a commit.
 - **Secrets:** admin password and datasource passwords from Vault pillar only
@@ -104,7 +109,7 @@ adds its own provisioning file.
 ### Phase 0: Inventory and backup (read-only)
 
 - `grafana-server -v`; `grep -vE '^\s*(;|#|$)' /etc/grafana/grafana.ini`;
-  `ls -l /etc/grafana/provisioning/*/`; `grafana-cli plugins ls`.
+  `ls -l /etc/grafana/provisioning/*/`; `ls /var/lib/grafana/plugins/`.
 - Datasources and dashboards from the API (admin login), saved to files.
 - `tar czf /root/grafana-backup-<date>.tgz /etc/grafana /var/lib/grafana/grafana.db`.
 

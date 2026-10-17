@@ -31,3 +31,4 @@ base:
   'zabbix':
     - application.zabbix.server
     - application.grafana.datasource-prometheus
+    - application.grafana.datasource-homeassistant
