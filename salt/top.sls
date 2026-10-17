@@ -5,7 +5,7 @@ base:
   'kernel:Linux':
     - match: grain
     - os.linux
-    #- application.zabbix
+    - application.zabbix   # agent2; re-enabled 2026-10-17 (PEP-HL-SLT-031), works on Debian now
   'os:MacOS':
     - match: grain
     - os.mac.brew_update
