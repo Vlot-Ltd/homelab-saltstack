@@ -7,10 +7,14 @@
 # homeassistant_grafana_token (a long-lived HA token, own one for Grafana).
 {%- set ha_url = salt['pillar.get']('grafana_homeassistant_url', 'http://192.168.0.24:8123') %}
 
+# grafana-cli is deprecated and, run outside the service, can't find Grafana's
+# homepath or the Debian package's plugin dir. Spell both out (hit 2026-10-17).
 grafana-plugin-infinity:
   cmd.run:
-    - name: grafana-cli plugins install yesoreyeram-infinity-datasource
-    - unless: grafana-cli plugins ls | grep -q yesoreyeram-infinity-datasource
+    - name: >-
+        grafana cli --homepath /usr/share/grafana --config /etc/grafana/grafana.ini
+        --pluginsDir /var/lib/grafana/plugins plugins install yesoreyeram-infinity-datasource
+    - unless: test -d /var/lib/grafana/plugins/yesoreyeram-infinity-datasource
 
 grafana-datasource-homeassistant:
   file.managed:
@@ -32,7 +36,7 @@ grafana-datasource-homeassistant:
               allowedHosts:
                 - {{ ha_url }}
             secureJsonData:
-              bearerToken: {{ salt['pillar.get']('homeassistant_grafana_token') | yaml_dquote }}
+              bearerToken: {{ salt['pillar.get']('homeassistant_grafana_token', '') | trim | yaml_dquote }}
     - require:
       - cmd: grafana-plugin-infinity
 
