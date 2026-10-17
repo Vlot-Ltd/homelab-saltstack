@@ -9,7 +9,7 @@
   ],
   "description": "Bambu A1 via Home Assistant (ha-bambulab) -> HA prometheus integration -> Prometheus on docker. PEP-HL-SLT-028.",
   "schemaVersion": 39,
-  "version": 6,
+  "version": 7,
   "editable": true,
   "graphTooltip": 1,
   "time": {
@@ -27,9 +27,9 @@
   "links": [],
   "panels": [
     {
-      "id": 26,
+      "id": 1,
       "type": "row",
-      "title": "Now printing",
+      "title": "Current job",
       "collapsed": false,
       "gridPos": {
         "h": 1,
@@ -50,8 +50,8 @@
       },
       "transparent": true,
       "gridPos": {
-        "h": 6,
-        "w": 5,
+        "h": 9,
+        "w": 4,
         "x": 0,
         "y": 1
       },
@@ -78,7 +78,8 @@
               "text": "Cover",
               "type": "string"
             }
-          ]
+          ],
+          "filterExpression": "Cover != \"\""
         }
       ],
       "fieldConfig": {
@@ -89,7 +90,7 @@
               "type": "image"
             }
           },
-          "noValue": " "
+          "noValue": "Idle"
         },
         "overrides": []
       },
@@ -112,9 +113,9 @@
       },
       "transparent": true,
       "gridPos": {
-        "h": 6,
-        "w": 19,
-        "x": 5,
+        "h": 3,
+        "w": 20,
+        "x": 4,
         "y": 1
       },
       "targets": [
@@ -184,19 +185,6 @@
       }
     },
     {
-      "id": 1,
-      "type": "row",
-      "title": "Current job",
-      "collapsed": false,
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 7
-      },
-      "panels": []
-    },
-    {
       "id": 2,
       "type": "gauge",
       "title": "Progress",
@@ -207,8 +195,8 @@
       "gridPos": {
         "h": 6,
         "w": 4,
-        "x": 0,
-        "y": 8
+        "x": 4,
+        "y": 4
       },
       "targets": [
         {
@@ -275,8 +263,8 @@
       "gridPos": {
         "h": 6,
         "w": 4,
-        "x": 4,
-        "y": 8
+        "x": 8,
+        "y": 4
       },
       "targets": [
         {
@@ -355,8 +343,8 @@
       "gridPos": {
         "h": 6,
         "w": 4,
-        "x": 8,
-        "y": 8
+        "x": 12,
+        "y": 4
       },
       "targets": [
         {
@@ -421,9 +409,9 @@
       },
       "gridPos": {
         "h": 6,
-        "w": 6,
-        "x": 12,
-        "y": 8
+        "w": 4,
+        "x": 16,
+        "y": 4
       },
       "targets": [
         {
@@ -500,9 +488,9 @@
       },
       "gridPos": {
         "h": 6,
-        "w": 6,
-        "x": 18,
-        "y": 8
+        "w": 4,
+        "x": 20,
+        "y": 4
       },
       "targets": [
         {
@@ -603,7 +591,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 14
+        "y": 10
       },
       "panels": []
     },
@@ -619,7 +607,7 @@
         "h": 8,
         "w": 16,
         "x": 0,
-        "y": 15
+        "y": 11
       },
       "description": "Daily increase of the printer's lifetime usage counter.",
       "targets": [
@@ -682,7 +670,7 @@
         "h": 4,
         "w": 4,
         "x": 16,
-        "y": 15
+        "y": 11
       },
       "targets": [
         {
@@ -749,7 +737,7 @@
         "h": 4,
         "w": 4,
         "x": 20,
-        "y": 15
+        "y": 11
       },
       "targets": [
         {
@@ -816,7 +804,7 @@
         "h": 4,
         "w": 4,
         "x": 16,
-        "y": 19
+        "y": 15
       },
       "targets": [
         {
@@ -883,7 +871,7 @@
         "h": 4,
         "w": 4,
         "x": 20,
-        "y": 19
+        "y": 15
       },
       "targets": [
         {
@@ -953,7 +941,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 23
+        "y": 19
       },
       "panels": []
     },
@@ -969,7 +957,7 @@
         "h": 8,
         "w": 16,
         "x": 0,
-        "y": 24
+        "y": 20
       },
       "targets": [
         {
@@ -1082,7 +1070,7 @@
         "h": 8,
         "w": 8,
         "x": 16,
-        "y": 24
+        "y": 20
       },
       "targets": [
         {
@@ -1150,7 +1138,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 32
+        "y": 28
       },
       "panels": []
     },
@@ -1166,7 +1154,7 @@
         "h": 7,
         "w": 12,
         "x": 0,
-        "y": 33
+        "y": 29
       },
       "targets": [
         {
@@ -1250,7 +1238,7 @@
         "h": 7,
         "w": 8,
         "x": 12,
-        "y": 33
+        "y": 29
       },
       "targets": [
         {
@@ -1335,7 +1323,7 @@
         "h": 7,
         "w": 4,
         "x": 20,
-        "y": 33
+        "y": 29
       },
       "targets": [
         {
@@ -1413,7 +1401,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 40
+        "y": 36
       },
       "panels": []
     },
@@ -1431,7 +1419,7 @@
         "h": 8,
         "w": 16,
         "x": 0,
-        "y": 41
+        "y": 37
       },
       "targets": [
         {
@@ -1491,7 +1479,7 @@
         "h": 4,
         "w": 4,
         "x": 16,
-        "y": 41
+        "y": 37
       },
       "transparent": true,
       "targets": [
@@ -1557,7 +1545,7 @@
         "h": 4,
         "w": 4,
         "x": 20,
-        "y": 41
+        "y": 37
       },
       "transparent": true,
       "targets": [
@@ -1623,7 +1611,7 @@
         "h": 4,
         "w": 4,
         "x": 16,
-        "y": 45
+        "y": 41
       },
       "transparent": true,
       "targets": [
@@ -1689,7 +1677,7 @@
         "h": 4,
         "w": 4,
         "x": 20,
-        "y": 45
+        "y": 41
       },
       "transparent": true,
       "targets": [
