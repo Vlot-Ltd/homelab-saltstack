@@ -4,11 +4,24 @@ include:
 zabbix-agent-packages:
   pkg.installed:
     - pkgs:
-      - zabbix-agent2
-      - zabbix-sender
       - facter
     - require:
       - pkg: install-zabbix-release
+
+{#- latest, not installed: a release-package change (e.g. 8.0 beta -> GA)
+    upgrades the agent on the next highstate (PEP-HL-SLT-031). #}
+zabbix-agent-latest:
+  pkg.latest:
+    - pkgs:
+      - zabbix-agent2
+      - zabbix-sender
+    - refresh: True
+    - require:
+      - pkg: install-zabbix-release
+    - require_in:
+      - file: zabbix-agent2-config
+    - watch_in:
+      - service: zabbix-agent2-service
 
 zabbix-agent2-config:
   file.managed:
