@@ -9,7 +9,7 @@
   ],
   "description": "Bambu A1 via Home Assistant (ha-bambulab) -> HA prometheus integration -> Prometheus on docker. PEP-HL-SLT-028.",
   "schemaVersion": 39,
-  "version": 5,
+  "version": 6,
   "editable": true,
   "graphTooltip": 1,
   "time": {
@@ -27,6 +27,163 @@
   "links": [],
   "panels": [
     {
+      "id": 26,
+      "type": "row",
+      "title": "Now printing",
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "panels": []
+    },
+    {
+      "id": 27,
+      "type": "table",
+      "title": "",
+      "description": "From Home Assistant (Infinity datasource), sensor.a1_current_job: the job name while a print is preparing, running or paused, otherwise Idle. The cover image's URL carries HA's own short-lived token, renewed by HA every few minutes; the dashboard refreshes every minute.",
+      "datasource": {
+        "type": "yesoreyeram-infinity-datasource",
+        "uid": "homeassistant"
+      },
+      "transparent": true,
+      "gridPos": {
+        "h": 6,
+        "w": 5,
+        "x": 0,
+        "y": 1
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "homeassistant"
+          },
+          "refId": "A",
+          "type": "json",
+          "source": "url",
+          "format": "table",
+          "parser": "backend",
+          "url": "http://192.168.0.24:8123/api/states/sensor.a1_current_job",
+          "url_options": {
+            "method": "GET",
+            "data": ""
+          },
+          "root_selector": "",
+          "columns": [
+            {
+              "selector": "attributes.cover_url",
+              "text": "Cover",
+              "type": "string"
+            }
+          ]
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "center",
+            "cellOptions": {
+              "type": "image"
+            }
+          },
+          "noValue": " "
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": false,
+        "cellHeight": "lg",
+        "footer": {
+          "show": false
+        }
+      }
+    },
+    {
+      "id": 28,
+      "type": "stat",
+      "title": "Job",
+      "description": "From Home Assistant (Infinity datasource), sensor.a1_current_job: the job name while a print is preparing, running or paused, otherwise Idle. The cover image's URL carries HA's own short-lived token, renewed by HA every few minutes; the dashboard refreshes every minute.",
+      "datasource": {
+        "type": "yesoreyeram-infinity-datasource",
+        "uid": "homeassistant"
+      },
+      "transparent": true,
+      "gridPos": {
+        "h": 6,
+        "w": 19,
+        "x": 5,
+        "y": 1
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "homeassistant"
+          },
+          "refId": "A",
+          "type": "json",
+          "source": "url",
+          "format": "table",
+          "parser": "backend",
+          "url": "http://192.168.0.24:8123/api/states/sensor.a1_current_job",
+          "url_options": {
+            "method": "GET",
+            "data": ""
+          },
+          "root_selector": "",
+          "columns": [
+            {
+              "selector": "state",
+              "text": "Job",
+              "type": "string"
+            }
+          ]
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "noValue": "Idle",
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "text"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "/^Job$/",
+          "values": false
+        },
+        "colorMode": "none",
+        "graphMode": "none",
+        "textMode": "value",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "wideLayout": true,
+        "text": {
+          "valueSize": 28
+        },
+        "showPercentChange": false
+      }
+    },
+    {
       "id": 1,
       "type": "row",
       "title": "Current job",
@@ -35,7 +192,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 0
+        "y": 7
       },
       "panels": []
     },
@@ -51,7 +208,7 @@
         "h": 6,
         "w": 4,
         "x": 0,
-        "y": 1
+        "y": 8
       },
       "targets": [
         {
@@ -119,7 +276,7 @@
         "h": 6,
         "w": 4,
         "x": 4,
-        "y": 1
+        "y": 8
       },
       "targets": [
         {
@@ -199,7 +356,7 @@
         "h": 6,
         "w": 4,
         "x": 8,
-        "y": 1
+        "y": 8
       },
       "targets": [
         {
@@ -266,7 +423,7 @@
         "h": 6,
         "w": 6,
         "x": 12,
-        "y": 1
+        "y": 8
       },
       "targets": [
         {
@@ -345,7 +502,7 @@
         "h": 6,
         "w": 6,
         "x": 18,
-        "y": 1
+        "y": 8
       },
       "targets": [
         {
@@ -446,7 +603,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 7
+        "y": 14
       },
       "panels": []
     },
@@ -462,7 +619,7 @@
         "h": 8,
         "w": 16,
         "x": 0,
-        "y": 8
+        "y": 15
       },
       "description": "Daily increase of the printer's lifetime usage counter.",
       "targets": [
@@ -525,7 +682,7 @@
         "h": 4,
         "w": 4,
         "x": 16,
-        "y": 8
+        "y": 15
       },
       "targets": [
         {
@@ -592,7 +749,7 @@
         "h": 4,
         "w": 4,
         "x": 20,
-        "y": 8
+        "y": 15
       },
       "targets": [
         {
@@ -659,7 +816,7 @@
         "h": 4,
         "w": 4,
         "x": 16,
-        "y": 12
+        "y": 19
       },
       "targets": [
         {
@@ -726,7 +883,7 @@
         "h": 4,
         "w": 4,
         "x": 20,
-        "y": 12
+        "y": 19
       },
       "targets": [
         {
@@ -796,7 +953,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 16
+        "y": 23
       },
       "panels": []
     },
@@ -812,7 +969,7 @@
         "h": 8,
         "w": 16,
         "x": 0,
-        "y": 17
+        "y": 24
       },
       "targets": [
         {
@@ -925,7 +1082,7 @@
         "h": 8,
         "w": 8,
         "x": 16,
-        "y": 17
+        "y": 24
       },
       "targets": [
         {
@@ -993,7 +1150,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 25
+        "y": 32
       },
       "panels": []
     },
@@ -1009,7 +1166,7 @@
         "h": 7,
         "w": 12,
         "x": 0,
-        "y": 26
+        "y": 33
       },
       "targets": [
         {
@@ -1093,7 +1250,7 @@
         "h": 7,
         "w": 8,
         "x": 12,
-        "y": 26
+        "y": 33
       },
       "targets": [
         {
@@ -1178,7 +1335,7 @@
         "h": 7,
         "w": 4,
         "x": 20,
-        "y": 26
+        "y": 33
       },
       "targets": [
         {
@@ -1256,7 +1413,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 33
+        "y": 40
       },
       "panels": []
     },
@@ -1274,7 +1431,7 @@
         "h": 8,
         "w": 16,
         "x": 0,
-        "y": 34
+        "y": 41
       },
       "targets": [
         {
@@ -1334,7 +1491,7 @@
         "h": 4,
         "w": 4,
         "x": 16,
-        "y": 34
+        "y": 41
       },
       "transparent": true,
       "targets": [
@@ -1400,7 +1557,7 @@
         "h": 4,
         "w": 4,
         "x": 20,
-        "y": 34
+        "y": 41
       },
       "transparent": true,
       "targets": [
@@ -1466,7 +1623,7 @@
         "h": 4,
         "w": 4,
         "x": 16,
-        "y": 38
+        "y": 45
       },
       "transparent": true,
       "targets": [
@@ -1532,7 +1689,7 @@
         "h": 4,
         "w": 4,
         "x": 20,
-        "y": 38
+        "y": 45
       },
       "transparent": true,
       "targets": [

@@ -30,3 +30,6 @@ grafana_datasources:
 
 # PEP-HL-SLT-028 Phase 3: Prometheus on the docker host
 grafana_prometheus_url: "http://docker:9090"
+
+# PEP-HL-SLT-028: Home Assistant (Infinity datasource, Bambu "Now printing")
+grafana_homeassistant_url: "http://192.168.0.24:8123"
