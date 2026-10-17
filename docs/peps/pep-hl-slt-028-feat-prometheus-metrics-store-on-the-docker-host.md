@@ -175,6 +175,8 @@ central Alloy (PEP-015) ──remote_write──► Prometheus :9090 ◄──sc
 - LiteLLM scrape job, using a LiteLLM key from Vault.
 - `billing=api` resource attribute in the `friday` job env files.
 - Compare one week's `billing=api` + LiteLLM total with the Console's usage page.
+  The Console runs about a day behind (confirmed 2026-10-17), so compare a week
+  that ended at least a day ago.
   They should agree within rounding.
 
 Alloy's remote write lands with PEP-HL-SLT-015 Phase 1.
