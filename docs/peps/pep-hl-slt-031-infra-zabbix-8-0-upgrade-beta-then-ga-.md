@@ -109,6 +109,26 @@ Planning detail lives in the vault note `30-projects/homelab-zabbix-8-upgrade.md
   steps ran from the master via `cmd.run` (use `cmd='…'` when the command contains
   `=`). Old 7.4 repo file removed; `test=True` clean; schedule re-enabled.
 
+### Phase 2b: Agents (done 2026-10-17)
+
+All ten Linux minions now run agent2 `2:8.0.0~rc1-2`; `zabbix_get agent.version`
+returns 8.0.0rc1 for each. The agent state had been commented out of `top.sls`
+since 6fa3731 (2025-04-21) because it broke on Debian. Fixes:
+
+- `repo.sls`: repo URL from grains (ubuntu24.04 / debian13), version from pillar
+  `zabbix:version` (default 8.0), `unless` checks the installed major version
+  instead of `creates:` (b29cac5).
+- `init.sls`: `zabbix-agent2` and `zabbix-sender` use `pkg.latest`, so GA arrives
+  with the next highstate (b29cac5).
+- Old repo files are removed only when dpkg marks them `obsolete` in
+  zabbix-release's conffiles (6f261db).
+- `Server=` includes zabbix's Tailscale IP: `friday` and `proxmox` are polled over
+  Tailscale and refused checks without it (7cb4028).
+- `application.zabbix` re-enabled for `kernel:Linux` in `top.sls` (00a8826).
+
+Rolled out canary first (`docker`), then one box at a time. Autoregistration
+metadata on `proxmox` and `nlremote` changed from Debian12 to Debian13.
+
 ### Phase 3: Vault integration
 
 - Vault policy (read on Zabbix's paths only) and an AppRole for `zabbix`.
@@ -164,3 +184,4 @@ Planning detail lives in the vault note `30-projects/homelab-zabbix-8-upgrade.md
 | 0.1 | 2026-10-16 | Timo Vlot | Initial draft |
 | 0.2 | 2026-10-16 | Timo Vlot | Phase 1 checks done; Grafana plugin risk researched |
 | 0.3 | 2026-10-17 | Timo Vlot | Phase 2 done: 8.0.0rc1 live |
+| 0.4 | 2026-10-17 | Timo Vlot | Phase 2b done: all agents on 8.0, agent state re-enabled |
